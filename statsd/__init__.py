@@ -8,7 +8,7 @@ from client import StatsClient
 
 __all__ = ['StatsClient', 'statsd', 'VERSION']
 
-VERSION = (0, 1)
+VERSION = (0, 1, 1)
 __version__ = '.'.join(map(str, VERSION))
 
 
