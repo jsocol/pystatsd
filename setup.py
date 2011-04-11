@@ -4,7 +4,7 @@ import statsd
 
 setup(
     name='statsd',
-    version='.'.join(statsd.VERSION),
+    version=statsd.__version__,
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
