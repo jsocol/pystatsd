@@ -27,3 +27,18 @@ Then instead of instantiating a new client every time, you can just grab::
 
     >>> from statsd import statsd
     >>> statsd.incr('foo')
+
+
+Context Manager
+===============
+
+You can use a ``StatsClient`` instance as a context manager to easily time
+sections of code with the ``timer()`` method::
+
+    >>> from statsd import statsd
+    >>> with statsd.timer('bar'):
+    ...     func()
+    ...     func()
+
+When the managed block exits, the client will automatically send the time it
+took to statsd.
