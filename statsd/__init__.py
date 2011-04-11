@@ -12,6 +12,9 @@ VERSION = (0, 1)
 
 
 if settings:
-    host = getattr(settings, 'STATSD_HOST', 'localhost')
-    port = getattr(settings, 'STATSD_PORT', 8125)
-    statsd = StatsClient(host, port)
+    try:
+        host = getattr(settings, 'STATSD_HOST', 'localhost')
+        port = getattr(settings, 'STATSD_PORT', 8125)
+        statsd = StatsClient(host, port)
+    except ImportError:
+        statsd = None
