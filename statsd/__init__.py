@@ -16,6 +16,7 @@ if settings:
     try:
         host = getattr(settings, 'STATSD_HOST', 'localhost')
         port = getattr(settings, 'STATSD_PORT', 8125)
-        statsd = StatsClient(host, port)
+        prefix = getattr(settings, 'STATSD_PREFIX', None)
+        statsd = StatsClient(host, port, prefix)
     except ImportError:
         statsd = None

@@ -6,10 +6,11 @@ import time
 
 class StatsClient(object):
     """A client for statsd."""
-    def __init__(self, host='localhost', port=8125):
+    def __init__(self, host='localhost', port=8125, prefix=None):
         """Create a new client."""
         self._addr = (host, port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.prefix = prefix
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
@@ -47,6 +48,9 @@ class StatsClient(object):
                 value = '%s|@%s' % (value, rate)
             else:
                 return
+
+        if self.prefix:
+            stat = '%s.%s' % (self.prefix, stat)
 
         try:
             self._sock.sendto('%s:%s' % (stat, value), self._addr)
