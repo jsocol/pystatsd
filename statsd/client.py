@@ -1,14 +1,28 @@
 from functools import wraps
 import random
 import socket
+import threading
 import time
 
 
 class _Timer(object):
     """A contextdecorator for timing."""
+    _local = threading.local()
 
     def __init__(self, cl):
         self.client = cl
+
+    def __delattr__(self, attr):
+        """Store thread-local data safely."""
+        delattr(self._local, attr)
+
+    def __getattr__(self, attr):
+        """Store thread-local data safely."""
+        return getattr(self._local, attr)
+
+    def __setattr__(self, attr, value):
+        """Store thread-local data safely."""
+        setattr(self._local, attr, value)
 
     def __call__(self, stat, rate=1):
         if callable(stat):  # As a decorator, stat may be a function.
@@ -28,6 +42,7 @@ class _Timer(object):
         dt = time.time() - self.start
         dt = int(round(dt * 1000))  # Convert to ms.
         self.client.timing(self.stat, dt, self.rate)
+        del self.start, self.stat, self.rate  # Clean up.
         return False
 
 
