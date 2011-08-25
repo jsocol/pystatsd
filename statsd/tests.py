@@ -1,4 +1,5 @@
 import random
+import re
 
 import mock
 from nose.tools import eq_
@@ -7,6 +8,7 @@ from statsd import StatsClient
 
 
 ADDR = ('localhost', 8125)
+
 
 
 def _client(prefix=None):
@@ -69,8 +71,8 @@ def test_prefix():
 def _timer_check(cl, count, start, end):
     eq_(cl._sock.sendto.call_count, count)
     value = cl._sock.sendto.call_args[0][0]
-    assert value.startswith(start)
-    assert value.endswith(end)
+    exp = re.compile('^%s:\d+|%s$' % (start, end))
+    assert exp.match(value)
 
 
 def test_timer():
@@ -80,7 +82,7 @@ def test_timer():
     with sc.timer('foo'):
         pass
 
-    _timer_check(sc, 1, 'foo:', '|ms')
+    _timer_check(sc, 1, 'foo', 'ms')
 
     @sc.timer('bar')
     def bar():
@@ -88,7 +90,7 @@ def test_timer():
 
     bar()
 
-    _timer_check(sc, 2, 'bar:', '|ms')
+    _timer_check(sc, 2, 'bar', 'ms')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -98,7 +100,7 @@ def test_timer_rate():
     with sc.timer('foo', rate=0.5):
         pass
 
-    _timer_check(sc, 1, 'foo:', '|ms|@0.5')
+    _timer_check(sc, 1, 'foo', 'ms|@0.5')
 
     @sc.timer('bar', rate=0.1)
     def bar():
@@ -106,4 +108,4 @@ def test_timer_rate():
 
     bar()
 
-    _timer_check(sc, 2, 'bar:', '|ms|@0.1')
+    _timer_check(sc, 2, 'bar', 'ms|@0.1')
