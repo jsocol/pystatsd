@@ -42,3 +42,44 @@ sections of code with the ``timer()`` method::
 
 When the managed block exits, the client will automatically send the time it
 took to statsd.
+
+
+Decorator
+=========
+
+You can *also* use a ``StatsClient`` instance as a decorator, also with the
+``timer()`` method::
+
+    >>> from statsd import statsd
+    >>> @statsd.timer('bar')
+    ... def foo():
+    ...     pass
+
+Every time ``foo()`` is called, timing information will be sent to the stat
+``bar``.
+
+
+Sample Rates
+============
+
+All methods support an optional ``rate`` (kw)arg. This is a float between 0 and
+1 that specifies what fraction of data to send through (for a specific call).
+Sample rates are recorded by statsd.
+
+For example, here ``foo`` will be incremented approximately 50% of the time::
+
+    >>> from statsd import statsd
+    >>> statsd.incr('foo', 1, rate=0.5)
+
+Statsd understands that this is a 50% sample rate and will adjust accordingly.
+
+Similarly with ``decr()`` and timings::
+
+    >>> from statsd import statsd
+    >>> statsd.decr('foo', 1, rate=0.5)
+    >>> statsd.timing('foo', 320, rate=0.25)
+    >>> with statsd.timer('bar', rate=0.1):
+    ...    pass
+    >>> @statsd.timer('bar', rate=0.5)
+    ... def foo():
+    ...     pass

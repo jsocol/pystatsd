@@ -59,12 +59,18 @@ def test_timing():
     _sock_check(sc, 3, 'foo:100|ms|@0.5')
 
 
-@mock.patch.object(random, 'random', lambda: -1)
 def test_prefix():
     sc = _client('foo')
 
     sc.incr('bar')
     _sock_check(sc, 1, 'foo.bar:1|c')
+
+
+def _timer_check(cl, count, start, end):
+    eq_(cl._sock.sendto.call_count, count)
+    value = cl._sock.sendto.call_args[0][0]
+    assert value.startswith(start)
+    assert value.endswith(end)
 
 
 def test_timer():
@@ -73,10 +79,8 @@ def test_timer():
 
     with sc.timer('foo'):
         pass
-    eq_(sc._sock.sendto.call_count, 1)
-    value = sc._sock.sendto.call_args[0][0]
-    assert value.startswith('foo:')
-    assert value.endswith('|ms')
+
+    _timer_check(sc, 1, 'foo:', '|ms')
 
     @sc.timer('bar')
     def bar():
@@ -84,7 +88,22 @@ def test_timer():
 
     bar()
 
-    eq_(sc._sock.sendto.call_count, 2)
-    value = sc._sock.sendto.call_args[0][0]
-    assert value.startswith('bar:')
-    assert value.endswith('|ms')
+    _timer_check(sc, 2, 'bar:', '|ms')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_timer_rate():
+    sc = _client()
+
+    with sc.timer('foo', rate=0.5):
+        pass
+
+    _timer_check(sc, 1, 'foo:', '|ms|@0.5')
+
+    @sc.timer('bar', rate=0.1)
+    def bar():
+        pass
+
+    bar()
+
+    _timer_check(sc, 2, 'bar:', '|ms|@0.1')

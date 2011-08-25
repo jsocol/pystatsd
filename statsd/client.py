@@ -4,7 +4,7 @@ import socket
 import time
 
 
-class Timer(object):
+class _Timer(object):
     """A contextdecorator for timing."""
 
     def __init__(self, cl):
@@ -39,7 +39,7 @@ class StatsClient(object):
         self._addr = (host, port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.prefix = prefix
-        self.timer = Timer(self)
+        self.timer = _Timer(self)
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
