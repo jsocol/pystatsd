@@ -7,22 +7,35 @@ import time
 
 class Timer(object):
     """A contextdecorator for timing."""
+    stat = None
+    rate = None
+
     def __init__(self, cl):
         self.client = cl
 
     def __call__(self, stat, rate=1):
+        self.stat = stat
+        self.rate = rate
+        this = self
         def decorator(fn):
             @wraps(fn)
             def wrapped(*a, **kw):
-                with self(stat, rate=rate):
+                with this:
                     return fn(*a, **kw)
             return wrapped
         return decorator
 
-    def __enter__(self, stat, rate=1):
+    def __enter__(self, stat=None, rate=None):
         self.start = time.time()
-        self.stat = stat
-        self.rate = rate
+        if stat is not None:
+            self.stat = stat
+        elif self.stat is None:
+            raise TypeError("'stat' is not defined")
+
+        if rate is not None:
+            self.rate = rate
+        elif self.rate is None:
+            raise TypeError("'rate' is not defined")
 
     def __exit__(self, typ, value, tb):
         dt = time.time() - self.start
