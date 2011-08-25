@@ -1,0 +1,90 @@
+import random
+
+import mock
+from nose.tools import eq_
+
+from statsd import StatsClient
+
+
+ADDR = ('localhost', 8125)
+
+
+def _client(prefix=None):
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix)
+    sc._sock = mock.Mock()
+    return sc
+
+
+def _sock_check(cl, count, val):
+    eq_(cl._sock.sendto.call_count, count)
+    eq_(cl._sock.sendto.call_args, ((val, ADDR), {}))
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_incr():
+    sc = _client()
+
+    sc.incr('foo')
+    _sock_check(sc, 1, 'foo:1|c')
+
+    sc.incr('foo', 10)
+    _sock_check(sc, 2, 'foo:10|c')
+
+    sc.incr('foo', 10, rate=0.5)
+    _sock_check(sc, 3, 'foo:10|c|@0.5')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_decr():
+    sc = _client()
+
+    sc.decr('foo')
+    _sock_check(sc, 1, 'foo:-1|c')
+
+    sc.decr('foo', 10)
+    _sock_check(sc, 2, 'foo:-10|c')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_timing():
+    sc = _client()
+
+    sc.timing('foo', 100)
+    _sock_check(sc, 1, 'foo:100|ms')
+
+    sc.timing('foo', 350)
+    _sock_check(sc, 2, 'foo:350|ms')
+
+    sc.timing('foo', 100, rate=0.5)
+    _sock_check(sc, 3, 'foo:100|ms|@0.5')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_prefix():
+    sc = _client('foo')
+
+    sc.incr('bar')
+    _sock_check(sc, 1, 'foo.bar:1|c')
+
+
+def test_timer():
+    """StatsClient.timer is a context decorator."""
+    sc = _client()
+
+    with sc.timer('foo'):
+        pass
+    eq_(sc._sock.sendto.call_count, 1)
+    value = sc._sock.sendto.call_args[0][0]
+    assert value.startswith('foo:')
+    assert value.endswith('|ms')
+
+    @sc.timer('bar')
+    def bar():
+        pass
+
+    bar()
+
+    eq_(sc._sock.sendto.call_count, 2)
+    value = sc._sock.sendto.call_args[0][0]
+    assert value.startswith('bar:')
+    assert value.endswith('|ms')

@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from functools import wraps
 import random
 import socket
@@ -7,42 +6,29 @@ import time
 
 class Timer(object):
     """A contextdecorator for timing."""
-    stat = None
-    rate = None
 
     def __init__(self, cl):
         self.client = cl
 
     def __call__(self, stat, rate=1):
+        if callable(stat):  # As a decorator, stat may be a function.
+            @wraps(stat)
+            def wrapped(*a, **kw):
+                with self:
+                    return stat(*a, **kw)
+            return wrapped
         self.stat = stat
         self.rate = rate
-        this = self
-        def decorator(fn):
-            @wraps(fn)
-            def wrapped(*a, **kw):
-                with this:
-                    return fn(*a, **kw)
-            return wrapped
-        return decorator
+        return self
 
-    def __enter__(self, stat=None, rate=None):
+    def __enter__(self):
         self.start = time.time()
-        if stat is not None:
-            self.stat = stat
-        elif self.stat is None:
-            raise TypeError("'stat' is not defined")
-
-        if rate is not None:
-            self.rate = rate
-        elif self.rate is None:
-            raise TypeError("'rate' is not defined")
 
     def __exit__(self, typ, value, tb):
         dt = time.time() - self.start
         dt = int(round(dt * 1000))  # Convert to ms.
         self.client.timing(self.stat, dt, self.rate)
-        if any((typ, value, rb)):
-            raise typ, value, tb
+        return False
 
 
 class StatsClient(object):
