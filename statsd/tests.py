@@ -93,6 +93,14 @@ def test_timer():
     _timer_check(sc, 2, 'bar', 'ms')
 
 
+def test_timer_capture():
+    """You can capture the output of StatsClient.timer."""
+    sc = _client()
+    with sc.timer('woo') as result:
+        eq_(result.ms, None)
+    assert isinstance(result.ms, int)
+
+
 @mock.patch.object(random, 'random', lambda: -1)
 def test_timer_rate():
     sc = _client()
