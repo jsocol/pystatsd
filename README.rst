@@ -56,6 +56,14 @@ sections of code with the ``timer()`` method::
 When the managed block exits, the client will automatically send the time it
 took to statsd.
 
+If you'd like to catpure the elapsed time, add a variable to the ``with``
+block::
+
+    >>> from statsd import statsd
+    >>> with statsd.timer('bar') as timer:
+    ...     func()
+    >>> print timer.ms  # Elapsed time in milliseconds.
+
 
 Decorator
 =========
