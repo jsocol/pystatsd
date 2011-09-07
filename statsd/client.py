@@ -16,7 +16,12 @@ class _Timer(object):
     _local = threading.local()
 
     def __init__(self, cl):
-        self.client = cl
+        # We have to make sure the client is attached directly to __dict__
+        # because the __setattr__ below is so clever. Otherwise the client
+        # becomes a thread-local object even though the connection is for the
+        # whole process. This error was witnessed under mod_wsgi when using an
+        # ImportScript.
+        self.__dict__['client'] = cl
 
     def __delattr__(self, attr):
         """Store thread-local data safely."""
