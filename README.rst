@@ -6,6 +6,9 @@ A Python statsd client
 <http://graphite.wikidot.com/>`_. This is a Python client for the statsd
 daemon.
 
+You can install either from github at <https://github.com/jsocol/pystatsd> or 
+using easy_install/pip from PyPi at <http://pypi.python.org/pypi/statsd/>
+
 To use::
 
     >>> import statsd
