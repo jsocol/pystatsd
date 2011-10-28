@@ -20,6 +20,26 @@ You can also add a prefix to all your stats::
     >>> c.incr('bar')  # Will be 'foo.bar' in statsd/graphite.
 
 
+Installing
+==========
+
+The easiest way to install statsd is with pip!
+
+You can install from PyPI::
+
+    $ pip install statsd
+
+Or GitHub::
+
+    $ pip install -e git+https://github.com/jsocol/pystatsd#egg=statsd
+
+Or from source::
+
+    $ git clone https://github.com/jsocol/pystatsd
+    $ cd statsd
+    $ python setup.py install
+
+
 In Django
 =========
 
