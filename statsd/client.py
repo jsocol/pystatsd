@@ -1,63 +1,33 @@
 from functools import wraps
 import random
 import socket
-import threading
 import time
 
 
-class TimerResult(object):
-
-    def __init__(self, ms=None):
-        self.ms = ms
-
-
 class _Timer(object):
-    """A contextdecorator for timing."""
-    _local = threading.local()
+    """A context manager/decorator for statsd.timing()."""
 
-    def __init__(self, cl):
-        # We have to make sure the client is attached directly to __dict__
-        # because the __setattr__ below is so clever. Otherwise the client
-        # becomes a thread-local object even though the connection is for the
-        # whole process. This error was witnessed under mod_wsgi when using an
-        # ImportScript.
-        self.__dict__['client'] = cl
-
-    def __delattr__(self, attr):
-        """Store thread-local data safely."""
-        delattr(self._local, attr)
-
-    def __getattr__(self, attr):
-        """Store thread-local data safely."""
-        return getattr(self._local, attr)
-
-    def __setattr__(self, attr, value):
-        """Store thread-local data safely."""
-        setattr(self._local, attr, value)
-
-    def __call__(self, stat, rate=1):
-        if callable(stat):  # As a decorator, stat may be a function.
-            @wraps(stat)
-            def wrapped(*a, **kw):
-                with self:
-                    return stat(*a, **kw)
-            return wrapped
+    def __init__(self, client, stat, rate=1):
+        self.client = client
         self.stat = stat
         self.rate = rate
-        return self
+        self.ms = None
+
+    def __call__(self, f):
+        @wraps(f)
+        def wrapper(*args, **kw):
+            with self:
+                return f(*args, **kw)
+        return wrapper
 
     def __enter__(self):
         self.start = time.time()
-        self.result = TimerResult()
-        return self.result
+        return self
 
     def __exit__(self, typ, value, tb):
         dt = time.time() - self.start
-        dt = int(round(dt * 1000))  # Convert to ms.
-        self.result.ms = dt
-        self.client.timing(self.stat, dt, self.rate)
-        del self.start, self.stat, self.rate, self.result  # Clean up.
-        return False
+        self.ms = int(round(1000 * dt))  # Convert to ms.
+        self.client.timing(self.stat, self.ms, self.rate)
 
 
 class StatsClient(object):
@@ -68,7 +38,9 @@ class StatsClient(object):
         self._addr = (host, port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.prefix = prefix
-        self.timer = _Timer(self)
+
+    def timer(self, stat, rate=1):
+        return _Timer(self, stat, rate)
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
