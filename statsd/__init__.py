@@ -1,9 +1,8 @@
 try:
     from django.conf import settings
+    from django.utils.importlib import import_module
 except ImportError:
     settings = None
-
-from client import StatsClient
 
 
 __all__ = ['StatsClient', 'statsd']
@@ -14,9 +13,10 @@ __version__ = '.'.join(map(str, VERSION))
 
 if settings:
     try:
+        client = getattr(settings, 'STATSD_CLIENT', 'statsd.client')
         host = getattr(settings, 'STATSD_HOST', 'localhost')
         port = getattr(settings, 'STATSD_PORT', 8125)
         prefix = getattr(settings, 'STATSD_PREFIX', None)
-        statsd = StatsClient(host, port, prefix)
+        statsd = import_module(client).StatsClient(host, port, prefix)
     except ImportError:
         statsd = None
