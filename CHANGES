@@ -1,0 +1,23 @@
+Statsd Changelog
+================
+
+Version 0.4.0
+-------------
+
+- Look up IP addresses once per client instance.
+- Support IPv6.
+
+
+Version 0.3.0
+-------------
+
+- Improve StatsClient.timer.
+- Remove nasty threadlocal stuff.
+- Return result of StatsClient.timer.
+
+
+Version 0.2.0
+-------------
+
+- Optional prefix for all stats.
+- Introduce StatsClient.timer context decorator.
