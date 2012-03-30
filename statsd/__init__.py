@@ -17,7 +17,7 @@ __version__ = '.'.join(map(str, VERSION))
 if settings:
     try:
         host = getattr(settings, 'STATSD_HOST', 'localhost')
-        host = socket.gethostbyaddr(host)[2][0]
+        host = socket.gethostbyname(host)
         port = getattr(settings, 'STATSD_PORT', 8125)
         prefix = getattr(settings, 'STATSD_PREFIX', None)
         statsd = StatsClient(host, port, prefix)
