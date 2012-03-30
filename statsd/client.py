@@ -35,7 +35,8 @@ class StatsClient(object):
 
     def __init__(self, host='localhost', port=8125, prefix=None):
         """Create a new client."""
-        self._addr = (host, port)
+        # Use getaddrinfo to support IPv4/6.
+        self._addr = socket.getaddrinfo(host, port)[4]
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.prefix = prefix
 
