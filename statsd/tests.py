@@ -1,5 +1,6 @@
 import random
 import re
+import socket
 
 import mock
 from nose.tools import eq_
@@ -7,7 +8,8 @@ from nose.tools import eq_
 from statsd import StatsClient
 
 
-ADDR = ('localhost', 8125)
+IN_ADDR = ('localhost', 8125)
+ADDR = socket.getaddrinfo(*IN_ADDR)[0][4]
 
 
 
