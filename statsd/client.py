@@ -55,6 +55,10 @@ class StatsClient(object):
         """Decrement a stat by `count`."""
         self.incr(stat, -count, rate)
 
+    def gauge(self, stat, value, rate=1):
+        """Set a gauge value."""
+        self._send(stat, '%d|g' % value, rate)
+
     def _send(self, stat, value, rate=1):
         """Send data to statsd."""
         if rate < 1:
