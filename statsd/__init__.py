@@ -24,7 +24,7 @@ if settings:
     except (socket.error, socket.gaierror, ImportError):
         try:
             host = os.environ['STATSD_HOST']
-            port = os.environ['STATSD_PORT']
+            port = int(os.environ['STATSD_PORT'])
             prefix = os.environ.get('STATSD_PREFIX')
             statsd = StatsClient(host, port, prefix)
         except (socket.error, socket.gaierror, KeyError):
