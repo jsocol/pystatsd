@@ -1,5 +1,5 @@
-import socket
 import os
+import socket
 
 try:
     from django.conf import settings
@@ -11,9 +11,11 @@ from client import StatsClient
 
 __all__ = ['StatsClient', 'statsd']
 
-VERSION = (0, 4, 0)
+VERSION = (0, 5, 0)
 __version__ = '.'.join(map(str, VERSION))
 
+
+statsd = None
 
 if settings:
     try:
@@ -22,11 +24,12 @@ if settings:
         prefix = getattr(settings, 'STATSD_PREFIX', None)
         statsd = StatsClient(host, port, prefix)
     except (socket.error, socket.gaierror, ImportError):
-        try:
-            host = os.environ['STATSD_HOST']
-            port = int(os.environ['STATSD_PORT'])
-            prefix = os.environ.get('STATSD_PREFIX')
-            statsd = StatsClient(host, port, prefix)
-        except (socket.error, socket.gaierror, KeyError):
-            statsd = None
-
+        pass
+elif 'STATSD_HOST' in os.environ:
+    try:
+        host = os.environ['STATSD_HOST']
+        port = int(os.environ['STATSD_PORT'])
+        prefix = os.environ.get('STATSD_PREFIX')
+        statsd = StatsClient(host, port, prefix)
+    except (socket.error, socket.gaierror, KeyError):
+        pass
