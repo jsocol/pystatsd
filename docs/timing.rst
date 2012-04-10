@@ -13,7 +13,7 @@ Calling ``timing`` manually
 ===========================
 
 The simplest way to use a timer is to record the time yourself and send it
-manually, using the :ref:``timing`` method::
+manually, using the :ref:`timing` method::
 
     import time
     from statsd import StatsClient
@@ -31,7 +31,7 @@ manually, using the :ref:``timing`` method::
 Using a context manager
 =======================
 
-Each ``StatsClient`` instance contains a :ref:``timer`` attribute that can be
+Each ``StatsClient`` instance contains a :ref:`timer` attribute that can be
 used as a context manager or a decorator. When used as a context manager, it
 will automatically report the time taken for the inner block::
 

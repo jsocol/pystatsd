@@ -26,7 +26,7 @@ number of events per second during a one-minute period.
 
 The statsd server collects counters under the ``stats`` prefix.
 
-Counters are managed with the :ref:``incr`` and :ref:``decr`` methods of
+Counters are managed with the :ref:`incr` and :ref:`decr` methods of
 ``StatsClient``::
 
     from statsd import StatsClient
@@ -117,7 +117,7 @@ track how many active WebSocket connections you have.
 
 The statsd server collects gauges under the ``stats.gauges`` prefix.
 
-The :ref:``gauge`` method also support the ``rate`` parameter to sample data
+The :ref:`gauge` method also support the ``rate`` parameter to sample data
 back to the statsd server, but use it with care, especially with gauges that
 may not be updated very often.
 
