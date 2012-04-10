@@ -4,9 +4,9 @@
 Using Timers
 ============
 
-:ref:`Timers <timers>` are an incredibly powerful tool for tracking application
-performance. Statsd provides a number of ways to use them to instrument your
-code.
+:ref:`Timers <timer-type>` are an incredibly powerful tool for tracking
+application performance. Statsd provides a number of ways to use them to
+instrument your code.
 
 
 Calling ``timing`` manually
@@ -39,7 +39,7 @@ will automatically report the time taken for the inner block::
 
     statsd = StatsClient()
 
-    with stats.timer('foo'):
+    with statsd.timer('foo'):
         # This block will be timed.
         for i in xrange(0, 100000):
             i ** 2
