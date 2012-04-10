@@ -12,7 +12,6 @@ IN_ADDR = ('localhost', 8125)
 ADDR = socket.getaddrinfo(*IN_ADDR)[0][4]
 
 
-
 def _client(prefix=None):
     sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix)
     sc._sock = mock.Mock()

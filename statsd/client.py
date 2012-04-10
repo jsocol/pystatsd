@@ -38,7 +38,7 @@ class StatsClient(object):
         # Use getaddrinfo to support IPv4/6.
         self._addr = socket.getaddrinfo(host, port)[0][4]
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.prefix = prefix
+        self._prefix = prefix
 
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
@@ -67,8 +67,8 @@ class StatsClient(object):
             else:
                 return
 
-        if self.prefix:
-            stat = '%s.%s' % (self.prefix, stat)
+        if self._prefix:
+            stat = '%s.%s' % (self._prefix, stat)
 
         try:
             self._sock.sendto('%s:%s' % (stat, value), self._addr)
