@@ -7,9 +7,11 @@ API Reference
 The ``StatsClient`` provides accessors for all the types of data the statsd_
 server supports.
 
-**NB:** Each public API method supports a ``rate`` parameter, but statsd
-doesn't always use it the same way. See the :ref:`types-chapter` for more
-information.
+.. note::
+
+    Each public API method supports a ``rate`` parameter, but statsd doesn't
+    always use it the same way. See the :ref:`types-chapter` for more
+    information.
 
 
 .. _StatsClient:
@@ -141,5 +143,12 @@ Set a :ref:`gauge <gauge-type>` value.
   percentage of the time. The statsd server does *not* take the sample rate
   into account for gauges. Use with care.
 
+.. note::
+
+   Gauges were added to the statsd server in commit 0ed78be_. If you try to use
+   this method with an older version of the server, the data will not be
+   recorded.
+
 
 .. _statsd: https://github.com/etsy/statsd
+.. _0ed78be: https://github.com/etsy/statsd/commit/0ed78be7

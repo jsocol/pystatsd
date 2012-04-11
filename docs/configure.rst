@@ -90,11 +90,13 @@ and then in your Python application, you can simply do::
 
     from statsd import statsd
 
-    stats.incr('foo')
+    statsd.incr('foo')
 
-**NB**: To make this default instance available, you will need to set at least
-``STATSD_HOST`` and ``STATSD_PORT``, even if using the default values of
-``localhost`` and ``8125``.
+.. note::
+
+    To make this default instance available, you will need to set at least
+    ``STATSD_HOST`` and ``STATSD_PORT``, even if using the default values of
+    ``localhost`` and ``8125``.
 
 .. _statsd: https://github.com/etsy/statsd
 .. _Django: https://www.djangoproject.com/
