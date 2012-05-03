@@ -8,8 +8,7 @@ from nose.tools import eq_
 from statsd import StatsClient
 
 
-IN_ADDR = ('localhost', 8125)
-ADDR = socket.getaddrinfo(*IN_ADDR)[0][4]
+ADDR = (socket.gethostbyname('localhost'), 8125)
 
 
 def _client(prefix=None):
