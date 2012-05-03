@@ -1,6 +1,11 @@
 Statsd Changelog
 ================
 
+Version 0.5.1
+-------------
+
+- Stop supporting IPv6. StatsD doesn't support it, and it breaks things.
+
 Version 0.5.0
 -------------
 
