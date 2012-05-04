@@ -1,7 +1,6 @@
 from functools import wraps
 import random
 import socket
-from socket import AF_INET, SOL_UDP
 import time
 
 
