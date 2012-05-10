@@ -32,8 +32,11 @@ def test_incr():
     sc.incr('foo', 10)
     _sock_check(sc, 2, 'foo:10|c')
 
+    sc.incr('foo', 1.2)
+    _sock_check(sc, 3, 'foo:1.2|c')
+
     sc.incr('foo', 10, rate=0.5)
-    _sock_check(sc, 3, 'foo:10|c|@0.5')
+    _sock_check(sc, 4, 'foo:10|c|@0.5')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -46,8 +49,11 @@ def test_decr():
     sc.decr('foo', 10)
     _sock_check(sc, 2, 'foo:-10|c')
 
+    sc.decr('foo', 1.2)
+    _sock_check(sc, 3, 'foo:-1.2|c')
+
     sc.decr('foo', 1, rate=0.5)
-    _sock_check(sc, 3, 'foo:-1|c|@0.5')
+    _sock_check(sc, 4, 'foo:-1|c|@0.5')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -56,8 +62,11 @@ def test_gauge():
     sc.gauge('foo', 30)
     _sock_check(sc, 1, 'foo:30|g')
 
+    sc.gauge('foo', 1.2)
+    _sock_check(sc, 2, 'foo:1.2|g')
+
     sc.gauge('foo', 70, rate=0.5)
-    _sock_check(sc, 2, 'foo:70|g|@0.5')
+    _sock_check(sc, 3, 'foo:70|g|@0.5')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
