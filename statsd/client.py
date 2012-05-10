@@ -49,7 +49,7 @@ class StatsClient(object):
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""
-        self._send(stat, '%d|c' % count, rate)
+        self._send(stat, '%s|c' % count, rate)
 
     def decr(self, stat, count=1, rate=1):
         """Decrement a stat by `count`."""
@@ -57,7 +57,7 @@ class StatsClient(object):
 
     def gauge(self, stat, value, rate=1):
         """Set a gauge value."""
-        self._send(stat, '%d|g' % value, rate)
+        self._send(stat, '%s|g' % value, rate)
 
     def _send(self, stat, value, rate=1):
         """Send data to statsd."""
