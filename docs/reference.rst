@@ -26,7 +26,7 @@ server supports.
 Create a new ``StatsClient`` instance with the appropriate connection and
 prefix information.
 
-* ``host``: the hostname or IP (v4/v6) address of the statsd_ server.
+* ``host``: the hostname or IPv4 address of the statsd_ server.
 
 * ``port``: the port of the statsd server.
 
