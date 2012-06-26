@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
-import statsd
-
 setup(
     name='statsd',
-    version=statsd.__version__,
+    version='0.5.1',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
@@ -21,6 +19,12 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
 )

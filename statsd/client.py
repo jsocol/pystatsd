@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from functools import wraps
 import random
 import socket
@@ -70,7 +71,8 @@ class StatsClient(object):
             stat = '%s.%s' % (self._prefix, stat)
 
         try:
-            self._sock.sendto('%s:%s' % (stat, value), self._addr)
+            txt = '%s:%s' % (stat, value)
+            self._sock.sendto(txt.encode('ascii'), self._addr)
         except socket.error:
             # No time for love, Dr. Jones!
             pass
