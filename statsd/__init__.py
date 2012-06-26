@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 import socket
 
@@ -6,7 +7,7 @@ try:
 except ImportError:
     settings = None
 
-from client import StatsClient
+from .client import StatsClient
 
 
 __all__ = ['StatsClient', 'statsd']

@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import random
 import re
 import socket
@@ -18,6 +19,7 @@ def _client(prefix=None):
 
 
 def _sock_check(cl, count, val):
+    val = val.encode('ascii')
     eq_(cl._sock.sendto.call_count, count)
     eq_(cl._sock.sendto.call_args, ((val, ADDR), {}))
 
@@ -92,7 +94,7 @@ def test_prefix():
 
 def _timer_check(cl, count, start, end):
     eq_(cl._sock.sendto.call_count, count)
-    value = cl._sock.sendto.call_args[0][0]
+    value = cl._sock.sendto.call_args[0][0].decode('ascii')
     exp = re.compile('^%s:\d+|%s$' % (start, end))
     assert exp.match(value)
 
