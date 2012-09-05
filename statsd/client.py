@@ -61,6 +61,17 @@ class StatsClient(object):
         """Set a gauge value."""
         self._send(stat, '%s|g' % value, rate)
 
+    def flush(self):
+        """Flush the stats batching buffer."""
+        if (0 < len(self._stats)):
+            data = '\n'.join(self._stats)
+            self._stats = []
+            try:
+                self._sock.sendto(data.encode('ascii'), self._addr)
+            except socket.error:
+                # No time for love, Dr. Jones!
+                pass
+
     def _send(self, stat, value, rate=1):
         """Send data to statsd."""
         if rate < 1:
@@ -72,13 +83,7 @@ class StatsClient(object):
         if self._prefix:
             stat = '%s.%s' % (self._prefix, stat)
 
-        try:
-            txt = '%s:%s' % (stat, value)
-            self._stats.append(txt)
-            if self._batch_len <= len(self._stats):
-                data = '\n'.join(self._stats)
-                self._stats = []
-                self._sock.sendto(data.encode('ascii'), self._addr)
-        except socket.error:
-            # No time for love, Dr. Jones!
-            pass
+        txt = '%s:%s' % (stat, value)
+        self._stats.append(txt)
+        if self._batch_len <= len(self._stats):
+            self.flush()
