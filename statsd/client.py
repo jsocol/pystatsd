@@ -34,11 +34,13 @@ class _Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None):
+    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
+        self._batch_len = batch_len
+        self._stats = []
 
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
@@ -59,6 +61,17 @@ class StatsClient(object):
         """Set a gauge value."""
         self._send(stat, '%s|g' % value, rate)
 
+    def flush(self):
+        """Flush the stats batching buffer."""
+        if (0 < len(self._stats)):
+            data = '\n'.join(self._stats)
+            self._stats = []
+            try:
+                self._sock.sendto(data.encode('ascii'), self._addr)
+            except socket.error:
+                # No time for love, Dr. Jones!
+                pass
+
     def _send(self, stat, value, rate=1):
         """Send data to statsd."""
         if rate < 1:
@@ -70,9 +83,7 @@ class StatsClient(object):
         if self._prefix:
             stat = '%s.%s' % (self._prefix, stat)
 
-        try:
-            txt = '%s:%s' % (stat, value)
-            self._sock.sendto(txt.encode('ascii'), self._addr)
-        except socket.error:
-            # No time for love, Dr. Jones!
-            pass
+        txt = '%s:%s' % (stat, value)
+        self._stats.append(txt)
+        if self._batch_len <= len(self._stats):
+            self.flush()

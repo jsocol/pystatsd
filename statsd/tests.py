@@ -12,17 +12,19 @@ from statsd import StatsClient
 ADDR = (socket.gethostbyname('localhost'), 8125)
 
 
-def _client(prefix=None):
-    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix)
+def _client(prefix=None, batch_len=1):
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix, batch_len=batch_len)
     sc._sock = mock.Mock()
     return sc
 
 
 def _sock_check(cl, count, val):
-    val = val.encode('ascii')
     eq_(cl._sock.sendto.call_count, count)
-    eq_(cl._sock.sendto.call_args, ((val, ADDR), {}))
-
+    if val:
+        val = val.encode('ascii')
+        eq_(cl._sock.sendto.call_args, ((val, ADDR), {}))
+    else:
+        eq_(cl._sock.sendto.call_args, None)
 
 @mock.patch.object(random, 'random', lambda: -1)
 def test_incr():
@@ -84,6 +86,29 @@ def test_timing():
     sc.timing('foo', 100, rate=0.5)
     _sock_check(sc, 3, 'foo:100|ms|@0.5')
 
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_batch():
+    sc = _client(None, 2)
+
+    sc.incr('foo')
+    _sock_check(sc, 0, '')
+
+    sc.incr('bar')
+    _sock_check(sc, 1, 'foo:1|c\nbar:1|c')
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_batch_flush():
+    sc = _client(None, 10)
+
+    sc.incr('foo')
+    _sock_check(sc, 0, '')
+
+    sc.incr('bar')
+    _sock_check(sc, 0, '')
+
+    sc.flush()
+    _sock_check(sc, 1, 'foo:1|c\nbar:1|c')
 
 def test_prefix():
     sc = _client('foo')
