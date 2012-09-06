@@ -69,6 +69,7 @@ Here are the settings and their defaults::
     STATSD_HOST = 'localhost'
     STATSD_PORT = 8125
     STATSD_PREFIX = None
+    STATSD_BATCH_LEN = 1
 
 You can use the default ``StatsClient`` simply::
 
@@ -92,6 +93,7 @@ You can set these variables in the environment::
     STATSD_HOST
     STATSD_PORT
     STATSD_PREFIX
+    STATSD_BATCH_LEN
 
 and then in your Python application, you can simply do::
 
