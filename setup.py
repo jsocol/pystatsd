@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='statsd',
-    version='0.5.1',
+    version='1.0.0',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
@@ -13,7 +13,7 @@ setup(
     include_package_data=True,
     package_data={'': ['README.rst']},
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
