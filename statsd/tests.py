@@ -4,7 +4,7 @@ import re
 import socket
 
 import mock
-from nose.tools import assert_raises, eq_
+from nose.tools import eq_
 
 from statsd import StatsClient
 
@@ -25,6 +25,55 @@ def _sock_check(cl, count, val):
         eq_(cl._sock.sendto.call_args, ((val, ADDR), {}))
     else:
         eq_(cl._sock.sendto.call_args, None)
+
+
+class assert_raises(object):
+    """A context manager that asserts a given exception was raised.
+
+    >>> with assert_raises(TypeError):
+    ...     raise TypeError
+    ...
+
+    >>> with assert_raises(TypeError):
+    ...     raise ValueError
+    AssertionError: ValueError not in ['TypeError']
+
+    >>> with assert_raises(TypeError):
+    ...     pass
+    AssertionError: No exception raised.
+
+    Or you can specify any of a number of exceptions:
+
+    >>> with assert_raises(TypeError, ValueError):
+    ...     raise ValueError
+    ...
+
+    >>> with assert_raises(TypeError, ValueError):
+    ...     raise KeyError
+    AssertionError: KeyError not in ['TypeError', 'ValueError']
+
+    Lowercase name because that it's a class is an implementation detail.
+
+    """
+
+    def __init__(self, *exc_cls):
+        self.exc_cls = exc_cls
+
+    def __enter__(self):
+        # For access to the exception later.
+        return self
+
+    def __exit__(self, typ, value, tb):
+        assert typ, 'No exception raised.'
+        assert typ in self.exc_cls, '%s not in %s' % (
+            typ.__name__, [e.__name__ for e in self.exc_cls])
+        self.exc_type = typ
+        self.exception = value
+        self.traceback = tb
+
+        # Swallow expected exceptions.
+        return True
+
 
 @mock.patch.object(random, 'random', lambda: -1)
 def test_incr():
@@ -165,6 +214,7 @@ def test_timer_context_rate():
     _timer_check(sc, 1, 'foo', 'ms|@0.5')
 
 
+@mock.patch.object(random, 'random', lambda: -1)
 def test_timer_decorator_rate():
     sc = _client()
 
