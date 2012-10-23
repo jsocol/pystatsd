@@ -32,7 +32,6 @@ class assert_raises(object):
 
     >>> with assert_raises(TypeError):
     ...     raise TypeError
-    ...
 
     >>> with assert_raises(TypeError):
     ...     raise ValueError
@@ -46,11 +45,21 @@ class assert_raises(object):
 
     >>> with assert_raises(TypeError, ValueError):
     ...     raise ValueError
-    ...
 
     >>> with assert_raises(TypeError, ValueError):
     ...     raise KeyError
     AssertionError: KeyError not in ['TypeError', 'ValueError']
+
+    You can also get the exception back later:
+
+    >>> with assert_raises(TypeError) as cm:
+    ...     raise TypeError('bad type!')
+    >>> cm.exception
+    TypeError('bad type!')
+    >>> cm.exc_type
+    TypeError
+    >>> cm.traceback
+    <traceback @ 0x3323ef0>
 
     Lowercase name because that it's a class is an implementation detail.
 
