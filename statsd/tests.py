@@ -4,7 +4,7 @@ import re
 import socket
 
 import mock
-from nose.tools import eq_
+from nose.tools import assert_raises, eq_
 
 from statsd import StatsClient
 
@@ -124,8 +124,8 @@ def _timer_check(cl, count, start, end):
     assert exp.match(value)
 
 
-def test_timer():
-    """StatsClient.timer is a context decorator."""
+def test_timer_manager():
+    """StatsClient.timer is a context manager."""
     sc = _client()
 
     with sc.timer('foo'):
@@ -133,13 +133,18 @@ def test_timer():
 
     _timer_check(sc, 1, 'foo', 'ms')
 
+
+def test_timer_manager():
+    """StatsClient.timer is a decorator."""
+    sc = _client()
+
     @sc.timer('bar')
     def bar():
         pass
 
     bar()
 
-    _timer_check(sc, 2, 'bar', 'ms')
+    _timer_check(sc, 1, 'bar', 'ms')
 
 
 def test_timer_capture():
@@ -151,7 +156,7 @@ def test_timer_capture():
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_rate():
+def test_timer_context_rate():
     sc = _client()
 
     with sc.timer('foo', rate=0.5):
@@ -159,10 +164,39 @@ def test_timer_rate():
 
     _timer_check(sc, 1, 'foo', 'ms|@0.5')
 
+
+def test_timer_decorator_rate():
+    sc = _client()
+
     @sc.timer('bar', rate=0.1)
     def bar():
         pass
 
     bar()
 
-    _timer_check(sc, 2, 'bar', 'ms|@0.1')
+    _timer_check(sc, 1, 'bar', 'ms|@0.1')
+
+
+def test_timer_context_exceptions():
+    """Exceptions within a managed block should get logged and propagate."""
+    sc = _client()
+
+    with assert_raises(socket.timeout):
+        with sc.timer('foo'):
+            raise socket.timeout()
+
+    _timer_check(sc, 1, 'foo', 'ms')
+
+
+def test_timer_decorator_exceptions():
+    """Exceptions from wrapped methods should get logged and propagate."""
+    sc = _client()
+
+    @sc.timer('foo')
+    def foo():
+        raise ValueError()
+
+    with assert_raises(ValueError):
+        foo()
+
+    _timer_check(sc, 1, 'foo', 'ms')
