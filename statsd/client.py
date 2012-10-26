@@ -1,5 +1,7 @@
 from __future__ import with_statement
 from functools import wraps
+from collections import defaultdict
+import threading
 import random
 import socket
 import time
@@ -34,17 +36,35 @@ class _Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1):
+    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1, interval=60):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._batch_len = batch_len
         self._stats = []
+    
+        self._interval = interval
+        self._stats_interval = defaultdict(int)
+        self._interval_send()
 
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
 
+    def _interval_send(self):
+        for key in self._stats_interval.keys():
+            self.gauge(key, self._stats_interval.pop(key))
+        timer = threading.Timer(self._interval, self._interval_send)
+        timer.start()
+
+    def incr_interval(self, stat, count=1):
+        """Increment a interval stat by `count`."""
+        self._stats_interval[stat] += count
+
+    def decr_interval(self, stat, count=1):
+        """Decrement a interval stat by `count`."""
+        self._stats_interval[stat] -= count
+ 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
         self._send(stat, '%d|ms' % delta, rate)
