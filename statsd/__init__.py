@@ -24,7 +24,9 @@ if settings:
         port = getattr(settings, 'STATSD_PORT', 8125)
         prefix = getattr(settings, 'STATSD_PREFIX', None)
         batch_len = getattr(settings, 'STATSD_BATCH_LEN', 1)
-        statsd = StatsClient(host, port, prefix, batch_len)
+        thread_safe = getattr(settings, 'STATSD_THREAD_SAFE', False)
+        debug = getattr(settings, 'STATSD_DEBUG', False)
+        statsd = StatsClient(host, port, prefix, batch_len, thread_safe, debug)
     except (socket.error, socket.gaierror, ImportError):
         pass
 elif 'STATSD_HOST' in os.environ:
@@ -33,6 +35,8 @@ elif 'STATSD_HOST' in os.environ:
         port = int(os.environ['STATSD_PORT'])
         prefix = os.environ.get('STATSD_PREFIX')
         batch_len = int(os.environ.get('STATSD_BATCH_LEN', 1))
-        statsd = StatsClient(host, port, prefix, batch_len)
+        thread_safe = os.environ.get('STATSD_THREAD_SAFE') == 'True'
+        debug = os.environ.get('STATSD_DEBUG') == 'True'
+        statsd = StatsClient(host, port, prefix, batch_len, thread_safe, debug)
     except (socket.error, socket.gaierror, KeyError):
         pass
