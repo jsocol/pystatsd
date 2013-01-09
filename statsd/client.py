@@ -34,13 +34,21 @@ class _Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1):
+    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1,
+                 thread_safe=False, debug=False):
         """Create a new client."""
-        self._addr = (socket.gethostbyname(host), port)
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self._addr = host and (socket.gethostbyname(host), port)
+        self._sock = host and socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._batch_len = batch_len
         self._stats = []
+        self._debug = debug
+
+        if thread_safe:
+            import threading
+        else:
+            import dummy_threading as threading
+        self._lock = threading.Lock()
 
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
@@ -61,11 +69,21 @@ class StatsClient(object):
         """Set a gauge value."""
         self._send(stat, '%s|g' % value, rate)
 
-    def flush(self):
+    def flush(self, force=True):
         """Flush the stats batching buffer."""
-        if (0 < len(self._stats)):
-            data = '\n'.join(self._stats)
-            self._stats = []
+        with self._lock:
+            data = None
+            if self._stats and (force or len(self._stats) >= self._batch_len):
+                data = '\n'.join(self._stats)
+                self._stats = []
+        if data:
+            self._transmit(data)
+
+    def _transmit(self, data):
+        """Send an encoded event string over the network"""
+        if self._debug:
+            print data
+        if self._sock:
             try:
                 self._sock.sendto(data.encode('ascii'), self._addr)
             except socket.error:
@@ -84,6 +102,10 @@ class StatsClient(object):
             stat = '%s.%s' % (self._prefix, stat)
 
         txt = '%s:%s' % (stat, value)
-        self._stats.append(txt)
-        if self._batch_len <= len(self._stats):
-            self.flush()
+
+        if self._batch_len <= 1:
+            # Optimization - Skip buffer and transmit immediately
+            self._transmit(txt)
+        else:
+            self._stats.append(txt)
+            self.flush(force=False)
