@@ -5,7 +5,7 @@ import socket
 import time
 import collections
 try:
-    from StringIO import cStringIO as StringIO
+    from StringIO import StringIO
 except ImportError:
     # Py3k!
     from io import StringIO
