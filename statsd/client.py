@@ -3,6 +3,8 @@ from functools import wraps
 import random
 import socket
 import time
+import collections
+from StringIO import StringIO
 
 
 class _Timer(object):
@@ -34,13 +36,15 @@ class _Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1):
+    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1,
+                 max_packet_size=400):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._batch_len = batch_len
-        self._stats = []
+        self._max_packet_size = max_packet_size
+        self._stats = collections.deque()
 
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
@@ -63,14 +67,23 @@ class StatsClient(object):
 
     def flush(self):
         """Flush the stats batching buffer."""
-        if (0 < len(self._stats)):
-            data = '\n'.join(self._stats)
-            self._stats = []
-            try:
-                self._sock.sendto(data.encode('ascii'), self._addr)
-            except socket.error:
-                # No time for love, Dr. Jones!
-                pass
+        if self._stats:
+            out = StringIO('')
+            stats = self._stats
+            while stats:
+                # Break up messages into ideal packet sizes.
+                while stats and (len(out.getvalue()) < self._max_packet_size):
+                    out.write(stats.popleft().encode('ascii'))
+                    out.write('\n')
+
+                try:
+                    self._sock.sendto(
+                        out.getvalue().strip(), self._addr)
+                except socket.error:
+                    # No time for love, Dr. Jones!
+                    pass
+                out.truncate(0)
+            self._stats.clear()
 
     def _send(self, stat, value, rate=1):
         """Send data to statsd."""

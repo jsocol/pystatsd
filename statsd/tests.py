@@ -168,6 +168,17 @@ def test_batch_flush():
     sc.flush()
     _sock_check(sc, 1, 'foo:1|c\nbar:1|c')
 
+@mock.patch.object(random, 'random', lambda: -1)
+def test_max_packet_size():
+    sc = _client(None, 1000)
+
+    for x in xrange(52):
+        sc.incr('foo')
+        _sock_check(sc, 0, '')
+
+    sc.flush()
+    _sock_check(sc, 2, 'foo:1|c\nfoo:1|c')
+
 def test_prefix():
     sc = _client('foo')
 
