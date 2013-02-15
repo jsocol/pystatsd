@@ -4,7 +4,11 @@ import random
 import socket
 import time
 import collections
-from StringIO import StringIO
+try:
+    from StringIO import cStringIO as StringIO
+except ImportError:
+    # Py3k!
+    from io import StringIO
 
 
 class _Timer(object):
