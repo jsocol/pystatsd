@@ -72,13 +72,15 @@ class StatsClient(object):
     def flush(self):
         """Flush the stats batching buffer."""
         if self._stats:
-            out = StringIO('')
             stats = self._stats
             while stats:
+                out = StringIO('')
+                print(len(stats), "stats")
                 # Break up messages into ideal packet sizes.
                 while stats and (len(out.getvalue()) < self._max_packet_size):
                     out.write(stats.popleft())
                     out.write('\n')
+                    print(len(out.getvalue()), 'bytes to send')
 
                 try:
                     self._sock.sendto(
@@ -86,7 +88,6 @@ class StatsClient(object):
                 except socket.error:
                     # No time for love, Dr. Jones!
                     pass
-                out.truncate(0)
             self._stats.clear()
 
     def _send(self, stat, value, rate=1):
