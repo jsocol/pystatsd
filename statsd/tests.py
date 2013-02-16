@@ -172,7 +172,7 @@ def test_batch_flush():
 def test_max_packet_size():
     sc = _client(None, 1000)
 
-    for x in xrange(52):
+    for x in range(52):
         sc.incr('foo')
         _sock_check(sc, 0, '')
 
