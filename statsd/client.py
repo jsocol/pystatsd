@@ -77,12 +77,12 @@ class StatsClient(object):
             while stats:
                 # Break up messages into ideal packet sizes.
                 while stats and (len(out.getvalue()) < self._max_packet_size):
-                    out.write(stats.popleft().encode('ascii'))
+                    out.write(stats.popleft())
                     out.write('\n')
 
                 try:
                     self._sock.sendto(
-                        out.getvalue().strip(), self._addr)
+                        out.getvalue().encode('ascii').strip(), self._addr)
                 except socket.error:
                     # No time for love, Dr. Jones!
                     pass
