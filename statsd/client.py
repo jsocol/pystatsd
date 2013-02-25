@@ -61,6 +61,10 @@ class StatsClient(object):
         """Set a gauge value."""
         self._send(stat, '%s|g' % value, rate)
 
+    def meter(self, stat, count=1, rate=1):
+        """Increment a meter value."""
+        self._send(stat, '%s|m' % count, rate)
+
     def flush(self):
         """Flush the stats batching buffer."""
         if (0 < len(self._stats)):
