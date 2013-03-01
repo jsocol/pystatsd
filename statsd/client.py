@@ -5,7 +5,10 @@ import socket
 import time
 
 
-class _Timer(object):
+__all__ = ['StatsClient']
+
+
+class Timer(object):
     """A context manager/decorator for statsd.timing()."""
 
     def __init__(self, client, stat, rate=1):
@@ -44,10 +47,10 @@ class StatsClient(object):
         self._send(data)
 
     def pipeline(self):
-        return _Pipeline(self)
+        return Pipeline(self)
 
     def timer(self, stat, rate=1):
-        return _Timer(self, stat, rate)
+        return Timer(self, stat, rate)
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
@@ -93,7 +96,7 @@ class StatsClient(object):
             pass
 
 
-class _Pipeline(StatsClient):
+class Pipeline(StatsClient):
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix

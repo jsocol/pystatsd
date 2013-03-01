@@ -159,7 +159,7 @@ Set a :ref:`gauge <gauge-type>` value.
 
     StatsClient().pipeline()
 
-Returns a :ref:`_Pipeline <pipeline-chapter>` object for collecting
+Returns a :ref:`Pipeline <pipeline-chapter>` object for collecting
 several stats. Can also be used as a context manager::
 
     with StatsClient().pipeline() as pipe:
@@ -177,7 +177,7 @@ several stats. Can also be used as a context manager::
     pipe.incr('foo')
     pipe.send()
 
-Causes a :ref:`_Pipeline <pipeline-chapter>` object to send all batched
+Causes a :ref:`Pipeline <pipeline-chapter>` object to send all batched
 stats.
 
 .. note::

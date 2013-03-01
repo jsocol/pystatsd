@@ -4,11 +4,11 @@
 Pipelines
 =========
 
-The ``_Pipeline`` class is a subclass of ``StatsClient`` that batches
+The ``Pipeline`` class is a subclass of ``StatsClient`` that batches
 together several stats before sending. It implements the entire client
 interface, plus a ``send()`` method.
 
-``_Pipeline`` objects should be created with
+``Pipeline`` objects should be created with
 ``StatsClient().pipeline()``::
 
     client = StatsClient()
@@ -26,7 +26,7 @@ will be packed into as few UDP packets as possible.
 As a Context Manager
 ====================
 
-``_Pipeline`` objects can also be used as context managers::
+``Pipeline`` objects can also be used as context managers::
 
     with StatsClient().pipeline() as pipe:
         pipe.incr('foo')
