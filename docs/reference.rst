@@ -21,7 +21,7 @@ server supports.
 
 ::
 
-    StatsClient(host='localhost', port=8125, prefix=None, batch_len=1)
+    StatsClient(host='localhost', port=8125, prefix=None)
 
 Create a new ``StatsClient`` instance with the appropriate connection and
 prefix information.
@@ -32,9 +32,6 @@ prefix information.
 
 * ``prefix``: a prefix to distinguish and group stats from an application or
   environment.
-
-* ``batch_len``: how many stats to batch before flushing to the statsd_ server.
-  See :ref:`flush`.
 
 
 .. _incr:
@@ -151,26 +148,6 @@ Set a :ref:`gauge <gauge-type>` value.
    Gauges were added to the statsd server in commit 0ed78be_. If you try to use
    this method with an older version of the server, the data will not be
    recorded.
-
-
-.. _flush:
-
-``flush``
-=========
-
-::
-
-    StatsClient().flush()
-
-Flush batched stats data to the statsd_ server.
-
-.. note::
-
-   If you create a StatsClient instance with a ``batch_len`` greater than 1,
-   you should find a way to call ``flush`` at the end of whatever your
-   application is doing, because the client will only send every time the
-   number of stats is zero modulo ``batch_len``, which may introduce a systemic
-   bias to your stats.
 
 
 .. _statsd: https://github.com/etsy/statsd

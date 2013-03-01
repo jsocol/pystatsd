@@ -26,8 +26,7 @@ their defaults, are::
 
     statsd = StatsClient(host='localhost',
                          port=8125,
-                         prefix=None,
-                         batch_len=1)
+                         prefix=None)
 
 ``host`` is the host running the statsd server. It will support any kind of
 name or IP address you might use.
@@ -51,12 +50,6 @@ will produce two different stats, ``foo.baz`` and ``bar.baz``. Without the
 ``prefix`` argument, or with the same ``prefix``, two ``StatsClient`` instances
 will update the same stats.
 
-``batch_len`` tells the client how many stats to batch before sending to the
-statsd_ server. By default, this is ``1``, i.e. "automatically send every
-stat." If it is set to ``n``, the client will only send data to the server
-after every ``n`` other stats calls. It can be flushed to the server by calling
-``StatsClient.flush()`` (see :ref:`flush`).
-
 
 In Django
 =========
@@ -69,7 +62,6 @@ Here are the settings and their defaults::
     STATSD_HOST = 'localhost'
     STATSD_PORT = 8125
     STATSD_PREFIX = None
-    STATSD_BATCH_LEN = 1
 
 You can use the default ``StatsClient`` simply::
 
@@ -93,7 +85,6 @@ You can set these variables in the environment::
     STATSD_HOST
     STATSD_PORT
     STATSD_PREFIX
-    STATSD_BATCH_LEN
 
 and then in your Python application, you can simply do::
 

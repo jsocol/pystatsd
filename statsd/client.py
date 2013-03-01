@@ -34,24 +34,26 @@ class _Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, batch_len=1):
+    def __init__(self, host='localhost', port=8125, prefix=None):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
-        self._batch_len = batch_len
-        self._stats = []
 
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
-        self._send(stat, '%d|ms' % delta, rate)
+        data = self._prepare(stat, '%d|ms' % delta, rate)
+        if data is not None:
+            self._send(data)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""
-        self._send(stat, '%s|c' % count, rate)
+        data = self._prepare(stat, '%s|c' % count, rate)
+        if data is not None:
+            self._send(data)
 
     def decr(self, stat, count=1, rate=1):
         """Decrement a stat by `count`."""
@@ -59,21 +61,11 @@ class StatsClient(object):
 
     def gauge(self, stat, value, rate=1):
         """Set a gauge value."""
-        self._send(stat, '%s|g' % value, rate)
+        data = self._prepare(stat, '%s|g' % value, rate)
+        if data is not None:
+            self._send(data)
 
-    def flush(self):
-        """Flush the stats batching buffer."""
-        if (0 < len(self._stats)):
-            data = '\n'.join(self._stats)
-            self._stats = []
-            try:
-                self._sock.sendto(data.encode('ascii'), self._addr)
-            except socket.error:
-                # No time for love, Dr. Jones!
-                pass
-
-    def _send(self, stat, value, rate=1):
-        """Send data to statsd."""
+    def _prepare(self, stat, value, rate=1):
         if rate < 1:
             if random.random() < rate:
                 value = '%s|@%s' % (value, rate)
@@ -83,7 +75,13 @@ class StatsClient(object):
         if self._prefix:
             stat = '%s.%s' % (self._prefix, stat)
 
-        txt = '%s:%s' % (stat, value)
-        self._stats.append(txt)
-        if self._batch_len <= len(self._stats):
-            self.flush()
+        data = '%s:%s' % (stat, value)
+        return data
+
+    def _send(self, text):
+        """Send data to statsd."""
+        try:
+            self._sock.sendto(text.encode('ascii'), self._addr)
+        except socket.error:
+            # No time for love, Dr. Jones!
+            pass
