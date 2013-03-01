@@ -114,3 +114,4 @@ class Pipeline(StatsClient):
     def send(self):
         data = '\n'.join(self._stats)
         self._client._send(data)
+        self._stats = []
