@@ -40,6 +40,12 @@ class StatsClient(object):
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
 
+    def _after(self, data):
+        self._send(data)
+
+    def pipeline(self):
+        return _Pipeline(self)
+
     def timer(self, stat, rate=1):
         return _Timer(self, stat, rate)
 
@@ -47,13 +53,13 @@ class StatsClient(object):
         """Send new timing information. `delta` is in milliseconds."""
         data = self._prepare(stat, '%d|ms' % delta, rate)
         if data is not None:
-            self._send(data)
+            self._after(data)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""
         data = self._prepare(stat, '%s|c' % count, rate)
         if data is not None:
-            self._send(data)
+            self._after(data)
 
     def decr(self, stat, count=1, rate=1):
         """Decrement a stat by `count`."""
@@ -63,7 +69,7 @@ class StatsClient(object):
         """Set a gauge value."""
         data = self._prepare(stat, '%s|g' % value, rate)
         if data is not None:
-            self._send(data)
+            self._after(data)
 
     def _prepare(self, stat, value, rate=1):
         if rate < 1:
@@ -78,10 +84,30 @@ class StatsClient(object):
         data = '%s:%s' % (stat, value)
         return data
 
-    def _send(self, text):
+    def _send(self, data):
         """Send data to statsd."""
         try:
-            self._sock.sendto(text.encode('ascii'), self._addr)
+            self._sock.sendto(data.encode('ascii'), self._addr)
         except socket.error:
             # No time for love, Dr. Jones!
             pass
+
+
+class _Pipeline(StatsClient):
+    def __init__(self, client):
+        self._client = client
+        self._prefix = client._prefix
+        self._stats = []
+
+    def _after(self, data):
+        self._stats.append(data)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, typ, value, tb):
+        self.send()
+
+    def send(self):
+        data = '\n'.join(self._stats)
+        self._client._send(data)

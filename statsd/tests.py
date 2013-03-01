@@ -253,3 +253,40 @@ def test_timer_decorator_exceptions():
         foo()
 
     _timer_check(sc, 1, 'foo', 'ms')
+
+
+def test_pipeline():
+    sc = _client()
+    pipe = sc.pipeline()
+    pipe.incr('foo')
+    pipe.decr('bar')
+    pipe.timing('baz', 320)
+    pipe.send()
+    _sock_check(sc, 1, 'foo:1|c\nbar:-1|c\nbaz:320|ms')
+
+
+def test_pipeline_manager():
+    sc = _client()
+    with sc.pipeline() as pipe:
+        pipe.incr('foo')
+        pipe.decr('bar')
+        pipe.gauge('baz', 15)
+    _sock_check(sc, 1, 'foo:1|c\nbar:-1|c\nbaz:15|g')
+
+
+def test_pipeline_timer_manager():
+    sc = _client()
+    with sc.pipeline() as pipe:
+        with pipe.timer('foo') as ms:
+            pass
+    _timer_check(sc, 1, 'foo', 'ms')
+
+
+def test_pipeline_timer_decorator():
+    sc = _client()
+    with sc.pipeline() as pipe:
+        @pipe.timer('foo')
+        def foo():
+            pass
+        foo()
+    _timer_check(sc, 1, 'foo', 'ms')

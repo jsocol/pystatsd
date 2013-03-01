@@ -150,5 +150,40 @@ Set a :ref:`gauge <gauge-type>` value.
    recorded.
 
 
+.. _pipeline:
+
+``pipeline``
+============
+
+::
+
+    StatsClient().pipeline()
+
+Returns a :ref:`_Pipeline <pipeline-chapter>` object for collecting
+several stats. Can also be used as a context manager::
+
+    with StatsClient().pipeline() as pipe:
+        pipe.incr('foo')
+
+
+.. _pipeline-send:
+
+``send``
+========
+
+::
+
+    pipe = StatsClient().pipeline()
+    pipe.incr('foo')
+    pipe.send()
+
+Causes a :ref:`_Pipeline <pipeline-chapter>` object to send all batched
+stats.
+
+.. note::
+
+   This method is not implemented on the base StatsClient class.
+
+
 .. _statsd: https://github.com/etsy/statsd
 .. _0ed78be: https://github.com/etsy/statsd/commit/0ed78be7
