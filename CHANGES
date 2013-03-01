@@ -1,6 +1,19 @@
 Statsd Changelog
 ================
 
+Version 2.0
+-----------
+
+- Add Pipeline subclass for batching.
+- Added an _after method subclasses can use to change behavior.
+
+Version 1.0
+-----------
+
+- Clean up tests and requirements.
+- Encode socket data in ASCII.
+- Tag v1.
+
 Version 0.5.1
 -------------
 
