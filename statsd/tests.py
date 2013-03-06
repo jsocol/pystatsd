@@ -186,7 +186,7 @@ def test_timer_manager():
     _timer_check(sc, 1, 'foo', 'ms')
 
 
-def test_timer_manager():
+def test_timer_decorator():
     """StatsClient.timer is a decorator."""
     sc = _client()
 
@@ -277,7 +277,7 @@ def test_pipeline_manager():
 def test_pipeline_timer_manager():
     sc = _client()
     with sc.pipeline() as pipe:
-        with pipe.timer('foo') as ms:
+        with pipe.timer('foo'):
             pass
     _timer_check(sc, 1, 'foo', 'ms')
 
