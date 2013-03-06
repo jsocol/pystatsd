@@ -320,7 +320,7 @@ def test_pipeline_packet_size():
     """Pipelines shouldn't send packets larger than 512 bytes."""
     sc = _client()
     pipe = sc.pipeline()
-    for x in xrange(32):
+    for x in range(32):
         # 32 * 16 = 512, so this will need 2 packets.
         pipe.incr('sixteen_char_str')
     pipe.send()
