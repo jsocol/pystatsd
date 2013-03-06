@@ -34,3 +34,14 @@ As a Context Manager
 
 ``pipe.send()`` will be called automatically when the managed block
 exits.
+
+
+Thread Safety
+=============
+
+While ``StatsClient`` instances are considered thread-safe (or at least
+as thread-safe as the standard library's ``socket.send`` is),
+``Pipeline`` instances **are not thread-safe**. Storing stats for later
+creates at least two important race conditions in a multi-threaded
+environment. You should create one ``Pipeline`` per-thread, if
+necessary.

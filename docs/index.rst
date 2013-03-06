@@ -54,6 +54,7 @@ Contents
    timing.rst
    pipeline.rst
    reference.rst
+   contributing.rst
 
 
 Indices and tables
