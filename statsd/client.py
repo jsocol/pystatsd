@@ -112,6 +112,14 @@ class Pipeline(StatsClient):
         self.send()
 
     def send(self):
-        data = '\n'.join(self._stats)
-        self._client._send(data)
-        self._stats = []
+        # Use pop(0) to preserve the order of the stats.
+        data = self._stats.pop(0)
+        while self._stats:
+            stat = self._stats.pop(0)
+            if len(stat) + len(data) + 1 >= 512:
+                self._client._send(data)
+                data = stat
+            else:
+                data += '\n' + stat
+        if data:
+            self._client._send(data)

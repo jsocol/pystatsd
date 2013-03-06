@@ -290,3 +290,25 @@ def test_pipeline_timer_decorator():
             pass
         foo()
     _timer_check(sc, 1, 'foo', 'ms')
+
+
+def test_pipeline_empty():
+    """Pipelines should be empty after a send() call."""
+    sc = _client()
+    with sc.pipeline() as pipe:
+        pipe.incr('foo')
+        eq_(1, len(pipe._stats))
+    eq_(0, len(pipe._stats))
+
+
+def test_pipeline_packet_size():
+    """Pipelines shouldn't send packets larger than 512 bytes."""
+    sc = _client()
+    pipe = sc.pipeline()
+    for x in xrange(32):
+        # 32 * 16 = 512, so this will need 2 packets.
+        pipe.incr('sixteen_char_str')
+    pipe.send()
+    eq_(2, sc._sock.sendto.call_count)
+    assert len(sc._sock.sendto.call_args_list[0][0][0]) <= 512
+    assert len(sc._sock.sendto.call_args_list[1][0][0]) <= 512
