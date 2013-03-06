@@ -131,6 +131,21 @@ def test_gauge():
     _sock_check(sc, 3, 'foo:70|g|@0.5')
 
 
+def test_gauge_delta():
+    sc = _client()
+    sc.gauge('foo', 12, delta=True)
+    _sock_check(sc, 1, 'foo:+12|g')
+
+    sc.gauge('foo', -13, delta=True)
+    _sock_check(sc, 2, 'foo:-13|g')
+
+    sc.gauge('foo', 1.2, delta=True)
+    _sock_check(sc, 3, 'foo:+1.2|g')
+
+    sc.gauge('foo', -1.3, delta=True)
+    _sock_check(sc, 4, 'foo:-1.3|g')
+
+
 @mock.patch.object(random, 'random', lambda: -1)
 def test_timing():
     sc = _client()

@@ -126,5 +126,23 @@ data back to the statsd server, but use it with care, especially with
 gauges that may not be updated very often.
 
 
+Gauge Deltas
+------------
+
+Gauges may be *updated* (as opposed to *set*) by setting the ``delta``
+keyword argument to ``True``. For example::
+
+    statsd.gauge('foo', 70)  # Set the 'foo' gauge to 70.
+    statsd.gauge('foo', 1, delta=True)  # Set 'foo' to 71.
+    statsd.gauge('foo', -3, delta=True)  # Set 'foo' to 68.
+
+.. note::
+
+   Support for gauge deltas was added to the server in 3eecd18_. You
+   will need to be running at least that version for the ``delta`` kwarg
+   to have any effect.
+
+
 .. _statsd: https://github.com/etsy/statsd
 .. _Graphite: http://graphite.wikidot.com/
+.. _3eecd18: https://github.com/etsy/statsd/commit/3eecd18

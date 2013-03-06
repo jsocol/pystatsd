@@ -131,7 +131,7 @@ call.  See also the :ref:`chapter on timing <timing-chapter>`.
 
 ::
 
-    StatsClient().gauge(stat, value, rate=1)
+    StatsClient().gauge(stat, value, rate=1, delta=False)
 
 Set a :ref:`gauge <gauge-type>` value.
 
@@ -142,6 +142,10 @@ Set a :ref:`gauge <gauge-type>` value.
 * ``rate``: a sample rate, a float between 0 and 1. Will only send data
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for gauges. Use with care.
+
+* ``delta``: whether or not to consider this a delta value or an
+  absolute value. See the :ref:`gauge <gauge-type>` type for more
+  detail.
 
 .. note::
 

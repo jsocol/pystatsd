@@ -68,9 +68,13 @@ class StatsClient(object):
         """Decrement a stat by `count`."""
         self.incr(stat, -count, rate)
 
-    def gauge(self, stat, value, rate=1):
+    def gauge(self, stat, value, rate=1, delta=False):
         """Set a gauge value."""
-        data = self._prepare(stat, '%s|g' % value, rate)
+        if delta:
+            value = '%+g|g' % value
+        else:
+            value = '%g|g' % value
+        data = self._prepare(stat, value, rate)
         if data is not None:
             self._after(data)
 

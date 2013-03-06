@@ -6,6 +6,8 @@ Version 2.0
 
 - Add Pipeline subclass for batching.
 - Added an _after method subclasses can use to change behavior.
+- Add support for gauge deltas.
+
 
 Version 1.0
 -----------
@@ -14,11 +16,13 @@ Version 1.0
 - Encode socket data in ASCII.
 - Tag v1.
 
+
 Version 0.5.1
 -------------
 
 - Stop supporting IPv6. StatsD doesn't support it, and it breaks things.
 - incr, decr, and gauge now support floating point values.
+
 
 Version 0.5.0
 -------------
