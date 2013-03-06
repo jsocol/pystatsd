@@ -21,7 +21,7 @@ server supports.
 
 ::
 
-    StatsClient(host='localhost', port=8125, prefix=None, batch_len=1)
+    StatsClient(host='localhost', port=8125, prefix=None)
 
 Create a new ``StatsClient`` instance with the appropriate connection and
 prefix information.
@@ -32,9 +32,6 @@ prefix information.
 
 * ``prefix``: a prefix to distinguish and group stats from an application or
   environment.
-
-* ``batch_len``: how many stats to batch before flushing to the statsd_ server.
-  See :ref:`flush`.
 
 
 .. _incr:
@@ -153,24 +150,39 @@ Set a :ref:`gauge <gauge-type>` value.
    recorded.
 
 
-.. _flush:
+.. _pipeline:
 
-``flush``
-=========
+``pipeline``
+============
 
 ::
 
-    StatsClient().flush()
+    StatsClient().pipeline()
 
-Flush batched stats data to the statsd_ server.
+Returns a :ref:`Pipeline <pipeline-chapter>` object for collecting
+several stats. Can also be used as a context manager::
+
+    with StatsClient().pipeline() as pipe:
+        pipe.incr('foo')
+
+
+.. _pipeline-send:
+
+``send``
+========
+
+::
+
+    pipe = StatsClient().pipeline()
+    pipe.incr('foo')
+    pipe.send()
+
+Causes a :ref:`Pipeline <pipeline-chapter>` object to send all batched
+stats.
 
 .. note::
 
-   If you create a StatsClient instance with a ``batch_len`` greater than 1,
-   you should find a way to call ``flush`` at the end of whatever your
-   application is doing, because the client will only send every time the
-   number of stats is zero modulo ``batch_len``, which may introduce a systemic
-   bias to your stats.
+   This method is not implemented on the base StatsClient class.
 
 
 .. _statsd: https://github.com/etsy/statsd

@@ -52,6 +52,7 @@ Contents
    configure.rst
    types.rst
    timing.rst
+   pipeline.rst
    reference.rst
 
 
