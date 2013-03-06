@@ -12,8 +12,8 @@ instrument your code.
 Calling ``timing`` manually
 ===========================
 
-The simplest way to use a timer is to record the time yourself and send it
-manually, using the :ref:`timing` method::
+The simplest way to use a timer is to record the time yourself and send
+it manually, using the :ref:`timing` method::
 
     import time
     from statsd import StatsClient
@@ -31,9 +31,10 @@ manually, using the :ref:`timing` method::
 Using a context manager
 =======================
 
-Each ``StatsClient`` instance contains a :ref:`timer` attribute that can be
-used as a context manager or a decorator. When used as a context manager, it
-will automatically report the time taken for the inner block::
+Each ``StatsClient`` instance contains a :ref:`timer` attribute that can
+be used as a context manager or a decorator. When used as a context
+manager, it will automatically report the time taken for the inner
+block::
 
     from statsd import StatsClient
 
@@ -49,9 +50,9 @@ will automatically report the time taken for the inner block::
 Using a decorator
 =================
 
-The ``timer`` attribute can also be used as a function decorator. Every time
-the decorated function is called, the time it took to execute will be sent to
-the statsd server.
+The ``timer`` attribute can also be used as a function decorator. Every
+time the decorated function is called, the time it took to execute will
+be sent to the statsd server.
 
 ::
 
