@@ -6,8 +6,12 @@
 Welcome to Python StatsD's documentation!
 =========================================
 
-statsd_ is a friendly front-end to Graphite_. This is a Python client for the
-statsd daemon.
+.. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
+   :target: https://travis-ci.org/jsocol/pystatsd
+   :alt: Travis-CI build status
+
+statsd_ is a friendly front-end to Graphite_. This is a Python client
+for the statsd daemon.
 
 Quickly, to use::
 
