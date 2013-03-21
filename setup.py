@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+import statsd
+
 setup(
     name='statsd',
-    version='1.0.0',
+    version=statsd.__version__,
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
