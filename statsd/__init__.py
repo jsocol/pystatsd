@@ -8,13 +8,10 @@ except ImportError:
     settings = None
 
 from .client import StatsClient
+from ._version import __version__
 
 
 __all__ = ['StatsClient', 'statsd']
-
-VERSION = (2, 0, 0)
-__version__ = '.'.join(map(str, VERSION))
-
 
 statsd = None
 

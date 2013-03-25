@@ -1,6 +1,12 @@
 Statsd Changelog
 ================
 
+Version 2.0.1
+-------------
+
+- Fix install with Django 1.5 in the environment.
+
+
 Version 2.0
 -----------
 
