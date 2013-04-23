@@ -21,7 +21,7 @@ statsd_ server supports.
 
 ::
 
-    StatsClient(host='localhost', port=8125, prefix=None)
+    StatsClient(host='localhost', port=8125, prefix=None, suffix=None)
 
 Create a new ``StatsClient`` instance with the appropriate connection
 and prefix information.
@@ -33,6 +33,8 @@ and prefix information.
 * ``prefix``: a prefix to distinguish and group stats from an
   application or environment.
 
+* ``suffix``: a suffix to distinguish and group stats from an
+  application or environment.
 
 .. _incr:
 
