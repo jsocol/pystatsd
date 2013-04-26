@@ -146,6 +146,7 @@ def test_gauge_delta():
     _sock_check(sc, 4, 'foo:-1.3|g')
 
 
+@mock.patch.object(random, 'random', lambda: -1)
 def test_set():
     sc = _client()
     sc.set('foo', 10)
@@ -154,8 +155,11 @@ def test_set():
     sc.set('foo', 2.3)
     _sock_check(sc, 2, 'foo:2.3|s')
 
+    sc.set('foo', 'bar')
+    _sock_check(sc, 3, 'foo:bar|s')
+
     sc.set('foo', 2.3, 0.5)
-    _sock_check(sc, 3, 'foo:2.3|s|@0.5')
+    _sock_check(sc, 4, 'foo:2.3|s|@0.5')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
