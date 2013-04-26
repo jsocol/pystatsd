@@ -142,6 +142,19 @@ keyword argument to ``True``. For example::
    will need to be running at least that version for the ``delta`` kwarg
    to have any effect.
 
+Sets
+======
+
+*Sets* count the number of unique values passed to a key.
+
+For example, you could count the number of users accessing your system
+using:
+
+    statsd.set('users', userid)
+
+If that method is called multiple times with the same userid, that
+userid will only be counted once, for the sample period.
+
 
 .. _statsd: https://github.com/etsy/statsd
 .. _Graphite: http://graphite.wikidot.com/
