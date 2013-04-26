@@ -78,6 +78,12 @@ class StatsClient(object):
         if data is not None:
             self._after(data)
 
+    def set(self, stat, value, rate=1):
+        """Set a set value."""
+        data = self._prepare(stat, '%s|s' % value, rate)
+        if data is not None:
+            self._after(data)
+
     def _prepare(self, stat, value, rate=1):
         if rate < 1:
             if random.random() < rate:
