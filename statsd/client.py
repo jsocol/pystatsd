@@ -78,6 +78,13 @@ class StatsClient(object):
         if data is not None:
             self._after(data)
 
+    def set(self, stat, value):
+        """Send a value to your set."""
+        value = '%g|s' % value
+        data = self._prepare(stat, value)
+        if data is not None:
+            self._after(data)
+
     def _prepare(self, stat, value, rate=1):
         if rate < 1:
             if random.random() < rate:
