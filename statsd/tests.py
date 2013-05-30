@@ -280,6 +280,13 @@ def test_pipeline():
     _sock_check(sc, 1, 'foo:1|c\nbar:-1|c\nbaz:320|ms')
 
 
+def test_pipeline_null():
+    """ensure we don't error on a null pipeline"""
+    sc = _client()
+    pipe = sc.pipeline()
+    pipe.send()
+
+
 def test_pipeline_manager():
     sc = _client()
     with sc.pipeline() as pipe:

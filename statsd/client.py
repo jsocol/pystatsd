@@ -117,6 +117,8 @@ class Pipeline(StatsClient):
 
     def send(self):
         # Use pop(0) to preserve the order of the stats.
+        if not self._stats:
+            return
         data = self._stats.pop(0)
         while self._stats:
             stat = self._stats.pop(0)
