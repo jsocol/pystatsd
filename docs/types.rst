@@ -142,6 +142,9 @@ keyword argument to ``True``. For example::
    will need to be running at least that version for the ``delta`` kwarg
    to have any effect.
 
+
+.. _set-type:
+
 Sets
 ======
 
@@ -152,8 +155,8 @@ using:
 
     statsd.set('users', userid)
 
-If that method is called multiple times with the same userid, that
-userid will only be counted once, for the sample period.
+If that method is called multiple times with the same userid in the
+same sample period, that userid will only be counted once.
 
 
 .. _statsd: https://github.com/etsy/statsd
