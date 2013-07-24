@@ -1,6 +1,12 @@
 Statsd Changelog
 ================
 
+Version 2.0.2
+-------------
+
+- Don't try to pop stats off an empty pipeline.
+- Fix installs with Django 1.5 on the PYTHONPATH.
+
 Version 2.0.1
 -------------
 
