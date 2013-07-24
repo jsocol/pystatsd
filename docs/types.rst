@@ -143,6 +143,22 @@ keyword argument to ``True``. For example::
    to have any effect.
 
 
+.. _set-type:
+
+Sets
+======
+
+*Sets* count the number of unique values passed to a key.
+
+For example, you could count the number of users accessing your system
+using:
+
+    statsd.set('users', userid)
+
+If that method is called multiple times with the same userid in the
+same sample period, that userid will only be counted once.
+
+
 .. _statsd: https://github.com/etsy/statsd
 .. _Graphite: http://graphite.wikidot.com/
 .. _3eecd18: https://github.com/etsy/statsd/commit/3eecd18
