@@ -26,7 +26,8 @@ They, and their defaults, are::
 
     statsd = StatsClient(host='localhost',
                          port=8125,
-                         prefix=None)
+                         prefix=None,
+                         suffix=None)
 
 ``host`` is the host running the statsd server. It will support any kind
 of name or IP address you might use.
@@ -50,6 +51,19 @@ will produce two different stats, ``foo.baz`` and ``bar.baz``. Without
 the ``prefix`` argument, or with the same ``prefix``, two
 ``StatsClient`` instances will update the same stats.
 
+``suffix`` can also be used to distinguish between hosts or environments.
+The suffix will be appended to all stats, automatically. This is useful
+when working with clusters consisting of multiple hosts. For example::
+
+    from statsd import StatsClient
+    from os import uname
+
+    myhostname = uname()[1].split(".")[0]
+    stats = StatsClient(suffix=myhostname)
+
+will append ``.hostname`` to all stats sent to statsd. Without this, all
+hosts in a cluster would update the same stats.
+
 
 In Django
 =========
@@ -63,6 +77,7 @@ Here are the settings and their defaults::
     STATSD_HOST = 'localhost'
     STATSD_PORT = 8125
     STATSD_PREFIX = None
+    STATSD_SUFFIX = None
 
 You can use the default ``StatsClient`` simply::
 
