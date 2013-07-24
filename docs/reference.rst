@@ -154,6 +154,32 @@ Set a :ref:`gauge <gauge-type>` value.
    not be recorded.
 
 
+.. _set:
+
+``set``
+=========
+
+::
+
+    StatsClient().set(stat, value, rate=1)
+
+Increment a :ref:`set <set-type>` value.
+
+* ``stat``: the name of the set to update.
+
+* ``value``: the unique value to count.
+
+* ``rate``: a sample rate, a float between 0 and 1. Will only send data
+  this percentage of the time. The statsd server does *not* take the
+  sample rate into account for sets. Use with care.
+
+.. note::
+
+   Sets were added to the statsd server in commit 1c10cfc0ac_. If you
+   try to use this method with an older version of the server, the
+   data will not be recorded.
+
+
 .. _pipeline:
 
 ``pipeline``
