@@ -20,11 +20,11 @@ Quickly, to use::
     >>> c.incr('foo')  # Increment the 'foo' counter.
     >>> c.timing('stats.timed', 320)  # Record a 320ms 'stats.timed'.
 
-You can also add a prefix and/or suffix to all your stats::
+You can also add a prefix to all your stats::
 
     >>> import statsd
-    >>> c = statsd.StatsClient('localhost', 8125, prefix='foo', suffix='baz')
-    >>> c.incr('bar')  # Will be 'foo.bar.baz' in statsd/graphite.
+    >>> c = statsd.StatsClient('localhost', 8125, prefix='foo')
+    >>> c.incr('bar')  # Will be 'foo.bar' in statsd/graphite.
 
 
 Installing

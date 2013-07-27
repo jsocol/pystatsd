@@ -12,8 +12,8 @@ from statsd import StatsClient
 ADDR = (socket.gethostbyname('localhost'), 8125)
 
 
-def _client(prefix=None, suffix=None):
-    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix, suffix=suffix)
+def _client(prefix=None):
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix)
     sc._sock = mock.Mock()
     return sc
 
@@ -198,20 +198,6 @@ def test_prefix():
 
     sc.incr('bar')
     _sock_check(sc, 1, 'foo.bar:1|c')
-
-
-def test_suffix():
-    sc = _client(suffix='foo')
-
-    sc.incr('bar')
-    _sock_check(sc, 1, 'bar.foo:1|c')
-
-
-def test_prefix_and_suffix():
-    sc = _client(prefix='fooprefix', suffix='foosuffix')
-
-    sc.incr('bar')
-    _sock_check(sc, 1, 'fooprefix.bar.foosuffix:1|c')
 
 
 def _timer_check(cl, count, start, end):

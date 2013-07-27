@@ -37,12 +37,11 @@ class Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, suffix=None):
+    def __init__(self, host='localhost', port=8125, prefix=None):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
-        self._suffix = suffix
 
     def _after(self, data):
         self._send(data)
@@ -95,9 +94,6 @@ class StatsClient(object):
         if self._prefix:
             stat = '%s.%s' % (self._prefix, stat)
 
-        if self._suffix:
-            stat = '%s.%s' % (stat, self._suffix)
-
         data = '%s:%s' % (stat, value)
         return data
 
@@ -114,7 +110,6 @@ class Pipeline(StatsClient):
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix
-        self._suffix = client._suffix
         self._stats = []
 
     def _after(self, data):
