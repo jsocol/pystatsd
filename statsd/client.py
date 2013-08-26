@@ -129,9 +129,9 @@ class Pipeline(StatsClient):
         while self._stats:
             stat = self._stats.pop(0)
             if len(stat) + len(data) + 1 >= 512:
-                self._client._send(data)
+                self._client._after(data)
                 data = stat
             else:
                 data += '\n' + stat
         if data:
-            self._client._send(data)
+            self._client._after(data)
