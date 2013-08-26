@@ -350,3 +350,22 @@ def test_pipeline_packet_size():
     eq_(2, sc._sock.sendto.call_count)
     assert len(sc._sock.sendto.call_args_list[0][0][0]) <= 512
     assert len(sc._sock.sendto.call_args_list[1][0][0]) <= 512
+
+
+def test_big_numbers():
+    num = 1234568901234
+    result = 'foo:1234568901234|%s'
+    tests = (
+        # Explicitly create strings so we avoid the bug we're trying to test.
+        ('gauge', 'g'),
+        ('incr', 'c'),
+        ('timing', 'ms'),
+    )
+
+    def _check(method, suffix):
+        sc = _client()
+        getattr(sc, method)('foo', num)
+        _sock_check(sc, 1, result % suffix)
+
+    for method, suffix in tests:
+        yield _check, method, suffix
