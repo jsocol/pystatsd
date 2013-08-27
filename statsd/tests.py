@@ -132,18 +132,20 @@ def test_gauge():
 
 
 def test_gauge_delta():
-    sc = _client()
-    sc.gauge('foo', 12, delta=True)
-    _sock_check(sc, 1, 'foo:+12|g')
+    tests = (
+        (12, '+12'),
+        (-13, '-13'),
+        (1.2, '+1.2'),
+        (-1.3, '-1.3'),
+    )
 
-    sc.gauge('foo', -13, delta=True)
-    _sock_check(sc, 2, 'foo:-13|g')
+    def _check(num, result):
+        sc = _client()
+        sc.gauge('foo', num, delta=True)
+        _sock_check(sc, 1, 'foo:%s|g' % result)
 
-    sc.gauge('foo', 1.2, delta=True)
-    _sock_check(sc, 3, 'foo:+1.2|g')
-
-    sc.gauge('foo', -1.3, delta=True)
-    _sock_check(sc, 4, 'foo:-1.3|g')
+    for num, result in tests:
+        yield _check, num, result
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -350,3 +352,22 @@ def test_pipeline_packet_size():
     eq_(2, sc._sock.sendto.call_count)
     assert len(sc._sock.sendto.call_args_list[0][0][0]) <= 512
     assert len(sc._sock.sendto.call_args_list[1][0][0]) <= 512
+
+
+def test_big_numbers():
+    num = 1234568901234
+    result = 'foo:1234568901234|%s'
+    tests = (
+        # Explicitly create strings so we avoid the bug we're trying to test.
+        ('gauge', 'g'),
+        ('incr', 'c'),
+        ('timing', 'ms'),
+    )
+
+    def _check(method, suffix):
+        sc = _client()
+        getattr(sc, method)('foo', num)
+        _sock_check(sc, 1, result % suffix)
+
+    for method, suffix in tests:
+        yield _check, method, suffix

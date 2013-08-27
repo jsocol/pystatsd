@@ -70,10 +70,8 @@ class StatsClient(object):
 
     def gauge(self, stat, value, rate=1, delta=False):
         """Set a gauge value."""
-        if delta:
-            value = '%+g|g' % value
-        else:
-            value = '%g|g' % value
+        prefix = '+' if delta and value >= 0 else ''
+        value = '%s%s|g' % (prefix, value)
         data = self._prepare(stat, value, rate)
         if data is not None:
             self._after(data)
