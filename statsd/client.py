@@ -42,7 +42,7 @@ class StatsClient(object):
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
-        self_suffix = suffix
+        self._suffix = suffix
 
     def _after(self, data):
         self._send(data)
