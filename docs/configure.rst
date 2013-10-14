@@ -26,7 +26,8 @@ They, and their defaults, are::
 
     statsd = StatsClient(host='localhost',
                          port=8125,
-                         prefix=None)
+                         prefix=None,
+                         disable=False)
 
 ``host`` is the host running the statsd server. It will support any kind
 of name or IP address you might use.
@@ -50,6 +51,9 @@ will produce two different stats, ``foo.baz`` and ``bar.baz``. Without
 the ``prefix`` argument, or with the same ``prefix``, two
 ``StatsClient`` instances will update the same stats.
 
+``disable`` makes the client not send data to statsd server. It is usefull in
+testing environments when you don't want to ruin your production metrics.
+
 
 In Django
 =========
@@ -63,6 +67,7 @@ Here are the settings and their defaults::
     STATSD_HOST = 'localhost'
     STATSD_PORT = 8125
     STATSD_PREFIX = None
+    STATSD_DISABLE = False
 
 You can use the default ``StatsClient`` simply::
 
@@ -86,6 +91,7 @@ You can set these variables in the environment::
     STATSD_HOST
     STATSD_PORT
     STATSD_PREFIX
+    STATSD_DISABLE
 
 and then in your Python application, you can simply do::
 
