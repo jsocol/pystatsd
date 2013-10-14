@@ -371,3 +371,15 @@ def test_big_numbers():
 
     for method, suffix in tests:
         yield _check, method, suffix
+
+def test_disabled_client():
+    """ Assert that a cliend with disabled=True does not send any data to
+    statsd.
+    """
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], disable=True)
+    sc._sock = mock.Mock()
+
+    sc.incr('foo')
+
+    eq_(sc._sock.call_count, 0)
+
