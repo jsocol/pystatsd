@@ -37,12 +37,13 @@ class Timer(object):
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, suffix=None):
+    def __init__(self, host='localhost', port=8125, prefix=None, suffix=None, maxudpsize=512):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._suffix = suffix
+        self._maxudpsize = maxudpsize
 
     def _after(self, data):
         self._send(data)
@@ -111,6 +112,7 @@ class Pipeline(StatsClient):
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix
+        self._maxudpsize = client._maxudpsize
         self._stats = []
 
     def _after(self, data):
@@ -129,7 +131,7 @@ class Pipeline(StatsClient):
         data = self._stats.pop(0)
         while self._stats:
             stat = self._stats.pop(0)
-            if len(stat) + len(data) + 1 >= 512:
+            if len(stat) + len(data) + 1 >= self._maxudpsize:
                 self._client._after(data)
                 data = stat
             else:

@@ -26,7 +26,8 @@ They, and their defaults, are::
 
     statsd = StatsClient(host='localhost',
                          port=8125,
-                         prefix=None)
+                         prefix=None,
+                         maxudpsize=512)
 
 ``host`` is the host running the statsd server. It will support any kind
 of name or IP address you might use.
@@ -50,6 +51,13 @@ will produce two different stats, ``foo.baz`` and ``bar.baz``. Without
 the ``prefix`` argument, or with the same ``prefix``, two
 ``StatsClient`` instances will update the same stats.
 
+``maxudpsize`` specifies the maximum packet size statsd will use. This is
+an advanced options and should not be changed unless you know what you are
+doing. Larger values then the default of 512 are generally deemed unsafe for use
+on the internet. On a controlled local network or when the statsd server is
+running on 127.0.0.1 larger values can decrease the number of UDP packets when
+pipelining many metrics. Use with care!
+
 
 In Django
 =========
@@ -63,6 +71,7 @@ Here are the settings and their defaults::
     STATSD_HOST = 'localhost'
     STATSD_PORT = 8125
     STATSD_PREFIX = None
+    STATSD_MAXUDPSIZE = 512
 
 You can use the default ``StatsClient`` simply::
 
@@ -86,6 +95,7 @@ You can set these variables in the environment::
     STATSD_HOST
     STATSD_PORT
     STATSD_PREFIX
+    STATSD_MAXUDPSIZE
 
 and then in your Python application, you can simply do::
 
