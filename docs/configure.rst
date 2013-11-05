@@ -19,7 +19,7 @@ it's extremely easy::
     statsd = StatsClient()
     statsd.incr('foo')
 
-There are three arguments to configure your ``StatsClient`` instance.
+There are five arguments to configure your ``StatsClient`` instance.
 They, and their defaults, are::
 
     from statsd import StatsClient
@@ -27,6 +27,7 @@ They, and their defaults, are::
     statsd = StatsClient(host='localhost',
                          port=8125,
                          prefix=None,
+                         suffix=None,
                          maxudpsize=512)
 
 ``host`` is the host running the statsd server. It will support any kind
@@ -50,6 +51,8 @@ automatically. For example::
 will produce two different stats, ``foo.baz`` and ``bar.baz``. Without
 the ``prefix`` argument, or with the same ``prefix``, two
 ``StatsClient`` instances will update the same stats.
+
+``suffix`` can also be used in a similar manner.
 
 ``maxudpsize`` specifies the maximum packet size statsd will use. This is
 an advanced options and should not be changed unless you know what you are
