@@ -26,6 +26,11 @@ You can also add a prefix to all your stats::
     >>> c = statsd.StatsClient('localhost', 8125, prefix='foo')
     >>> c.incr('bar')  # Will be 'foo.bar' in statsd/graphite.
 
+You can also add a suffix to all your stats::
+
+    >>> import statsd
+    >>> c = statsd.StatsClient('localhost', 8125, suffix='host001-example-com')
+    >>> c.incr('bar')  # Will be 'bar.host001-example-com' in statsd/graphite.
 
 Installing
 ----------
