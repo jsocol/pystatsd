@@ -44,9 +44,6 @@ class StatsClient(object):
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
-    def _after(self, data):
-        self._send(data)
-
     def pipeline(self):
         return Pipeline(self)
 
@@ -55,15 +52,11 @@ class StatsClient(object):
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
-        data = self._prepare(stat, '%d|ms' % delta, rate)
-        if data is not None:
-            self._after(data)
+        self._send_stat(stat, '%d|ms' % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""
-        data = self._prepare(stat, '%s|c' % count, rate)
-        if data is not None:
-            self._after(data)
+        self._send_stat(stat, '%s|c' % count, rate)
 
     def decr(self, stat, count=1, rate=1):
         """Decrement a stat by `count`."""
@@ -72,29 +65,29 @@ class StatsClient(object):
     def gauge(self, stat, value, rate=1, delta=False):
         """Set a gauge value."""
         prefix = '+' if delta and value >= 0 else ''
-        value = '%s%s|g' % (prefix, value)
-        data = self._prepare(stat, value, rate)
-        if data is not None:
-            self._after(data)
+        self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
 
     def set(self, stat, value, rate=1):
         """Set a set value."""
-        data = self._prepare(stat, '%s|s' % value, rate)
-        if data is not None:
-            self._after(data)
+        self._send_stat(stat, '%s|s' % value, rate)
 
-    def _prepare(self, stat, value, rate=1):
+    def _send_stat(self, stat, value, rate):
+        self._after(self._prepare(stat, value, rate))
+
+    def _prepare(self, stat, value, rate):
         if rate < 1:
-            if random.random() < rate:
-                value = '%s|@%s' % (value, rate)
-            else:
+            if random.random() > rate:
                 return
+            value = '%s|@%s' % (value, rate)
 
         if self._prefix:
             stat = '%s.%s' % (self._prefix, stat)
 
-        data = '%s:%s' % (stat, value)
-        return data
+        return '%s:%s' % (stat, value)
+
+    def _after(self, data):
+        if data:
+            self._send(data)
 
     def _send(self, data):
         """Send data to statsd."""
@@ -133,5 +126,4 @@ class Pipeline(StatsClient):
                 data = stat
             else:
                 data += '\n' + stat
-        if data:
-            self._client._after(data)
+        self._client._after(data)
