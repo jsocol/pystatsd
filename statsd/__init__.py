@@ -18,7 +18,7 @@ except ImportError:
 from .client import StatsClient
 
 
-VERSION = (2, 1, 0)
+VERSION = (2, 1, 1)
 __version__ = '.'.join(map(str, VERSION))
 __all__ = ['StatsClient', 'statsd']
 
