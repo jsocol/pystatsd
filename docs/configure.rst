@@ -51,6 +51,8 @@ will produce two different stats, ``foo.baz`` and ``bar.baz``. Without
 the ``prefix`` argument, or with the same ``prefix``, two
 ``StatsClient`` instances will update the same stats.
 
+.. versionadded:: 2.0.3
+
 ``maxudpsize`` specifies the maximum packet size statsd will use. This is
 an advanced options and should not be changed unless you know what you are
 doing. Larger values then the default of 512 are generally deemed unsafe for use

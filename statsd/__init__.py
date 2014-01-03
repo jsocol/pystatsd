@@ -16,7 +16,7 @@ except ImportError:
     settings = None
 
 from .client import StatsClient
-from ._version import __version__  # noqa
+from ._version import __version__, VERSION  # noqa
 
 
 __all__ = ['StatsClient', 'statsd']

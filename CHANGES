@@ -1,6 +1,12 @@
 Statsd Changelog
 ================
 
+Version 2.1
+-----------
+
+- Add maxudpsize option for Pipelines.
+- Add methods to use Timer objects directly.
+
 Version 2.0.3
 -------------
 

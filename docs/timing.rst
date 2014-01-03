@@ -74,6 +74,8 @@ be sent to the statsd server.
 Using a Timer object directly
 =============================
 
+.. versionadded:: 2.1
+
 :py:class:`statsd.client.Timer` objects function as context managers and
 as decorators, but they can also be used directly. (Flat is, after all,
 better than nested.)
