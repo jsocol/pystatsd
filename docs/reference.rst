@@ -172,8 +172,7 @@ Record :ref:`timer <timer-type>` information.
 
 ::
 
-    timer = StatsClient().timer('foo', rate=1).start()
-    timer.stop()
+    timer = StatsClient().timer('foo', rate=1)
 
 Automatically record timing information for a managed block or function
 call.  See also the :ref:`chapter on timing <timing-chapter>`.
@@ -233,8 +232,7 @@ Causes the timer to send any unsent data. If the data has already been
 sent, or has not yet been recorded, a ``RuntimeError`` is raised.
 
 .. note::
-   See the note abbout `timer objects and pipelines
-   <timer-direct-note>`_.
+   See the note abbout :ref:`timer objects and pipelines <timer-direct-note>`.
 
 
 .. _pipeline:

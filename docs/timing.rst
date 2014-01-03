@@ -71,8 +71,8 @@ be sent to the statsd server.
     myfunc(3, 7)
 
 
-Using a Timer directly
-======================
+Using a Timer object directly
+=============================
 
 :py:class:`statsd.client.Timer` objects function as context managers and
 as decorators, but they can also be used directly. (Flat is, after all,
