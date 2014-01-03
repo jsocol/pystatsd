@@ -317,6 +317,22 @@ def test_timer_object_rate():
     _timer_check(sc, 1, 'foo', 'ms@0.5')
 
 
+def test_timer_object_no_send_twice():
+    sc = _client()
+
+    t = sc.timer('foo').start()
+    t.stop()
+
+    with assert_raises(RuntimeError):
+        t.send()
+
+
+def test_timer_object_stop_without_start():
+    sc = _client()
+    with assert_raises(RuntimeError):
+        sc.timer('foo').stop()
+
+
 def test_pipeline():
     sc = _client()
     pipe = sc.pipeline()

@@ -16,6 +16,8 @@ class Timer(object):
         self.stat = stat
         self.rate = rate
         self.ms = None
+        self._sent = False
+        self._start_time = None
 
     def __call__(self, f):
         @wraps(f)
@@ -35,6 +37,8 @@ class Timer(object):
         return self
 
     def stop(self, send=True):
+        if self._start_time is None:
+            raise RuntimeError('Timer has not started.')
         dt = time.time() - self._start_time
         self.ms = int(round(1000 * dt))  # Convert to milliseconds.
         if send:
@@ -42,6 +46,11 @@ class Timer(object):
         return self
 
     def send(self):
+        if self.ms is None:
+            raise RuntimeError('No data recorded.')
+        if self._sent:
+            raise RuntimeError('Already sent data.')
+        self._sent = True
         self.client.timing(self.stat, self.ms, self.rate)
 
 
