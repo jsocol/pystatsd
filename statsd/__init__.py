@@ -16,9 +16,10 @@ except ImportError:
     settings = None
 
 from .client import StatsClient
-from ._version import __version__, VERSION  # noqa
 
 
+VERSION = (2, 1, 0)
+__version__ = '.'.join(map(str, VERSION))
 __all__ = ['StatsClient', 'statsd']
 
 statsd = None

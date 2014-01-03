@@ -3,23 +3,9 @@ import re
 from setuptools import find_packages, setup
 
 
-VERSIONFILE = os.path.join('statsd', '_version.py')
-VSRE = r'^__version__ = [\'"]([^\'"]*)[\'"]'
-
-
-def get_version():
-    verstrline = open(VERSIONFILE, "rt").read()
-    mo = re.search(VSRE, verstrline, re.M)
-    if mo:
-        return mo.group(1)
-    else:
-        raise RuntimeError(
-            "Unable to find version string in %s." % VERSIONFILE)
-
-
 setup(
     name='statsd',
-    version=get_version(),
+    version='2.1',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
