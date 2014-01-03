@@ -286,7 +286,7 @@ def test_timer_decorator_exceptions():
     _timer_check(sc, 1, 'foo', 'ms')
 
 
-def test_imperative_timer():
+def test_timer_object():
     sc = _client()
 
     t = sc.timer('foo').start()
@@ -295,7 +295,7 @@ def test_imperative_timer():
     _timer_check(sc, 1, 'foo', 'ms')
 
 
-def test_imperative_timer_no_send():
+def test_timer_object_no_send():
     sc = _client()
 
     t = sc.timer('foo').start()
@@ -307,7 +307,7 @@ def test_imperative_timer_no_send():
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_imperative_timer_rate():
+def test_timer_object_rate():
     sc = _client()
 
     t = sc.timer('foo', rate=0.5)
@@ -362,7 +362,7 @@ def test_pipeline_timer_decorator():
     _timer_check(sc, 1, 'foo', 'ms')
 
 
-def test_pipeline_timer_imperative():
+def test_pipeline_timer_object():
     sc = _client()
     with sc.pipeline() as pipe:
         t = pipe.timer('foo').start()
