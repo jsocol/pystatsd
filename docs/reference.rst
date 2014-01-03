@@ -114,6 +114,11 @@ Record :ref:`timer <timer-type>` information.
     def foo():
         pass
 
+::
+
+    timer = StatsClient().timer('foo', rate=1).start()
+    timer.stop()
+
 Automatically record timing information for a managed block or function
 call.  See also the :ref:`chapter on timing <timing-chapter>`.
 
@@ -122,6 +127,58 @@ call.  See also the :ref:`chapter on timing <timing-chapter>`.
 * ``rate``: a sample rate, a float between 0 and 1. Will only send data
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for timers.
+
+
+.. _timer-start:
+
+``start``
+=========
+
+::
+
+    StatsClient().timer('foo').start()
+
+Causes a timer object to start counting. Called automatically when the
+object is used as a decorator or context manager. Returns the timer
+object for simplicity.
+
+
+.. _timer-stop:
+
+``stop``
+========
+
+::
+
+    timer = StatsClient().timer('foo').start()
+    timer.stop()
+
+Causes the timer object to stop timing and send the results to statsd_.
+Can be called with ``send=False`` to prevent immediate sending
+immediately, and use ``send()``. Called automatically when the object is
+used as a decorator or context manager. Returns the timer object.
+
+If ``stop()`` is called before ``start()``, a ``RuntimeError`` is
+raised.
+
+
+.. _timer-send:
+
+``send``
+========
+
+::
+
+    timer = StatsClient().timer('foo').start()
+    timer.stop(send=False)
+    timer.send()
+
+Causes the timer to send any unsent data. If the data has already been
+sent, or has not yet been recorded, a ``RuntimeError`` is raised.
+
+.. note::
+   See the note abbout `timer objects and pipelines
+   <timer-direct-note>`_.
 
 
 .. _gauge:

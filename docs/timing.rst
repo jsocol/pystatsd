@@ -99,6 +99,8 @@ this behavior with the ``send=False`` keyword argument to ``stop()``::
 Use :py:meth:`statsd.client.Timer.send` to send the stat when you're
 ready.
 
+.. _timer-direct-note:
+
 .. note::
    This use of timers is compatible with `Pipelines <pipeline-chapter>`_
    but be careful with the ``send()`` method. It *must* be called for
