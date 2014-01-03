@@ -25,19 +25,31 @@ class Timer(object):
         return wrapper
 
     def __enter__(self):
-        self.start = time.time()
-        return self
+        return self.start()
 
     def __exit__(self, typ, value, tb):
-        dt = time.time() - self.start
-        self.ms = int(round(1000 * dt))  # Convert to ms.
+        self.stop()
+
+    def start(self):
+        self._start_time = time.time()
+        return self
+
+    def stop(self, send=True):
+        dt = time.time() - self._start_time
+        self.ms = int(round(1000 * dt))  # Convert to milliseconds.
+        if send:
+            self.send()
+        return self
+
+    def send(self):
         self.client.timing(self.stat, self.ms, self.rate)
 
 
 class StatsClient(object):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, maxudpsize=512):
+    def __init__(self, host='localhost', port=8125, prefix=None,
+                 maxudpsize=512):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -106,7 +118,8 @@ class Pipeline(StatsClient):
         self._stats = []
 
     def _after(self, data):
-        self._stats.append(data)
+        if data is not None:
+            self._stats.append(data)
 
     def __enter__(self):
         return self

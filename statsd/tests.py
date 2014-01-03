@@ -18,13 +18,11 @@ def _client(prefix=None):
     return sc
 
 
-def _sock_check(cl, count, val):
+def _sock_check(cl, count, val=None):
     eq_(cl._sock.sendto.call_count, count)
-    if val:
+    if val is not None:
         val = val.encode('ascii')
         eq_(cl._sock.sendto.call_args, ((val, ADDR), {}))
-    else:
-        eq_(cl._sock.sendto.call_args, None)
 
 
 class assert_raises(object):
@@ -288,6 +286,37 @@ def test_timer_decorator_exceptions():
     _timer_check(sc, 1, 'foo', 'ms')
 
 
+def test_imperative_timer():
+    sc = _client()
+
+    t = sc.timer('foo').start()
+    t.stop()
+
+    _timer_check(sc, 1, 'foo', 'ms')
+
+
+def test_imperative_timer_no_send():
+    sc = _client()
+
+    t = sc.timer('foo').start()
+    t.stop(send=False)
+    _sock_check(sc, 0)
+
+    t.send()
+    _timer_check(sc, 1, 'foo', 'ms')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_imperative_timer_rate():
+    sc = _client()
+
+    t = sc.timer('foo', rate=0.5)
+    t.start()
+    t.stop()
+
+    _timer_check(sc, 1, 'foo', 'ms@0.5')
+
+
 def test_pipeline():
     sc = _client()
     pipe = sc.pipeline()
@@ -303,6 +332,7 @@ def test_pipeline_null():
     sc = _client()
     pipe = sc.pipeline()
     pipe.send()
+    _sock_check(sc, 0)
 
 
 def test_pipeline_manager():
@@ -329,6 +359,15 @@ def test_pipeline_timer_decorator():
         def foo():
             pass
         foo()
+    _timer_check(sc, 1, 'foo', 'ms')
+
+
+def test_pipeline_timer_imperative():
+    sc = _client()
+    with sc.pipeline() as pipe:
+        t = pipe.timer('foo').start()
+        t.stop()
+        _sock_check(sc, 0)
     _timer_check(sc, 1, 'foo', 'ms')
 
 
