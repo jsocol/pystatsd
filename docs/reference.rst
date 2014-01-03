@@ -37,7 +37,7 @@ and prefix information.
 .. _incr:
 
 ``incr``
-========
+--------
 
 ::
 
@@ -58,7 +58,7 @@ Increment a :ref:`counter <counter-type>`.
 .. _decr:
 
 ``decr``
-========
+--------
 
 ::
 
@@ -77,10 +77,66 @@ Decrement a :ref:`counter <counter-type>`.
   rate into account for counters.
 
 
+.. _gauge:
+
+``gauge``
+---------
+
+::
+
+    StatsClient().gauge(stat, value, rate=1, delta=False)
+
+Set a :ref:`gauge <gauge-type>` value.
+
+* ``stat``: the name of the gauge to set.
+
+* ``value``: the current value of the gauge.
+
+* ``rate``: a sample rate, a float between 0 and 1. Will only send data
+  this percentage of the time. The statsd server does *not* take the
+  sample rate into account for gauges. Use with care.
+
+* ``delta``: whether or not to consider this a delta value or an
+  absolute value. See the :ref:`gauge <gauge-type>` type for more
+  detail.
+
+.. note::
+
+   Gauges were added to the statsd server in commit 0ed78be_. If you try
+   to use this method with an older version of the server, the data will
+   not be recorded.
+
+
+.. _set:
+
+``set``
+---------
+
+::
+
+    StatsClient().set(stat, value, rate=1)
+
+Increment a :ref:`set <set-type>` value.
+
+* ``stat``: the name of the set to update.
+
+* ``value``: the unique value to count.
+
+* ``rate``: a sample rate, a float between 0 and 1. Will only send data
+  this percentage of the time. The statsd server does *not* take the
+  sample rate into account for sets. Use with care.
+
+.. note::
+
+   Sets were added to the statsd server in commit 1c10cfc0ac_. If you
+   try to use this method with an older version of the server, the
+   data will not be recorded.
+
+
 .. _timing:
 
 ``timing``
-==========
+----------
 
 ::
 
@@ -132,7 +188,7 @@ call.  See also the :ref:`chapter on timing <timing-chapter>`.
 .. _timer-start:
 
 ``start``
-=========
+---------
 
 ::
 
@@ -146,7 +202,7 @@ object for simplicity.
 .. _timer-stop:
 
 ``stop``
-========
+--------
 
 ::
 
@@ -165,7 +221,7 @@ raised.
 .. _timer-send:
 
 ``send``
-========
+--------
 
 ::
 
@@ -179,62 +235,6 @@ sent, or has not yet been recorded, a ``RuntimeError`` is raised.
 .. note::
    See the note abbout `timer objects and pipelines
    <timer-direct-note>`_.
-
-
-.. _gauge:
-
-``gauge``
-=========
-
-::
-
-    StatsClient().gauge(stat, value, rate=1, delta=False)
-
-Set a :ref:`gauge <gauge-type>` value.
-
-* ``stat``: the name of the gauge to set.
-
-* ``value``: the current value of the gauge.
-
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server does *not* take the
-  sample rate into account for gauges. Use with care.
-
-* ``delta``: whether or not to consider this a delta value or an
-  absolute value. See the :ref:`gauge <gauge-type>` type for more
-  detail.
-
-.. note::
-
-   Gauges were added to the statsd server in commit 0ed78be_. If you try
-   to use this method with an older version of the server, the data will
-   not be recorded.
-
-
-.. _set:
-
-``set``
-=========
-
-::
-
-    StatsClient().set(stat, value, rate=1)
-
-Increment a :ref:`set <set-type>` value.
-
-* ``stat``: the name of the set to update.
-
-* ``value``: the unique value to count.
-
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server does *not* take the
-  sample rate into account for sets. Use with care.
-
-.. note::
-
-   Sets were added to the statsd server in commit 1c10cfc0ac_. If you
-   try to use this method with an older version of the server, the
-   data will not be recorded.
 
 
 .. _pipeline:
@@ -256,7 +256,7 @@ several stats. Can also be used as a context manager::
 .. _pipeline-send:
 
 ``send``
-========
+--------
 
 ::
 
