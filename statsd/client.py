@@ -33,6 +33,8 @@ class Timer(object):
         self.stop()
 
     def start(self):
+        self.ms = None
+        self._sent = False
         self._start_time = time.time()
         return self
 

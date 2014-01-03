@@ -226,8 +226,11 @@ def test_timer_decorator():
         pass
 
     bar()
-
     _timer_check(sc, 1, 'bar', 'ms')
+
+    # Make sure the decorator works more than once:
+    bar()
+    _timer_check(sc, 2, 'bar', 'ms')
 
 
 def test_timer_capture():

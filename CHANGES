@@ -1,6 +1,12 @@
 Statsd Changelog
 ================
 
+Version 2.1.1
+-------------
+
+- Fix issue with timers used as decorators.
+
+
 Version 2.1
 -----------
 
