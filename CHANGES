@@ -1,6 +1,13 @@
 Statsd Changelog
 ================
 
+Version 2.1.2
+-------------
+
+- Fix negative absolute (non-delta) gauges.
+- Improve test coverage.
+
+
 Version 2.1.1
 -------------
 
