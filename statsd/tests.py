@@ -348,6 +348,19 @@ def test_timer_object_no_send_twice():
         t.send()
 
 
+def test_timer_send_without_stop():
+    sc = _client()
+    with sc.timer('foo') as t:
+        assert t.ms is None
+        with assert_raises(RuntimeError):
+            t.send()
+
+    t = sc.timer('bar').start()
+    assert t.ms is None
+    with assert_raises(RuntimeError):
+        t.send()
+
+
 def test_timer_object_stop_without_start():
     sc = _client()
     with assert_raises(RuntimeError):
@@ -456,3 +469,17 @@ def test_big_numbers():
 
     for method, suffix in tests:
         yield _check, method, suffix
+
+
+@mock.patch.object(random, 'random', lambda: 2)
+def test_rate_no_send():
+    sc = _client()
+    sc.incr('foo', rate=0.5)
+    _sock_check(sc, 0)
+
+
+def test_socket_error():
+    sc = _client()
+    sc._sock.sendto.side_effect = socket.timeout()
+    sc.incr('foo')
+    _sock_check(sc, 1, 'foo:1|c')
