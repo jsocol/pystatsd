@@ -146,6 +146,24 @@ def test_gauge_delta():
         yield _check, num, result
 
 
+def test_gauge_absolute_negative():
+    sc = _client()
+    sc.gauge('foo', -5, delta=False)
+    _sock_check(sc, 1, 'foo:0|g\nfoo:-5|g')
+
+
+@mock.patch.object(random, 'random')
+def test_gauge_absolute_negative_rate(mock_random):
+    sc = _client()
+    mock_random.return_value = -1
+    sc.gauge('foo', -1, rate=0.5, delta=False)
+    _sock_check(sc, 1, 'foo:0|g\nfoo:-1|g')
+    
+    mock_random.return_value = 2
+    sc.gauge('foo', -2, rate=0.5, delta=False)
+    _sock_check(sc, 1, 'foo:0|g\nfoo:-1|g')  # Should not have changed.
+
+
 @mock.patch.object(random, 'random', lambda: -1)
 def test_set():
     sc = _client()
@@ -410,6 +428,15 @@ def test_pipeline_packet_size():
     eq_(2, sc._sock.sendto.call_count)
     assert len(sc._sock.sendto.call_args_list[0][0][0]) <= 512
     assert len(sc._sock.sendto.call_args_list[1][0][0]) <= 512
+
+
+def test_pipeline_negative_absolute_gauge():
+    """Negative absolute gauges use an internal pipeline."""
+    sc = _client()
+    with sc.pipeline() as pipe:
+        pipe.gauge('foo', -10, delta=False)
+        pipe.incr('bar')
+    _sock_check(sc, 1, 'foo:0|g\nfoo:-10|g\nbar:1|c')
 
 
 def test_big_numbers():

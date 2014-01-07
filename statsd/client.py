@@ -87,8 +87,16 @@ class StatsClient(object):
 
     def gauge(self, stat, value, rate=1, delta=False):
         """Set a gauge value."""
-        prefix = '+' if delta and value >= 0 else ''
-        self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
+        if value < 0 and not delta:
+            if rate < 1:
+                if random.random() > rate:
+                    return
+            with self.pipeline() as pipe:
+                pipe._send_stat(stat, '0|g', 1)
+                pipe._send_stat(stat, '%s|g' % value, 1)
+        else:
+            prefix = '+' if delta and value >= 0 else ''
+            self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
 
     def set(self, stat, value, rate=1):
         """Set a set value."""
