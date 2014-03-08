@@ -43,7 +43,7 @@ class Timer(object):
             raise RuntimeError('Timer has not started.')
         dt = time.time() - self._start_time
         self.ms = int(round(1000 * dt))  # Convert to milliseconds.
-        if send:
+        if send and self.ms > 0:
             self.send()
         return self
 
