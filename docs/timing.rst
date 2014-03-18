@@ -70,6 +70,10 @@ be sent to the statsd server.
     myfunc(1, 2)
     myfunc(3, 7)
 
+**Caution:** do not use timer decorators on functions that may be called
+concurrently or you will get RuntimeError("Already sent") errors. Use
+a context manager in the function instead.
+
 
 Using a Timer object directly
 =============================

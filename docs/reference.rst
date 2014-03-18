@@ -183,6 +183,10 @@ call.  See also the :ref:`chapter on timing <timing-chapter>`.
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for timers.
 
+**Caution:** do not use timer decorators on functions that may be called
+concurrently or you will get RuntimeError("Already sent") errors. Use
+a context manager in the function instead.
+
 
 .. _timer-start:
 
