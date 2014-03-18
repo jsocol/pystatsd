@@ -70,6 +70,11 @@ be sent to the statsd server.
     myfunc(1, 2)
     myfunc(3, 7)
 
+.. warning:
+   Decorators are not thread-safe and may cause errors when decorated
+   functions are called concurrently. Use context managers or raw timers
+   instead.
+
 
 Using a Timer object directly
 =============================
