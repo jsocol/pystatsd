@@ -60,12 +60,16 @@ class StatsClient(object):
     """A client for statsd."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512):
+                 maxudpsize=512, disabled=False):
         """Create a new client."""
         self._addr = (socket.gethostbyname(host), port)
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        if disabled:
+            self._sock = None
+        else:
+            self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
+        self._disabled = disabled
 
     def pipeline(self):
         return Pipeline(self)
@@ -121,7 +125,9 @@ class StatsClient(object):
             self._send(data)
 
     def _send(self, data):
-        """Send data to statsd."""
+        """Send data to statsd if it's not disabled."""
+        if self._disabled:
+            return
         try:
             self._sock.sendto(data.encode('ascii'), self._addr)
         except socket.error:
