@@ -67,4 +67,4 @@ Indices and tables
 * :ref:`search`
 
 .. _statsd: https://github.com/etsy/statsd
-.. _Graphite: http://graphite.wikidot.com/
+.. _Graphite: http://graphite.readthedocs.org/
