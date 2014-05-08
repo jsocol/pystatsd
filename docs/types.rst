@@ -160,5 +160,5 @@ same sample period, that userid will only be counted once.
 
 
 .. _statsd: https://github.com/etsy/statsd
-.. _Graphite: http://graphite.wikidot.com/
+.. _Graphite: http://graphite.readthedocs.org
 .. _3eecd18: https://github.com/etsy/statsd/commit/3eecd18
