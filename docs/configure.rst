@@ -77,39 +77,35 @@ Here are the settings and their defaults::
 
 You can use the default ``StatsClient`` simply::
 
-    from statsd import statsd
+    from statsd.defaults.django import statsd
 
     statsd.incr('foo')
-
-This instance will use the settings, if provided by Django. If no Django
-settings can be imported, it won't be available.
 
 
 From the Environment
 ====================
 
 Statsd isn't only useful in Django or on the web. A default instance
-will also be available if you configure at least two environment
-variables. These do not have defaults.
+can also be configured via environment variables.
 
-You can set these variables in the environment::
+Here are the environment variables and their defaults::
 
-    STATSD_HOST
-    STATSD_PORT
-    STATSD_PREFIX
-    STATSD_MAXUDPSIZE
+    STATSD_HOST=localhost
+    STATSD_PORT=8125
+    STATSD_PREFIX=None
+    STATSD_MAXUDPSIZE=512
 
 and then in your Python application, you can simply do::
 
-    from statsd import statsd
+    from statsd.defaults.env import statsd
 
     statsd.incr('foo')
 
 .. note::
 
-    To make this default instance available, you will need to set at
-    least ``STATSD_HOST`` and ``STATSD_PORT``, even if using the default
-    values of ``localhost`` and ``8125``.
+    As of version 3.0, this default instance is always available,
+    configured with the default values, unless overridden by the
+    environment.
 
 .. _statsd: https://github.com/etsy/statsd
 .. _Django: https://www.djangoproject.com/
