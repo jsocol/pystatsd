@@ -50,5 +50,5 @@ There are lots of docs in the ``docs/`` directory and on ReadTheDocs_.
 
 
 .. _statsd: https://github.com/etsy/statsd
-.. _Graphite: http://graphite.wikidot.com/
+.. _Graphite: http://graphite.readthedocs.org/
 .. _ReadTheDocs: http://statsd.readthedocs.org/en/latest/index.html
