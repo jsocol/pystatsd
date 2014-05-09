@@ -96,7 +96,7 @@ better than nested.)
     # Do something fun.
     foo_timer.stop()
 
-When :py:meth:`statsd.client.Timer.stop` is called, a `timing stat
+When :py:meth:`statsd.client.Timer.stop` is called, a :ref:`timing stat
 <timer-type>`_ will automatically be sent to StatsD. You can over ride
 this behavior with the ``send=False`` keyword argument to ``stop()``::
 
@@ -109,11 +109,11 @@ ready.
 .. _timer-direct-note:
 
 .. note::
-   This use of timers is compatible with `Pipelines <pipeline-chapter>`_
-   but be careful with the ``send()`` method. It *must* be called for
-   the stat to be included when the Pipeline finally sends data, but
-   ``send()`` will *not* immediately cause data to be sent in the
-   context of a Pipeline. For example::
+   This use of timers is compatible with :ref:`Pipelines
+   <pipeline-chapter>`_ but be careful with the ``send()`` method. It
+   *must* be called for the stat to be included when the Pipeline
+   finally sends data, but ``send()`` will *not* immediately cause data
+   to be sent in the context of a Pipeline. For example::
 
     with statsd.pipeline() as pipe:
         foo_timer = pipe.timer('foo').start()

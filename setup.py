@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='statsd',
-    version='2.1.2',
+    version='3.0',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
@@ -15,6 +15,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={'': ['README.rst']},
+    test_suite='nose.collector',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
@@ -28,6 +29,8 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Software Development :: Libraries :: Python Modules',
-    ]
+    ],
 )

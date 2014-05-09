@@ -1,0 +1,4 @@
+HOST = 'localhost'
+PORT = 8125
+PREFIX = None
+MAXUDPSIZE = 512

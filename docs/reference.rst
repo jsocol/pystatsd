@@ -277,3 +277,4 @@ stats.
 
 .. _statsd: https://github.com/etsy/statsd
 .. _0ed78be: https://github.com/etsy/statsd/commit/0ed78be7
+.. _1c10cfc0ac: https://github.com/etsy/statsd/commit/1c10cfc0ac
