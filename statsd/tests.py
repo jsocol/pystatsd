@@ -236,19 +236,27 @@ def test_timer_manager():
 
 
 def test_timer_decorator():
-    """StatsClient.timer is a decorator."""
+    """timer_decorator is a thread-safe decorator."""
     sc = _client()
 
+    @sc.timer('foo')
+    def foo(a, b):
+        return [a, b]
+
     @sc.timer('bar')
-    def bar():
-        pass
+    def bar(a, b):
+        return [b, a]
 
-    bar()
-    _timer_check(sc, 1, 'bar', 'ms')
+    # make sure it works with more than one decorator, called multiple times,
+    # and that parameters are handled correctly
+    assert foo(4, 2) == [4, 2]
+    _timer_check(sc, 1, 'foo', 'ms')
 
-    # Make sure the decorator works more than once:
-    bar()
+    assert bar(4, 2) == [2, 4]
     _timer_check(sc, 2, 'bar', 'ms')
+
+    assert bar(5, 6) == [6, 5]
+    _timer_check(sc, 3, 'bar', 'ms')
 
 
 def test_timer_capture():
@@ -273,13 +281,19 @@ def test_timer_context_rate():
 def test_timer_decorator_rate():
     sc = _client()
 
-    @sc.timer('bar', rate=0.1)
-    def bar():
-        pass
+    @sc.timer('foo', rate=0.1)
+    def foo(a, b):
+        return [b, a]
 
-    bar()
+    @sc.timer('bar', rate=0.2)
+    def bar(a, b=2, c=3):
+        return [c, b, a]
 
-    _timer_check(sc, 1, 'bar', 'ms|@0.1')
+    assert foo(4, 2) == [2, 4]
+    _timer_check(sc, 1, 'foo', 'ms|@0.1')
+
+    assert bar(5) == [3, 2, 5]
+    _timer_check(sc, 2, 'bar', 'ms|@0.2')
 
 
 def test_timer_context_exceptions():
