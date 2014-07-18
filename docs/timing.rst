@@ -52,9 +52,9 @@ block::
 Using a decorator
 =================
 
-The ``timer`` attribute can also be used as a function decorator. Every
-time the decorated function is called, the time it took to execute will
-be sent to the statsd server.
+The ``timer`` attribute decorates your methods in a thread-safe manner.
+Every time the decorated function is called, the time it took to execute
+will be sent to the statsd server.
 
 ::
 
@@ -70,10 +70,6 @@ be sent to the statsd server.
     myfunc(1, 2)
     myfunc(3, 7)
 
-.. warning::
-   Decorators are not thread-safe and may cause errors when decorated
-   functions are called concurrently. Use context managers or raw timers
-   instead.
 
 
 Using a Timer object directly

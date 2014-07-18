@@ -20,11 +20,16 @@ class Timer(object):
         self._start_time = None
 
     def __call__(self, f):
-        @wraps(f)
-        def wrapper(*args, **kw):
-            with self:
-                return f(*args, **kw)
-        return wrapper
+        """Thread-safe timing function decorator."""
+        def decorated_function(*args, **kwargs):
+            start_time = time.time()
+            try:
+                return_value = f(*args, **kwargs)
+            finally:
+                elapsed_time_ms = int(round(1000 * (time.time() - start_time)))
+                self.client.timing(self.stat, elapsed_time_ms, self.rate)
+            return return_value
+        return decorated_function
 
     def __enter__(self):
         return self.start()
