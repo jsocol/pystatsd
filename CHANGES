@@ -1,11 +1,18 @@
 Statsd Changelog
 ================
 
+Version 3.0.1
+-------------
+
+- Make timers-as-decorators threadsafe.
+
+
 Version 3.0
 -----------
 
 - Moved default client instances out of __init__.py. Now find them in
   the `statsd.defaults.{django,env}` modules.
+
 
 Version 2.1.2
 -------------
