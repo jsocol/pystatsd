@@ -6,12 +6,25 @@
 Welcome to Python StatsD's documentation!
 =========================================
 
+statsd_ is a friendly front-end to Graphite_. This is a Python client
+for the statsd daemon.
+
 .. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
    :target: https://travis-ci.org/jsocol/pystatsd
    :alt: Travis-CI build status
 
-statsd_ is a friendly front-end to Graphite_. This is a Python client
-for the statsd daemon.
+.. image:: https://pypip.in/v/statsd/badge.png
+   :target: https://pypi.python.org/pypi/statsd/
+   :alt: Latest release
+
+.. image:: https://pypip.in/d/statsd/badge.png
+   :target: https://pypi.python.org/pypi/statsd/
+   :alt: Downloads
+
+:Code:          https://github.com/jsocol/pystatsd
+:License:       MIT; see LICENSE file
+:Issues:        https://github.com/jsocol/pystatsd/issues
+:Documentation: http://statsd.readthedocs.org/
 
 Quickly, to use::
 
