@@ -1,4 +1,5 @@
 from __future__ import with_statement
+from collections import deque
 from functools import wraps
 import random
 import socket
@@ -140,7 +141,7 @@ class Pipeline(StatsClient):
         self._client = client
         self._prefix = client._prefix
         self._maxudpsize = client._maxudpsize
-        self._stats = []
+        self._stats = deque()
 
     def _after(self, data):
         if data is not None:
@@ -153,12 +154,12 @@ class Pipeline(StatsClient):
         self.send()
 
     def send(self):
-        # Use pop(0) to preserve the order of the stats.
+        # Use popleft to preserve the order of the stats.
         if not self._stats:
             return
-        data = self._stats.pop(0)
+        data = self._stats.popleft()
         while self._stats:
-            stat = self._stats.pop(0)
+            stat = self._stats.popleft()
             if len(stat) + len(data) + 1 >= self._maxudpsize:
                 self._client._after(data)
                 data = stat
