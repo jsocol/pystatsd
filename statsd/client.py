@@ -69,8 +69,11 @@ class StatsClient(object):
     def __init__(self, host='localhost', port=8125, prefix=None,
                  maxudpsize=512):
         """Create a new client."""
-        self._addr = (socket.gethostbyname(host), port)
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        family, _, _, _, addr = socket.getaddrinfo(
+            host, port, 0, socket.SOCK_DGRAM
+        )[0]
+        self._addr = addr
+        self._sock = socket.socket(family, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
