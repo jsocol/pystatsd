@@ -497,3 +497,7 @@ def test_socket_error():
     sc._sock.sendto.side_effect = socket.timeout()
     sc.incr('foo')
     _sock_check(sc, 1, 'foo:1|c')
+
+
+def test_ipv6_host():
+    StatsClient('::1')
