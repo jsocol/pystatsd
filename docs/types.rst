@@ -11,7 +11,7 @@ performs different aggregation on each of them. The three main types are
 The statsd server collects and aggregates in 30 second intervals before
 flushing to Graphite_. Graphite usually stores the most recent data in
 1-minute averaged buckets, so when you're looking at a graph, for each
-stat you are typically seing the average value over that minute.
+stat you are typically seeing the average value over that minute.
 
 
 .. _counter-type:
@@ -79,8 +79,8 @@ Graphite, that's usually per minute).
 * The *lower bound* is the lowest value statsd saw for that stat during
   that time period.
 
-* The *mean* is the average of all values statsd saw for that stat
-during that time period.
+* The *mean* is the average of all values statsd saw for that stat 
+  during that time period.
 
 * The *90th percentile* is a value *x* such that 90% of all the values
   statsd saw for that stat during that time period are below *x*, and
