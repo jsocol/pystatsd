@@ -136,7 +136,7 @@ class StatsClient(object):
         if data:
             self._send(data)
 
-    def _connect(self, reconnect=True):
+    def _connect(self, reconnect=False):
         if reconnect:
             self._sock.close()
         self._sock = socket.socket(self._family, self._socket_type)
@@ -148,6 +148,7 @@ class StatsClient(object):
         while True:
             try:
                 self._sock.sendto(data.encode('ascii'), self._addr)
+                break
             except socket.error as e:
                 if e.errno == 32:
                     try:
@@ -155,7 +156,7 @@ class StatsClient(object):
                     except Exception:
                         time.sleep(1)
                 else:
-                    return
+                    break
 
 
 class Pipeline(StatsClient):
