@@ -136,24 +136,25 @@ class StatsClient(object):
         if data:
             self._send(data)
 
-    def _connect(self, reconnect=False):
-        if reconnect:
-            self._sock.close()
-        self._sock = socket.socket(self._family, self._socket_type)
-        if self._socket_type == socket.SOCK_STREAM:
-            self._sock.connect(self._addr)
+    def _reconnect(self):
+        self._sock.close()
+        self._connect()
 
-    def _send(self, data):
+    def _connect(self):
+        self._sock = socket.socket(self._family, self._socket_type)
+        self._sock.connect(self._addr)
+
+    def _send(self, data, reconnect=True):
         """Send data to statsd."""
         while True:
             try:
                 self._sock.sendto(data.encode('ascii'), self._addr)
                 break
             except socket.error as e:
-                if e.errno == 32:
+                if e.errno == 32 and reconnect:
                     try:
-                        self._connect(reconnect=True)
-                    except Exception:
+                        self._reconnect()
+                    except socket.error:
                         time.sleep(1)
                 else:
                     break
