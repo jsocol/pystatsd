@@ -35,6 +35,11 @@ You can also add a prefix to all your stats::
     >>> c = statsd.StatsClient('localhost', 8125, prefix='foo')
     >>> c.incr('bar')  # Will be 'foo.bar' in statsd/graphite.
 
+It also supports using TCP connections::
+
+    >>> import statsd
+    >>> c = statsd.StatsClient('localhost', 8125, proto='tcp')
+
 
 Installing
 ==========
