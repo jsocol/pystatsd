@@ -12,8 +12,8 @@ from statsd import StatsClient
 ADDR = (socket.gethostbyname('localhost'), 8125)
 
 
-def _client(prefix=None):
-    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix)
+def _client(prefix=None, proto='udp'):
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix, proto=proto)
     sc._sock = mock.Mock()
     return sc
 

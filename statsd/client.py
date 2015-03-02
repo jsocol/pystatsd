@@ -67,15 +67,21 @@ class StatsClient(object):
     """A client for statsd."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512):
+                 maxudpsize=512, proto='udp'):
         """Create a new client."""
-        family, _, _, _, addr = socket.getaddrinfo(
-            host, port, 0, socket.SOCK_DGRAM
+        if proto == 'udp':
+            self._socket_type = socket.SOCK_DGRAM
+        elif proto == 'tcp':
+            self._socket_type = socket.SOCK_STREAM
+        else:
+            raise RuntimeError('Parameter "proto" must be "udp" or "tcp".')
+        self._family, _, _, _, addr = socket.getaddrinfo(
+            host, port, 0, self._socket_type
         )[0]
         self._addr = addr
-        self._sock = socket.socket(family, socket.SOCK_DGRAM)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
+        self._connect()
 
     def pipeline(self):
         return Pipeline(self)
@@ -130,13 +136,26 @@ class StatsClient(object):
         if data:
             self._send(data)
 
+    def _connect(self, reconnect=True):
+        if reconnect:
+            self._sock.close()
+        self._sock = socket.socket(self._family, self._socket_type)
+        if self._socket_type == socket.SOCK_STREAM:
+            self._sock.connect(self._addr)
+
     def _send(self, data):
         """Send data to statsd."""
-        try:
-            self._sock.sendto(data.encode('ascii'), self._addr)
-        except socket.error:
-            # No time for love, Dr. Jones!
-            pass
+        while True:
+            try:
+                self._sock.sendto(data.encode('ascii'), self._addr)
+            except socket.error as e:
+                if e.errno == 32:
+                    try:
+                        self._connect(reconnect=True)
+                    except Exception:
+                        time.sleep(1)
+                else:
+                    return
 
 
 class Pipeline(StatsClient):
