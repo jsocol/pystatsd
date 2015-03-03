@@ -85,9 +85,6 @@ class ConnHandlerBase(object):
     def _send(self, data):
         pass
 
-    def close(self):
-        pass
-
 
 class ConnHandlerTCP(ConnHandlerBase):
 
@@ -106,7 +103,7 @@ class ConnHandlerTCP(ConnHandlerBase):
             self._reconnect_send(data)
 
     def _reconnect_send(self, data):
-        self.close()
+        self._close()
         self._connect()
         self._do_send(data)
 
@@ -120,7 +117,7 @@ class ConnHandlerTCP(ConnHandlerBase):
     def _do_send(self, data):
         self._tlocal.sock.sendall(data.encode('ascii'))
 
-    def close(self):
+    def _close(self):
         if self._tlocal.sock and hasattr(self._tlocal.sock, 'close'):
             self._tlocal.sock.close()
         self._tlocal.sock = None
@@ -210,9 +207,6 @@ class StatsClient(object):
         if data:
             self._send(data)
 
-    def _close(self):
-        self._conn_handler.close()
-
     def _send(self, data):
         """Send data to statsd using the according method."""
         self._conn_handler.send(data)
@@ -248,6 +242,3 @@ class Pipeline(StatsClient):
             else:
                 data += '\n' + stat
         self._client._after(data)
-
-    def close(self):
-        self._client._close()
