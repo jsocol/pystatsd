@@ -12,8 +12,8 @@ from statsd import StatsClient
 ADDR = (socket.gethostbyname('localhost'), 8125)
 
 
-def _client(prefix=None):
-    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix)
+def _client(prefix=None, proto='udp'):
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], prefix=prefix, proto=proto)
     sc._sock = mock.Mock()
     return sc
 
@@ -80,6 +80,46 @@ class assert_raises(object):
 
         # Swallow expected exceptions.
         return True
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+@mock.patch.object(socket, 'socket')
+def test_udp_socket(mock_socket_fun):
+    _client(proto='udp')
+    assert mock_socket_fun.call_args[0][1] == socket.SOCK_DGRAM
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+@mock.patch.object(socket, 'socket')
+def test_tcp_socket(mock_socket_fun):
+    _client(proto='tcp')
+    assert mock_socket_fun.call_args[0][1] == socket.SOCK_STREAM
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+@mock.patch.object(socket, 'socket')
+def test_tcp_reconnect(mock_socket_fun):
+    socket_error = socket.error()
+    socket_error.errno = 32
+    mock_socket_obj = mock.MagicMock()
+    mock_socket_obj.sendto.side_effect = socket_error
+
+    # use exception to break out of endless loop
+    mock_socket_obj.connect.side_effect = [None, Exception]
+    mock_socket_fun.return_value = mock_socket_obj
+
+    sc = StatsClient(host=ADDR[0], port=ADDR[1], proto='tcp')
+    try:
+        sc.gauge('test', 1)
+    except Exception:
+        pass
+
+    assert mock_socket_obj.connect.call_count == 2
+
+
+def test_bad_proto():
+    with assert_raises(RuntimeError):
+        StatsClient(host=ADDR[0], port=ADDR[1], proto='badvalue')
 
 
 @mock.patch.object(random, 'random', lambda: -1)

@@ -1,6 +1,8 @@
 from __future__ import with_statement
+import abc
 from collections import deque
 from functools import wraps
+import threading
 import random
 import socket
 import time
@@ -63,17 +65,93 @@ class Timer(object):
         self.client.timing(self.stat, self.ms, self.rate)
 
 
+class ConnHandlerBase(object):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, host, port, fail_silently, timeout=None):
+        self._host = host
+        self._port = port
+        self._timeout = timeout
+        self._fail_silently = fail_silently
+
+    def send(self, data):
+        try:
+            self._send(data)
+        except socket.error:
+            if not self._fail_silently:
+                raise
+
+    @abc.abstractmethod
+    def _send(self, data):
+        pass
+
+
+class ConnHandlerTCP(ConnHandlerBase):
+
+    def __init__(self, *args, **kwargs):
+        super(ConnHandlerTCP, self).__init__(*args, **kwargs)
+        self._tlocal = threading.local()
+        self._tlocal.sock = None
+
+    def _send(self, data):
+        if not self._tlocal.sock:
+            self._connect()
+        try:
+            self._do_send(data)
+        except socket.error:
+            # try reconnecting and resending only once, so connections that
+            # have been up but died in the mean time will get re-established
+            self._reconnect_send(data)
+
+    def _reconnect_send(self, data):
+        self._close()
+        self._connect()
+        self._do_send(data)
+
+    def _connect(self):
+        family, _, _, _, addr = socket.getaddrinfo(
+            self._host, self._port, 0, socket.SOCK_STREAM)[0]
+        self._tlocal.sock = socket.socket(family, socket.SOCK_STREAM)
+        self._tlocal.sock.settimeout(self._timeout)
+        self._tlocal.sock.connect(addr)
+
+    def _do_send(self, data):
+        self._tlocal.sock.sendall(data.encode('ascii'))
+
+    def _close(self):
+        if self._tlocal.sock and hasattr(self._tlocal.sock, 'close'):
+            self._tlocal.sock.close()
+        self._tlocal.sock = None
+
+
+class ConnHandlerUDP(ConnHandlerBase):
+
+    def __init__(self, *args, **kwargs):
+        super(ConnHandlerUDP, self).__init__(*args, **kwargs)
+        family, _, _, _, self._addr = socket.getaddrinfo(
+            self._host, self._port, 0, socket.SOCK_DGRAM)[0]
+        self._sock = socket.socket(family, socket.SOCK_DGRAM)
+
+    def _send(self, data):
+        self._sock.sendto(data.encode('ascii'), self._addr)
+
+
 class StatsClient(object):
     """A client for statsd."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512):
+                 maxudpsize=512, proto='udp', fail_silently=True,
+                 timeout=None):
         """Create a new client."""
-        family, _, _, _, addr = socket.getaddrinfo(
-            host, port, 0, socket.SOCK_DGRAM
-        )[0]
-        self._addr = addr
-        self._sock = socket.socket(family, socket.SOCK_DGRAM)
+        self._conn_handlers = {
+            'udp': ConnHandlerUDP,
+            'tcp': ConnHandlerTCP,
+        }
+        if proto not in self._conn_handlers:
+            raise RuntimeError('Parameter "proto" must be one of {0}.'
+                               .format(', '.join(self._conn_handlers.keys())))
+        self._conn_handler = self._conn_handlers[proto](
+            host, port, fail_silently, timeout)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
@@ -131,12 +209,8 @@ class StatsClient(object):
             self._send(data)
 
     def _send(self, data):
-        """Send data to statsd."""
-        try:
-            self._sock.sendto(data.encode('ascii'), self._addr)
-        except socket.error:
-            # No time for love, Dr. Jones!
-            pass
+        """Send data to statsd using the according method."""
+        self._conn_handler.send(data)
 
 
 class Pipeline(StatsClient):
