@@ -234,7 +234,6 @@ class Pipeline(StatsClient):
 
     def __exit__(self, typ, value, tb):
         self.send()
-        self.close()
 
     def send(self):
         # Use popleft to preserve the order of the stats.
