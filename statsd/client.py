@@ -68,9 +68,10 @@ class Timer(object):
 class ConnHandlerBase(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, host, port, fail_silently=True):
+    def __init__(self, host, port, fail_silently, timeout=None):
         self._host = host
         self._port = port
+        self._timeout = timeout
         self._fail_silently = fail_silently
 
     def send(self, data):
@@ -93,18 +94,36 @@ class ConnHandlerTCP(ConnHandlerBase):
     def __init__(self, *args, **kwargs):
         super(ConnHandlerTCP, self).__init__(*args, **kwargs)
         self._tlocal = threading.local()
+        self._tlocal.sock = None
 
     def _send(self, data):
-        if not hasattr(self._tlocal, 'sock'):
-            family, _, _, _, addr = socket.getaddrinfo(
-                self._host, self._port, 0, socket.SOCK_STREAM)[0]
-            self._tlocal.sock = socket.socket(family, socket.SOCK_STREAM)
-            self._tlocal.sock.connect(addr)
+        if not self._tlocal.sock:
+            self._connect()
+        try:
+            self._do_send(data)
+        except socket.error:
+            # try reconnecting and resending only once
+            self._reconnect_send(data)
+
+    def _reconnect_send(self, data):
+        self.close()
+        self._connect()
+        self._do_send(data)
+
+    def _connect(self):
+        family, _, _, _, addr = socket.getaddrinfo(
+            self._host, self._port, 0, socket.SOCK_STREAM)[0]
+        self._tlocal.sock = socket.socket(family, socket.SOCK_STREAM)
+        self._tlocal.sock.settimeout(self._timeout)
+        self._tlocal.sock.connect(addr)
+
+    def _do_send(self, data):
         self._tlocal.sock.sendall(data.encode('ascii'))
 
     def close(self):
-        if hasattr(self._tlocal, 'sock'):
+        if self._tlocal.sock and hasattr(self._tlocal.sock, 'close'):
             self._tlocal.sock.close()
+        self._tlocal.sock = None
 
 
 class ConnHandlerUDP(ConnHandlerBase):
@@ -123,7 +142,8 @@ class StatsClient(object):
     """A client for statsd."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512, proto='udp', fail_silently=True):
+                 maxudpsize=512, proto='udp', fail_silently=True,
+                 timeout=None):
         """Create a new client."""
         self._conn_handlers = {
             'udp': ConnHandlerUDP,
@@ -133,7 +153,7 @@ class StatsClient(object):
             raise RuntimeError('Parameter "proto" must be one of {0}.'
                                .format(', '.join(self._conn_handlers.keys())))
         self._conn_handler = self._conn_handlers[proto](
-            host, port, fail_silently)
+            host, port, fail_silently, timeout)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
