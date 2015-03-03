@@ -1,6 +1,8 @@
 from __future__ import with_statement
+import abc
 from collections import deque
 from functools import wraps
+import threading
 import random
 import socket
 import time
@@ -63,25 +65,70 @@ class Timer(object):
         self.client.timing(self.stat, self.ms, self.rate)
 
 
+class ConnHandlerBase(object):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, host, port):
+        self._host = host
+        self._port = port
+
+    @abc.abstractmethod
+    def send(self):
+        pass
+
+    @abc.abstractmethod
+    def close(self):
+        pass
+
+
+class ConnHandlerTCP(ConnHandlerBase):
+
+    def __init__(self, *args, **kwargs):
+        super(ConnHandlerTCP, self).__init__(*args, **kwargs)
+        self._tlocal = threading.local()
+
+    def send(self, data):
+        if not hasattr(self._tlocal, 'sock'):
+            family, _, _, _, addr = socket.getaddrinfo(
+                self._host, self._port, 0, socket.SOCK_STREAM)[0]
+            self._tlocal.sock = socket.socket(family, socket.SOCK_STREAM)
+            self._tlocal.sock.connect(addr)
+        self._tlocal.sock.sendall(data.encode('ascii'))
+
+    def close(self):
+        if hasattr(self._tlocal, 'sock'):
+            self._tlocal.sock.close()
+
+
+class ConnHandlerUDP(ConnHandlerBase):
+
+    def send(self, data):
+        if not hasattr(self, '_sock'):
+            family, _, _, _, self._addr = socket.getaddrinfo(
+                self._host, self._port, 0, socket.SOCK_DGRAM)[0]
+            self._sock = socket.socket(family, socket.SOCK_DGRAM)
+        self._sock.sendto(data.encode('ascii'), self._addr)
+
+    def close(self):
+        pass
+
+
 class StatsClient(object):
     """A client for statsd."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
                  maxudpsize=512, proto='udp'):
         """Create a new client."""
-        if proto == 'udp':
-            self._socket_type = socket.SOCK_DGRAM
-        elif proto == 'tcp':
-            self._socket_type = socket.SOCK_STREAM
-        else:
-            raise RuntimeError('Parameter "proto" must be "udp" or "tcp".')
-        self._family, _, _, _, addr = socket.getaddrinfo(
-            host, port, 0, self._socket_type
-        )[0]
-        self._addr = addr
+        self._conn_handlers = {
+            'udp': ConnHandlerUDP,
+            'tcp': ConnHandlerTCP,
+        }
+        if proto not in self._conn_handlers:
+            raise RuntimeError('Parameter "proto" must be one of {0}.'
+                               .format(', '.join(self._conn_handlers.keys())))
+        self._conn_handler = self._conn_handlers[proto](host, port)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
-        self._connect()
 
     def pipeline(self):
         return Pipeline(self)
@@ -136,28 +183,12 @@ class StatsClient(object):
         if data:
             self._send(data)
 
-    def _reconnect(self):
-        self._sock.close()
-        self._connect()
+    def _close(self):
+        self._conn_handler.close()
 
-    def _connect(self):
-        self._sock = socket.socket(self._family, self._socket_type)
-        self._sock.connect(self._addr)
-
-    def _send(self, data, reconnect=True):
-        """Send data to statsd."""
-        while True:
-            try:
-                self._sock.sendto(data.encode('ascii'), self._addr)
-                break
-            except socket.error as e:
-                if e.errno == 32 and reconnect:
-                    try:
-                        self._reconnect()
-                    except socket.error:
-                        time.sleep(1)
-                else:
-                    break
+    def _send(self, data):
+        """Send data to statsd using the according method."""
+        self._conn_handler.send(data)
 
 
 class Pipeline(StatsClient):
@@ -176,6 +207,7 @@ class Pipeline(StatsClient):
 
     def __exit__(self, typ, value, tb):
         self.send()
+        self.close()
 
     def send(self):
         # Use popleft to preserve the order of the stats.
@@ -190,3 +222,6 @@ class Pipeline(StatsClient):
             else:
                 data += '\n' + stat
         self._client._after(data)
+
+    def close(self):
+        self._client._close()
