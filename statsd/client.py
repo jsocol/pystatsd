@@ -99,7 +99,8 @@ class ConnHandlerTCP(ConnHandlerBase):
         try:
             self._do_send(data)
         except socket.error:
-            # try reconnecting and resending only once
+            # try reconnecting and resending only once, so connections that
+            # have been up but died in the mean time will get re-established
             self._reconnect_send(data)
 
     def _reconnect_send(self, data):
