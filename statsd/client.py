@@ -84,7 +84,6 @@ class ConnHandlerBase(object):
     def _send(self, data):
         pass
 
-    @abc.abstractmethod
     def close(self):
         pass
 
@@ -118,9 +117,6 @@ class ConnHandlerUDP(ConnHandlerBase):
 
     def _send(self, data):
         self._sock.sendto(data.encode('ascii'), self._addr)
-
-    def close(self):
-        pass
 
 
 class StatsClient(object):
