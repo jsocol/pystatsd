@@ -68,12 +68,20 @@ class Timer(object):
 class ConnHandlerBase(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, fail_silently=True):
         self._host = host
         self._port = port
+        self._fail_silently = fail_silently
+
+    def send(self, data):
+        try:
+            self._send(data)
+        except socket.error:
+            if not self._fail_silently:
+                raise
 
     @abc.abstractmethod
-    def send(self):
+    def _send(self, data):
         pass
 
     @abc.abstractmethod
@@ -87,7 +95,7 @@ class ConnHandlerTCP(ConnHandlerBase):
         super(ConnHandlerTCP, self).__init__(*args, **kwargs)
         self._tlocal = threading.local()
 
-    def send(self, data):
+    def _send(self, data):
         if not hasattr(self._tlocal, 'sock'):
             family, _, _, _, addr = socket.getaddrinfo(
                 self._host, self._port, 0, socket.SOCK_STREAM)[0]
@@ -102,11 +110,13 @@ class ConnHandlerTCP(ConnHandlerBase):
 
 class ConnHandlerUDP(ConnHandlerBase):
 
-    def send(self, data):
-        if not hasattr(self, '_sock'):
-            family, _, _, _, self._addr = socket.getaddrinfo(
-                self._host, self._port, 0, socket.SOCK_DGRAM)[0]
-            self._sock = socket.socket(family, socket.SOCK_DGRAM)
+    def __init__(self, *args, **kwargs):
+        super(ConnHandlerUDP, self).__init__(*args, **kwargs)
+        family, _, _, _, self._addr = socket.getaddrinfo(
+            self._host, self._port, 0, socket.SOCK_DGRAM)[0]
+        self._sock = socket.socket(family, socket.SOCK_DGRAM)
+
+    def _send(self, data):
         self._sock.sendto(data.encode('ascii'), self._addr)
 
     def close(self):
@@ -117,7 +127,7 @@ class StatsClient(object):
     """A client for statsd."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512, proto='udp'):
+                 maxudpsize=512, proto='udp', fail_silently=True):
         """Create a new client."""
         self._conn_handlers = {
             'udp': ConnHandlerUDP,
@@ -126,7 +136,8 @@ class StatsClient(object):
         if proto not in self._conn_handlers:
             raise RuntimeError('Parameter "proto" must be one of {0}.'
                                .format(', '.join(self._conn_handlers.keys())))
-        self._conn_handler = self._conn_handlers[proto](host, port)
+        self._conn_handler = self._conn_handlers[proto](
+            host, port, fail_silently)
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
