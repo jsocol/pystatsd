@@ -4,6 +4,7 @@ from functools import wraps
 import random
 import socket
 import time
+import abc
 
 
 __all__ = ['StatsClient']
@@ -63,22 +64,18 @@ class Timer(object):
         self.client.timing(self.stat, self.ms, self.rate)
 
 
-class StatsClient(object):
-    """A client for statsd."""
+class StatsClientBase(object):
+    """A Base class for various statsd clients."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512):
-        """Create a new client."""
-        family, _, _, _, addr = socket.getaddrinfo(
-            host, port, 0, socket.SOCK_DGRAM
-        )[0]
-        self._addr = addr
-        self._sock = socket.socket(family, socket.SOCK_DGRAM)
-        self._prefix = prefix
-        self._maxudpsize = maxudpsize
+    __metaclass__ = abc.ABCMeta
 
+    @abc.abstractmethod
+    def _send(self):
+        pass
+
+    @abc.abstractmethod
     def pipeline(self):
-        return Pipeline(self)
+        pass
 
     def timer(self, stat, rate=1):
         return Timer(self, stat, rate)
@@ -130,6 +127,21 @@ class StatsClient(object):
         if data:
             self._send(data)
 
+
+class StatsClient(StatsClientBase):
+    """A client for statsd."""
+
+    def __init__(self, host='localhost', port=8125, prefix=None,
+                 maxudpsize=512):
+        """Create a new client."""
+        family, _, _, _, addr = socket.getaddrinfo(
+            host, port, 0, socket.SOCK_DGRAM
+        )[0]
+        self._addr = addr
+        self._sock = socket.socket(family, socket.SOCK_DGRAM)
+        self._prefix = prefix
+        self._maxudpsize = maxudpsize
+
     def _send(self, data):
         """Send data to statsd."""
         try:
@@ -138,13 +150,22 @@ class StatsClient(object):
             # No time for love, Dr. Jones!
             pass
 
+    def pipeline(self):
+        return Pipeline(self)
 
-class Pipeline(StatsClient):
+
+class PipelineBase(StatsClientBase):
+
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix
-        self._maxudpsize = client._maxudpsize
         self._stats = deque()
+
+    @abc.abstractmethod
+    def _send(self):
+        pass
 
     def _after(self, data):
         if data is not None:
@@ -157,11 +178,24 @@ class Pipeline(StatsClient):
         self.send()
 
     def send(self):
-        # Use popleft to preserve the order of the stats.
         if not self._stats:
             return
+        self._send()
+
+    def pipeline(self):
+        return self.__class__(self)
+
+
+class Pipeline(PipelineBase):
+
+    def __init__(self, client):
+        super(Pipeline, self).__init__(client)
+        self._maxudpsize = client._maxudpsize
+
+    def _send(self):
         data = self._stats.popleft()
         while self._stats:
+            # Use popleft to preserve the order of the stats.
             stat = self._stats.popleft()
             if len(stat) + len(data) + 1 >= self._maxudpsize:
                 self._client._after(data)
