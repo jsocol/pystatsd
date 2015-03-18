@@ -275,6 +275,93 @@ stats.
    This method is not implemented on the base StatsClient class.
 
 
+.. _TCPStatsClient:
+
+``TCPStatsClient``
+==================
+
+::
+
+    TCPStatsClient(host='localhost', port=8125, prefix=None, timeout=None)
+
+Create a new ``TCPStatsClient`` instance with the appropriate connection
+and prefix information.
+
+* ``host``: the hostname or IPv4 address of the statsd_ server.
+
+* ``port``: the port of the statsd server.
+
+* ``prefix``: a prefix to distinguish and group stats from an
+  application or environment.
+
+* ``timeout``: socket timeout for any actions on the connection socket.
+
+
+``TCPStatsClient`` implements all methods of ``StatsClient``, with the
+difference that it is not thread safe and it can raise exceptions on
+connection errors.  On the contrary to ``StatsClient`` it uses a ``TCP``
+connection to connect to Statsd.
+Additionally to the methods of ``StatsClient`` it has a few which are
+specific to ``TCP`` connections.
+
+
+.. _tcp_close:
+
+``close``
+---------
+
+::
+
+    from statsd import TCPStatsClient
+
+    statsd = TCPStatsClient()
+    statsd.incr('some.event')
+    statsd.close()
+
+Closes a connection that's currently open and deletes it's socket. If this is
+called on a ``TCPStatsClient`` which currently has no open connection it is a
+non-action.
+
+
+.. _tcp_connect:
+
+``connect``
+-----------
+
+::
+
+    from statsd import TCPStatsClient
+
+    statsd = TCPStatsClient()
+    statsd.incr('some.event')  # calls connect() internally
+    statsd.close()
+    statsd.connect()  # creates new connection
+
+Creates a connection to Statsd. If there are errors like connection timed out
+or connection refused, the according exceptions will be raised. It is usually
+not necessary to call this method because sending data to Statsd will call
+``connect`` implicitely if the current instance of ``TCPStatsClient`` does not
+already hold an open connection.
+
+
+.. _tcp_reconnect:
+
+``reconnect``
+-------------
+
+::
+
+    from statsd import TCPStatsClient
+
+    statsd = TCPStatsClient()
+    statsd.incr('some.event')
+    statsd.reconnect()  # closes open connection and creates new one
+
+Closes a currently existing connection and replaces it with a new one. If no
+connection exists already it will simply create a new one.  Internally this
+does nothing else than calling ``close()`` and ``connect()``.
+
+
 .. _statsd: https://github.com/etsy/statsd
 .. _0ed78be: https://github.com/etsy/statsd/commit/0ed78be7
 .. _1c10cfc0ac: https://github.com/etsy/statsd/commit/1c10cfc0ac

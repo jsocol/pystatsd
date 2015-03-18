@@ -70,6 +70,7 @@ Contents
    types.rst
    timing.rst
    pipeline.rst
+   tcp.rst
    reference.rst
    contributing.rst
 
