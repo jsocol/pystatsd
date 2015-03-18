@@ -1,6 +1,13 @@
 Statsd Changelog
 ================
 
+Version 3.1
+-----------
+
+- Add IPv6 support.
+- Add TCPStatsClient/TCPPipeline to support connection-mode clients.
+
+
 Version 3.0.1
 -------------
 
