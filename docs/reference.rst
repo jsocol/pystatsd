@@ -9,9 +9,9 @@ statsd_ server supports.
 
 .. note::
 
-    Each public API method supports a ``rate`` parameter, but statsd
-    doesn't always use it the same way. See the :ref:`types-chapter` for
-    more information.
+    Each public stats API method supports a ``rate`` parameter, but
+    statsd doesn't always use it the same way. See the
+    :ref:`types-chapter` for more information.
 
 
 .. _StatsClient:
@@ -21,7 +21,7 @@ statsd_ server supports.
 
 ::
 
-    StatsClient(host='localhost', port=8125, prefix=None)
+    StatsClient(host='localhost', port=8125, prefix=None, maxudpsize=512)
 
 Create a new ``StatsClient`` instance with the appropriate connection
 and prefix information.
@@ -32,6 +32,10 @@ and prefix information.
 
 * ``prefix``: a prefix to distinguish and group stats from an
   application or environment.
+
+* ``maxudpsize``: the largest safe UDP packet to save. 512 is generally
+  considered safe for the public internet, but private networks may
+  support larger packet sizes.
 
 
 .. _incr:
@@ -297,12 +301,13 @@ and prefix information.
 * ``timeout``: socket timeout for any actions on the connection socket.
 
 
-``TCPStatsClient`` implements all methods of ``StatsClient``, with the
-difference that it is not thread safe and it can raise exceptions on
-connection errors.  On the contrary to ``StatsClient`` it uses a ``TCP``
-connection to connect to Statsd.
-Additionally to the methods of ``StatsClient`` it has a few which are
-specific to ``TCP`` connections.
+``TCPStatsClient`` implements all methods of ``StatsClient``, including
+``pipeline()``, with the difference that it is not thread safe and it
+can raise exceptions on connection errors. Unlike ``StatsClient`` it
+uses a TCP connection to communicate with StatsD.
+
+In addition to the stats methods, ``TCPStatsClient`` supports the
+following TCP-specific methods.
 
 
 .. _tcp_close:
@@ -318,9 +323,9 @@ specific to ``TCP`` connections.
     statsd.incr('some.event')
     statsd.close()
 
-Closes a connection that's currently open and deletes it's socket. If this is
-called on a ``TCPStatsClient`` which currently has no open connection it is a
-non-action.
+Closes a connection that's currently open and deletes it's socket. If
+this is called on a ``TCPStatsClient`` which currently has no open
+connection it is a non-action.
 
 
 .. _tcp_connect:
@@ -337,11 +342,11 @@ non-action.
     statsd.close()
     statsd.connect()  # creates new connection
 
-Creates a connection to Statsd. If there are errors like connection timed out
-or connection refused, the according exceptions will be raised. It is usually
-not necessary to call this method because sending data to Statsd will call
-``connect`` implicitely if the current instance of ``TCPStatsClient`` does not
-already hold an open connection.
+Creates a connection to StatsD. If there are errors like connection
+timed out or connection refused, the according exceptions will be
+raised. It is usually not necessary to call this method because sending
+data to StatsD will call ``connect`` implicitely if the current instance
+of ``TCPStatsClient`` does not already hold an open connection.
 
 
 .. _tcp_reconnect:
@@ -357,9 +362,10 @@ already hold an open connection.
     statsd.incr('some.event')
     statsd.reconnect()  # closes open connection and creates new one
 
-Closes a currently existing connection and replaces it with a new one. If no
-connection exists already it will simply create a new one.  Internally this
-does nothing else than calling ``close()`` and ``connect()``.
+Closes a currently existing connection and replaces it with a new one.
+If no connection exists already it will simply create a new one.
+Internally this does nothing else than calling ``close()`` and
+``connect()``.
 
 
 .. _statsd: https://github.com/etsy/statsd
