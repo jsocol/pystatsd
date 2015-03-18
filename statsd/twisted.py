@@ -1,6 +1,8 @@
-import functools
+from __future__ import absolute_import
 
-import pystatsd
+from twisted.internet import protocol
+
+from statsd import client
 
 class _ConnectedUDPProtocol(protocol.DatagramProtocol):
 
@@ -10,14 +12,14 @@ class _ConnectedUDPProtocol(protocol.DatagramProtocol):
         self.transport = None
 
     def startProtocol(self):
-        self.transport.connect(host, port)
+        self.transport.connect(self.host, self.port)
 
     def write(self, data):
         if self.transport is None:
             return
         self.transport.write(data)
 
-class _StatsDClient(pystatsd.StatsDClient):
+class _StatsClient(client.StatsClient):
 
     def __init__(self, write, prefix=None, maxudpsize=512):
         self._send = write
@@ -25,8 +27,10 @@ class _StatsDClient(pystatsd.StatsDClient):
         self._maxudpsize = maxudpsize
 
 def client(reactor=None, prefix=None, maxudpsize=512, interface='127.0.0.1', host='127.0.0.1', port=8125):
+    if reactor is None:
+        from twisted.internet import reactor
     protocol = _ConnectedUDPProtocol(host, port)
     reactor.listenUDP(0, protocol, interface=interface)
     write = protocol.write
-    ret = _StatsDClient(write, prefix=prefix, maxudpsize=maxudpsize)
+    ret = _StatsClient(write, prefix=prefix, maxudpsize=maxudpsize)
     return ret
