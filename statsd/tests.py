@@ -556,13 +556,11 @@ def _test_timer_context_exceptions(cl, proto):
 
 
 def test_timer_context_exceptions_udp():
-    """Exceptions within a managed block should get logged and propagate (UDP)."""
     cl = _udp_client()
     _test_timer_context_exceptions(cl, 'udp')
 
 
 def test_timer_context_exceptions_tcp():
-    """Exceptions within a managed block should get logged and propagate (TCP)."""
     cl = _tcp_client()
     _test_timer_context_exceptions(cl, 'tcp')
 
@@ -579,13 +577,11 @@ def _test_timer_decorator_exceptions(cl, proto):
 
 
 def test_timer_decorator_exceptions_udp():
-    """Exceptions from wrapped methods should get logged and propagate (UDP)."""
     cl = _udp_client()
     _test_timer_decorator_exceptions(cl, 'udp')
 
 
 def test_timer_decorator_exceptions_tcp():
-    """Exceptions from wrapped methods should get logged and propagate (TCP)."""
     cl = _tcp_client()
     _test_timer_decorator_exceptions(cl, 'tcp')
 
