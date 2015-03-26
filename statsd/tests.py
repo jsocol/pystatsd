@@ -27,22 +27,23 @@ make_val = {
 }
 
 
-def _udp_client(prefix=None, addr=None, port=None):
+def _udp_client(prefix=None, addr=None, port=None, ipv6=False):
     if not addr:
         addr = ADDR[0]
     if not port:
         port = ADDR[1]
-    sc = StatsClient(host=addr, port=port, prefix=prefix)
+    sc = StatsClient(host=addr, port=port, prefix=prefix, ipv6=ipv6)
     sc._sock = mock.Mock()
     return sc
 
 
-def _tcp_client(prefix=None, addr=None, port=None, timeout=None):
+def _tcp_client(prefix=None, addr=None, port=None, timeout=None, ipv6=False):
     if not addr:
         addr = ADDR[0]
     if not port:
         port = ADDR[1]
-    sc = TCPStatsClient(host=addr, port=port, prefix=prefix, timeout=timeout)
+    sc = TCPStatsClient(host=addr, port=port, prefix=prefix, timeout=timeout,
+                        ipv6=ipv6)
     sc._sock = mock.Mock()
     return sc
 
@@ -210,19 +211,43 @@ def _test_ipv6(cl, proto, addr):
     _sock_check(cl._sock, 1, proto, 'foo:30|g', addr=addr)
 
 
-@mock.patch.object(random, 'random', lambda: -1)
 def test_ipv6_udp():
     """StatsClient can use to IPv6 address."""
     addr = ('::1', 8125, 0, 0)
-    cl = _udp_client(addr=addr[0])
+    cl = _udp_client(addr=addr[0], ipv6=True)
     _test_ipv6(cl, 'udp', addr)
 
-@mock.patch.object(random, 'random', lambda: -1)
+
 def test_ipv6_tcp():
     """TCPStatsClient can use to IPv6 address."""
     addr = ('::1', 8125, 0, 0)
-    cl = _tcp_client(addr=addr[0])
+    cl = _tcp_client(addr=addr[0], ipv6=True)
     _test_ipv6(cl, 'tcp', addr)
+
+
+def _test_resolution(cl, proto, addr):
+    cl.incr('foo')
+    _sock_check(cl._sock, 1, proto, 'foo:1|c', addr=addr)
+
+
+def test_ipv6_resolution_udp():
+    cl = _udp_client(addr='localhost', ipv6=True)
+    _test_resolution(cl, 'udp', ('::1', 8125, 0, 0))
+
+
+def test_ipv6_resolution_tcp():
+    cl = _tcp_client(addr='localhost', ipv6=True)
+    _test_resolution(cl, 'tcp', ('::1', 8125, 0, 0))
+
+
+def test_ipv4_resolution_udp():
+    cl = _udp_client(addr='localhost')
+    _test_resolution(cl, 'udp', ('127.0.0.1', 8125))
+
+
+def test_ipv4_resolution_tcp():
+    cl = _tcp_client(addr='localhost')
+    _test_resolution(cl, 'tcp', ('127.0.0.1', 8125))
 
 
 def _test_gauge_delta(cl, proto):
