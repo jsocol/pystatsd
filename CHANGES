@@ -1,6 +1,12 @@
 Statsd Changelog
 ================
 
+Version 3.2
+-----------
+
+- Add an explicit IPv6 flag.
+
+
 Version 3.1
 -----------
 

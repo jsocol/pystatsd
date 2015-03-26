@@ -131,12 +131,12 @@ class StatsClientBase(object):
 class StatsClient(StatsClientBase):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None,
+    def __init__(self, host='localhost', port=8125, ipv6=False, prefix=None,
                  maxudpsize=512):
         """Create a new client."""
+        fam = socket.AF_INET6 if ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
-            host, port, 0, socket.SOCK_DGRAM
-        )[0]
+            host, port, fam, socket.SOCK_DGRAM)[0]
         self._addr = addr
         self._sock = socket.socket(family, socket.SOCK_DGRAM)
         self._prefix = prefix
@@ -157,10 +157,12 @@ class StatsClient(StatsClientBase):
 class TCPStatsClient(StatsClientBase):
     """TCP version of StatsClient."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None, timeout=None):
+    def __init__(self, host='localhost', port=8125, ipv6=False, prefix=None,
+                 timeout=None):
         """Create a new client."""
         self._host = host
         self._port = port
+        self._ipv6 = ipv6
         self._timeout = timeout
         self._prefix = prefix
         self._sock = None
@@ -180,8 +182,9 @@ class TCPStatsClient(StatsClientBase):
         self._sock = None
 
     def connect(self):
+        fam = socket.AF_INET6 if self._ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
-            self._host, self._port, 0, socket.SOCK_STREAM)[0]
+            self._host, self._port, fam, socket.SOCK_STREAM)[0]
         self._sock = socket.socket(family, socket.SOCK_STREAM)
         self._sock.settimeout(self._timeout)
         self._sock.connect(addr)
