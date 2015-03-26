@@ -6,4 +6,8 @@ python:
  - "3.3"
  - "3.4"
  - "pypy"
-script: nosetests
+install:
+ - pip install -q flake8
+script:
+ - nosetests
+ - flake8 statsd/
