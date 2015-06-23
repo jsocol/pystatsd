@@ -5,6 +5,7 @@ Version 3.2
 -----------
 
 - Add an explicit IPv6 flag.
+- Add support for sub-millisecond timings
 
 
 Version 3.1
