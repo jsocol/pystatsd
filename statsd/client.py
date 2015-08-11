@@ -29,7 +29,7 @@ class Timer(object):
             try:
                 return_value = f(*args, **kwargs)
             finally:
-                elapsed_time_ms = int(round(1000 * (time.time() - start_time)))
+                elapsed_time_ms = float(1000 * (time.time() - start_time))
                 self.client.timing(self.stat, elapsed_time_ms, self.rate)
             return return_value
         return _wrapped
@@ -50,7 +50,7 @@ class Timer(object):
         if self._start_time is None:
             raise RuntimeError('Timer has not started.')
         dt = time.time() - self._start_time
-        self.ms = int(round(1000 * dt))  # Convert to milliseconds.
+        self.ms = float(1000 * dt)  # Convert to milliseconds.
         if send:
             self.send()
         return self
@@ -82,7 +82,7 @@ class StatsClientBase(object):
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
-        self._send_stat(stat, '%d|ms' % delta, rate)
+        self._send_stat(stat, '%f|ms' % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""

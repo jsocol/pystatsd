@@ -355,13 +355,13 @@ def test_set_tcp():
 
 def _test_timing(cl, proto):
     cl.timing('foo', 100)
-    _sock_check(cl._sock, 1, proto, 'foo:100|ms')
+    _sock_check(cl._sock, 1, proto, 'foo:100.000000|ms')
 
     cl.timing('foo', 350)
-    _sock_check(cl._sock, 2, proto, 'foo:350|ms')
+    _sock_check(cl._sock, 2, proto, 'foo:350.000000|ms')
 
     cl.timing('foo', 100, rate=0.5)
-    _sock_check(cl._sock, 3, proto, 'foo:100|ms|@0.5')
+    _sock_check(cl._sock, 3, proto, 'foo:100.000000|ms|@0.5')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -481,7 +481,7 @@ def test_timer_decorator_tcp():
 def _test_timer_capture(cl, proto):
     with cl.timer('woo') as result:
         eq_(result.ms, None)
-    assert isinstance(result.ms, int)
+    assert isinstance(result.ms, float)
 
 
 def test_timer_capture_udp():
@@ -715,7 +715,7 @@ def _test_pipeline(cl, proto):
     pipe.decr('bar')
     pipe.timing('baz', 320)
     pipe.send()
-    _sock_check(cl._sock, 1, proto, 'foo:1|c\nbar:-1|c\nbaz:320|ms')
+    _sock_check(cl._sock, 1, proto, 'foo:1|c\nbar:-1|c\nbaz:320.000000|ms')
 
 
 def test_pipeline_udp():
@@ -868,21 +868,20 @@ def test_pipeline_negative_absolute_gauge_tcp():
 
 def _test_big_numbers(cl, proto):
     num = 1234568901234
-    result = 'foo:1234568901234|%s'
     tests = (
         # Explicitly create strings so we avoid the bug we're trying to test.
-        ('gauge', 'g'),
-        ('incr', 'c'),
-        ('timing', 'ms'),
+        ('gauge', 'g', 'foo:1234568901234|%s'),
+        ('incr', 'c', 'foo:1234568901234|%s'),
+        ('timing', 'ms', 'foo:1234568901234.000000|%s'),
     )
 
-    def _check(method, suffix):
+    def _check(method, suffix, result):
         cl._sock.reset_mock()
         getattr(cl, method)('foo', num)
         _sock_check(cl._sock, 1, proto, result % suffix)
 
-    for method, suffix in tests:
-        _check(method, suffix)
+    for method, suffix, result in tests:
+        _check(method, suffix, result)
 
 
 def test_big_numbers_udp():
