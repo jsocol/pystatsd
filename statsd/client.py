@@ -5,7 +5,7 @@ import random
 import socket
 import time
 import abc
-
+import sys
 
 __all__ = ['StatsClient', 'TCPStatsClient']
 
@@ -121,7 +121,15 @@ class StatsClientBase(object):
         if self._prefix:
             stat = '%s.%s' % (self._prefix, stat)
 
+        stat = self._fix_encoding(stat)
+
         return '%s:%s' % (stat, value)
+
+    def _fix_encoding(self, stat):
+        if sys.version_info < (3,) and type(stat) != unicode:
+            # assuming utf-8 as default encoding
+            stat = stat.decode('utf-8', errors='ignore')
+        return stat.encode('ascii', errors='ignore')
 
     def _after(self, data):
         if data:
@@ -145,7 +153,7 @@ class StatsClient(StatsClientBase):
     def _send(self, data):
         """Send data to statsd."""
         try:
-            self._sock.sendto(data.encode('ascii'), self._addr)
+            self._sock.sendto(data, self._addr)
         except (socket.error, RuntimeError):
             # No time for love, Dr. Jones!
             pass
@@ -174,7 +182,7 @@ class TCPStatsClient(StatsClientBase):
         self._do_send(data)
 
     def _do_send(self, data):
-        self._sock.sendall(data.encode('ascii') + b'\n')
+        self._sock.sendall(data + b'\n')
 
     def close(self):
         if self._sock and hasattr(self._sock, 'close'):
