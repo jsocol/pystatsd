@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='statsd',
-    version='3.1',
+    version='3.2',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
