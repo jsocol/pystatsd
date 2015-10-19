@@ -82,7 +82,7 @@ class StatsClientBase(object):
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
-        self._send_stat(stat, '%f|ms' % delta, rate)
+        self._send_stat(stat, '%0.6f|ms' % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""
