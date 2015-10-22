@@ -27,7 +27,8 @@ They, and their defaults, are::
     statsd = StatsClient(host='localhost',
                          port=8125,
                          prefix=None,
-                         maxudpsize=512)
+                         maxudpsize=512,
+                         ipv6=False)
 
 ``host`` is the host running the statsd server. It will support any kind
 of name or IP address you might use.
@@ -59,6 +60,19 @@ doing. Larger values then the default of 512 are generally deemed unsafe for use
 on the internet. On a controlled local network or when the statsd server is
 running on 127.0.0.1 larger values can decrease the number of UDP packets when
 pipelining many metrics. Use with care!
+
+.. versionadded:: 3.2
+
+``ipv6`` tells the client explicitly to look up the host using IPv6 (``True``)
+or IPv4 (``False``).
+
+
+TCP Clients
+-----------
+
+:ref:`TCP-based clients <tcp-chapter>` have an additional ``timeout`` argument,
+which defaults to ``None``, and is passed to `settimeout
+<https://docs.python.org/2/library/socket.html#socket.socket.settimeout>`.
 
 
 In Django
