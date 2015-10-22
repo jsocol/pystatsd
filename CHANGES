@@ -1,6 +1,12 @@
 Statsd Changelog
 ================
 
+Version 3.2.1
+-------------
+
+- Restore `StatsClient(host, port, prefix)` argument order.
+
+
 Version 3.2
 -----------
 
