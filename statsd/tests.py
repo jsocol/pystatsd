@@ -942,7 +942,7 @@ def test_tcp_raises_exception_to_user(mock_socket):
     addr = ('127.0.0.1', 1234)
     cl = _tcp_client(addr=addr[0], port=addr[1])
     cl.incr('foo')
-    cl._sock.sendall.assert_called_once()
+    eq_(1, cl._sock.sendall.call_count)
     cl._sock.sendall.side_effect = socket.error
     with assert_raises(socket.error):
         cl.incr('foo')
@@ -954,5 +954,4 @@ def test_tcp_timeout(mock_socket):
     test_timeout = 321
     cl = TCPStatsClient(timeout=test_timeout)
     cl.incr('foo')
-    cl._sock.settimeout.assert_called_once()
-    cl._sock.settimeout.assert_called_with(test_timeout)
+    cl._sock.settimeout.assert_called_once_with(test_timeout)
