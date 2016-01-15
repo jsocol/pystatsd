@@ -12,7 +12,9 @@ Runtime
 =======
 
 If you are running the statsd_ server locally and on the default port,
-it's extremely easy::
+it's extremely easy
+
+.. code-block:: python
 
     from statsd import StatsClient
 
@@ -20,7 +22,9 @@ it's extremely easy::
     statsd.incr('foo')
 
 There are three arguments to configure your ``StatsClient`` instance.
-They, and their defaults, are::
+They, and their defaults, are
+
+.. code-block:: python
 
     from statsd import StatsClient
 
@@ -38,7 +42,9 @@ client is ``8125``.
 
 ``prefix`` helps distinguish multiple applications or environments using
 the same statsd server. It will be prepended to all stats,
-automatically. For example::
+automatically. For example
+
+.. code-block:: python
 
     from statsd import StatsClient
 
@@ -89,7 +95,9 @@ Here are the settings and their defaults::
     STATSD_PREFIX = None
     STATSD_MAXUDPSIZE = 512
 
-You can use the default ``StatsClient`` simply::
+You can use the default ``StatsClient`` simply
+
+.. code-block:: python
 
     from statsd.defaults.django import statsd
 
@@ -120,6 +128,19 @@ and then in your Python application, you can simply do::
     As of version 3.0, this default instance is always available,
     configured with the default values, unless overridden by the
     environment.
+
+There is also a helper to instantiate a client object from the these
+environment variables environment with
+``statsd.defaults.from_env()``
+
+.. code-block:: python
+
+     import statsd.defaults
+
+     class MyClass():
+         def __init__(self):
+             self.statsd = statsd.defaults.from_env()
+
 
 .. _statsd: https://github.com/etsy/statsd
 .. _Django: https://www.djangoproject.com/
