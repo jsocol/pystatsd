@@ -187,12 +187,6 @@ call.  See also the :ref:`chapter on timing <timing-chapter>`.
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for timers.
 
-.. warning::
-   Decorators are not thread-safe and may cause errors when decorated
-   functions are called concurrently. Use context managers or raw timers
-   instead.
-
-
 .. _timer-start:
 
 ``start``
