@@ -82,6 +82,13 @@ which defaults to ``None``, and is passed to `settimeout
 <https://docs.python.org/2/library/socket.html#socket.socket.settimeout>`.
 
 
+UnixSocket Clients
+------------------
+
+:ref:`UnixSocket-based clients <unix-socket-chapter>` have a single required
+``socket_path`` argument instead of ``host`` and ``port``.
+
+
 In Django
 =========
 
