@@ -197,6 +197,23 @@ class TCPStatsClient(StatsClientBase):
         self.connect()
 
 
+class UnixSocketStatsClient(TCPStatsClient):
+    """Unix domain socket version of TCPStatsClient."""
+
+    def __init__(self, socket_path='/var/run/statsd.socket', prefix=None,
+                 timeout=None):
+        """Create a new client."""
+        self._socket_path = socket_path
+        self._timeout = timeout
+        self._prefix = prefix
+        self._sock = None
+
+    def connect(self):
+        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self._sock.settimeout(self._timeout)
+        self._sock.connect(self._socket_path)
+
+
 class PipelineBase(StatsClientBase):
 
     __metaclass__ = abc.ABCMeta
