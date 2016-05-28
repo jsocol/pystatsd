@@ -66,6 +66,13 @@ pipelining many metrics. Use with care!
 ``ipv6`` tells the client explicitly to look up the host using IPv6 (``True``)
 or IPv4 (``False``).
 
+.. note::
+
+    Python will will inherently bind to an ephemeral port on all interfaces
+    (`0.0.0.0`) for each configured client. This is due to the underlying
+    Sockets API in the operating system/kernel. It is safe to block incoming
+    traffic on your firewall if you wish.
+
 
 TCP Clients
 -----------
