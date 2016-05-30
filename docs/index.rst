@@ -24,7 +24,7 @@ for the statsd daemon.
 :Code:          https://github.com/jsocol/pystatsd
 :License:       MIT; see LICENSE file
 :Issues:        https://github.com/jsocol/pystatsd/issues
-:Documentation: http://statsd.readthedocs.org/
+:Documentation: https://statsd.readthedocs.io/
 
 Quickly, to use::
 
@@ -81,4 +81,4 @@ Indices and tables
 * :ref:`search`
 
 .. _statsd: https://github.com/etsy/statsd
-.. _Graphite: http://graphite.readthedocs.org/
+.. _Graphite: https://graphite.readthedocs.io/
