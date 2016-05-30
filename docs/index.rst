@@ -71,6 +71,7 @@ Contents
    timing.rst
    pipeline.rst
    tcp.rst
+   unix_socket.rst
    reference.rst
    contributing.rst
 
