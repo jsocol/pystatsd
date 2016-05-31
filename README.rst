@@ -28,7 +28,7 @@ for the statsd daemon.
 :Code:          https://github.com/jsocol/pystatsd
 :License:       MIT; see LICENSE file
 :Issues:        https://github.com/jsocol/pystatsd/issues
-:Documentation: http://statsd.readthedocs.org/
+:Documentation: https://statsd.readthedocs.io/
 
 Quickly, to use:
 
@@ -75,5 +75,5 @@ There are lots of docs in the ``docs/`` directory and on ReadTheDocs_.
 
 
 .. _statsd: https://github.com/etsy/statsd
-.. _Graphite: http://graphite.readthedocs.org/
-.. _ReadTheDocs: http://statsd.readthedocs.org/en/latest/index.html
+.. _Graphite: https://graphite.readthedocs.io/
+.. _ReadTheDocs: https://statsd.readthedocs.io/en/latest/index.html

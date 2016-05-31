@@ -91,4 +91,4 @@ heading in an existing chapter.
 
 .. _issue: https://github.com/jsocol/pystatsd/issues
 .. _virtualenv: http://www.virtualenv.org/
-.. _ReadTheDocs: http://statsd.readthedocs.org/
+.. _ReadTheDocs: https://statsd.readthedocs.io/
