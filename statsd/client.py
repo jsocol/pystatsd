@@ -5,6 +5,7 @@ import random
 import socket
 import time
 import abc
+import errno
 
 
 __all__ = ['StatsClient', 'TCPStatsClient']
@@ -171,7 +172,14 @@ class TCPStatsClient(StatsClientBase):
         """Send data to statsd."""
         if not self._sock:
             self.connect()
-        self._do_send(data)
+        while True:
+            try:
+                self._do_send(data)
+                return
+            except socket.error as e:
+                if e.errno != errno.EPIPE:
+                    raise
+                self.reconnect()
 
     def _do_send(self, data):
         self._sock.sendall(data.encode('ascii') + b'\n')
