@@ -9,7 +9,7 @@ python:
  - "3.5"
  - "pypy"
 install:
- - pip install -q flake8
+ - pip install -q "flake8<3.0.0" # Flake8 3.x dropped support of Python 2.6 and 3.3
 script:
  - nosetests
  - flake8 statsd/
