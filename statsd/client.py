@@ -146,7 +146,7 @@ class StatsClient(StatsClientBase):
         """Send data to statsd."""
         try:
             self._sock.sendto(data.encode('ascii'), self._addr)
-        except (socket.error, RuntimeError):
+        except (socket.error, socket.gaierror, RuntimeError):
             # No time for love, Dr. Jones!
             pass
 
