@@ -145,7 +145,7 @@ class StatsClient(StatsClientBase):
     def _send(self, data):
         """Send data to statsd."""
         try:
-            self._sock.sendto(data.encode('ascii'), self._addr)
+            self._sock.sendto(data.encode('ascii', 'ignore'), self._addr)
         except (socket.error, RuntimeError):
             # No time for love, Dr. Jones!
             pass
@@ -174,7 +174,7 @@ class TCPStatsClient(StatsClientBase):
         self._do_send(data)
 
     def _do_send(self, data):
-        self._sock.sendall(data.encode('ascii') + b'\n')
+        self._sock.sendall(data.encode('ascii', 'ignore') + b'\n')
 
     def close(self):
         if self._sock and hasattr(self._sock, 'close'):
