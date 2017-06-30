@@ -6,3 +6,9 @@ dist
 .coverage
 *.swp
 docs/_build
+bin/
+lib/
+local/
+pip-selfcheck.json
+share/
+man/
