@@ -13,3 +13,5 @@ dist:
 
 clean:
 	- rm -rf bin lib local pip-selfcheck.json share build dist man statsd.egg-inf
+	- find . -type f -name "*.pyc" -delete
+	- find . -type f -name "*.pyo" -delete 
