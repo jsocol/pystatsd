@@ -3,8 +3,15 @@ from collections import deque
 from functools import wraps
 import random
 import socket
-import time
 import abc
+
+# Use timer that's not susceptable to time of day adjustments.
+try:
+    # perf_counter is only present on Py3.3+
+    from time import perf_counter as time_now
+except ImportError:
+    # fall back to using time
+    from time import time as time_now
 
 
 __all__ = ['StatsClient', 'TCPStatsClient']
@@ -25,11 +32,11 @@ class Timer(object):
         """Thread-safe timing function decorator."""
         @wraps(f)
         def _wrapped(*args, **kwargs):
-            start_time = time.time()
+            start_time = time_now()
             try:
                 return_value = f(*args, **kwargs)
             finally:
-                elapsed_time_ms = 1000.0 * (time.time() - start_time)
+                elapsed_time_ms = 1000.0 * (time_now() - start_time)
                 self.client.timing(self.stat, elapsed_time_ms, self.rate)
             return return_value
         return _wrapped
@@ -43,13 +50,13 @@ class Timer(object):
     def start(self):
         self.ms = None
         self._sent = False
-        self._start_time = time.time()
+        self._start_time = time_now()
         return self
 
     def stop(self, send=True):
         if self._start_time is None:
             raise RuntimeError('Timer has not started.')
-        dt = time.time() - self._start_time
+        dt = time_now() - self._start_time
         self.ms = 1000.0 * dt  # Convert to milliseconds.
         if send:
             self.send()
