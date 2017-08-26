@@ -1,6 +1,14 @@
 Statsd Changelog
 ================
 
+Version 3.2.2
+-------------
+
+- Use a monotomic timer to avoid clock adjustments (#96).
+- Test on Python 3.5 and 3.6.
+- Various doc updates.
+
+
 Version 3.2.1
 -------------
 
