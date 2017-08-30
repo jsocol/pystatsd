@@ -1,6 +1,11 @@
 Statsd Changelog
 ================
 
+Unreleased
+----------
+
+- Fix timer decorator with partial functions (#85)
+
 Version 3.2.2
 -------------
 

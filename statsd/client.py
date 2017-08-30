@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from collections import deque
-from functools import wraps
+import functools
 import random
 import socket
 import abc
@@ -17,6 +17,13 @@ except ImportError:
 __all__ = ['StatsClient', 'TCPStatsClient']
 
 
+def safe_wraps(wrapper, *args, **kwargs):
+    """Safely wraps partial functions."""
+    while isinstance(wrapper, functools.partial):
+        wrapper = wrapper.func
+    return functools.wraps(wrapper, *args, **kwargs)
+
+
 class Timer(object):
     """A context manager/decorator for statsd.timing()."""
 
@@ -30,7 +37,7 @@ class Timer(object):
 
     def __call__(self, f):
         """Thread-safe timing function decorator."""
-        @wraps(f)
+        @safe_wraps(f)
         def _wrapped(*args, **kwargs):
             start_time = time_now()
             try:
