@@ -235,7 +235,7 @@ Causes the timer to send any unsent data. If the data has already been
 sent, or has not yet been recorded, a ``RuntimeError`` is raised.
 
 .. note::
-   See the note abbout :ref:`timer objects and pipelines <timer-direct-note>`.
+   See the note about :ref:`timer objects and pipelines <timer-direct-note>`.
 
 
 .. _pipeline:
