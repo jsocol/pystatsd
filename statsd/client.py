@@ -70,7 +70,6 @@ class Timer(object):
         self._sent = True
         self.client.timing(self.stat, self.ms, self.rate)
 
-
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
 
@@ -117,7 +116,7 @@ class StatsClientBase(object):
         self._send_stat(stat, '%s|s' % value, rate)
 
     def _send_stat(self, stat, value, rate):
-        self._after(self._prepare(stat, value, rate))
+        self._after(stat, self._prepare(stat, value, rate))
 
     def _prepare(self, stat, value, rate):
         if rate < 1:
@@ -130,10 +129,9 @@ class StatsClientBase(object):
 
         return '%s:%s' % (stat, value)
 
-    def _after(self, data):
+    def _after(self, stat, data):
         if data:
-            self._send(data)
-
+            self._send(stat, data)
 
 class StatsClient(StatsClientBase):
     """A client for statsd."""
@@ -155,6 +153,40 @@ class StatsClient(StatsClientBase):
             self._sock.sendto(data.encode('ascii'), self._addr)
         except (socket.error, RuntimeError):
             # No time for love, Dr. Jones!
+            pass
+
+    def pipeline(self):
+        return Pipeline(self)
+
+
+class ConsistentHashingStatsClient(StatsClientBase):
+    """A client for statsd."""
+
+    def __init__(self, hosts=['localhost'], port=8125, prefix=None,
+                 maxudpsize=512, ipv6=False):
+        self._addrs = []
+        self._sock = None
+        for host in hosts:
+            self._addrs.append(self._get_addr(ipv6, host, port))
+        self._prefix = prefix
+        self._maxudpsize = maxudpsize
+
+    def _get_addr(self, ipv6, host, port):
+        fam = socket.AF_INET6 if ipv6 else socket.AF_INET
+        family, _, _, _, addr = socket.getaddrinfo(
+            host, port, fam, socket.SOCK_DGRAM)[0]
+        if not self._sock:
+            self._sock = socket.socket(family, socket.SOCK_DGRAM)
+        return addr
+
+    def _send(self, stat, data):
+        """Send data to statsd."""
+        try:
+            address_index = hash(stat) % len(self._addrs)
+            addr = self._addrs[address_index]
+            self._sock.sendto(data.encode('ascii'), addr)
+        except (socket.error, RuntimeError):
+            # Whimmy wham wham wozzle
             pass
 
     def pipeline(self):
@@ -217,7 +249,7 @@ class PipelineBase(StatsClientBase):
     def _send(self):
         pass
 
-    def _after(self, data):
+    def _after(self, stat, data):
         if data is not None:
             self._stats.append(data)
 
@@ -248,11 +280,11 @@ class Pipeline(PipelineBase):
             # Use popleft to preserve the order of the stats.
             stat = self._stats.popleft()
             if len(stat) + len(data) + 1 >= self._maxudpsize:
-                self._client._after(data)
+                self._client._after(stat, data)
                 data = stat
             else:
                 data += '\n' + stat
-        self._client._after(data)
+        self._client._after(stat, data)
 
 
 class TCPPipeline(PipelineBase):
