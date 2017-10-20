@@ -147,7 +147,7 @@ class StatsClient(StatsClientBase):
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
-    def _send(self, data):
+    def _send(self, stat, data):
         """Send data to statsd."""
         try:
             self._sock.sendto(data.encode('ascii'), self._addr)
@@ -206,7 +206,7 @@ class TCPStatsClient(StatsClientBase):
         self._prefix = prefix
         self._sock = None
 
-    def _send(self, data):
+    def _send(self, stat, data):
         """Send data to statsd."""
         if not self._sock:
             self.connect()
