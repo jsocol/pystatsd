@@ -1,4 +1,5 @@
 from __future__ import with_statement
+import functools
 import random
 import re
 import socket
@@ -515,6 +516,18 @@ def test_timer_context_rate_tcp():
     """TCPStatsClient.timer can be used as manager with rate."""
     cl = _tcp_client()
     _test_timer_context_rate(cl, 'tcp')
+
+
+def test_timer_decorator_partial_function():
+    """TCPStatsClient.timer can be used as decorator on a partial function."""
+    cl = _tcp_client()
+
+    foo = functools.partial(lambda x: x * x, 2)
+    func = cl.timer('foo')(foo)
+
+    eq_(4, func())
+
+    _timer_check(cl._sock, 1, 'tcp', 'foo', 'ms|@0.1')
 
 
 def _test_timer_decorator_rate(cl, proto):
