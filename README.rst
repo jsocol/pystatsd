@@ -9,21 +9,17 @@ for the statsd daemon.
    :target: https://travis-ci.org/jsocol/pystatsd
    :alt: Travis-CI build status
 
-.. image:: https://pypip.in/v/statsd/badge.png?style=flat
+.. image:: https://img.shields.io/pypi/v/statsd.svg
    :target: https://pypi.python.org/pypi/statsd/
    :alt: Latest release
 
-.. image:: https://pypip.in/py_versions/statsd/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/pyversions/statsd.svg
    :target: https://pypi.python.org/pypi/statsd/
    :alt: Supported Python versions
 
-.. image:: https://pypip.in/wheel/statsd/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/wheel/statsd.svg
    :target: https://pypi.python.org/pypi/statsd/
    :alt: Wheel Status
-
-.. image:: https://pypip.in/d/statsd/badge.png?style=flat
-   :target: https://pypi.python.org/pypi/statsd/
-   :alt: Downloads
 
 :Code:          https://github.com/jsocol/pystatsd
 :License:       MIT; see LICENSE file
