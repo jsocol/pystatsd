@@ -211,6 +211,42 @@ class TCPStatsClient(StatsClientBase):
         self.connect()
 
 
+class UnixSocketStatsClient(StatsClientBase):
+    """Unix domain socket version of StatsClient."""
+
+    def __init__(self, socket_path, prefix=None, timeout=None):
+        """Create a new client."""
+        self._socket_path = socket_path
+        self._timeout = timeout
+        self._prefix = prefix
+        self._sock = None
+
+    def connect(self):
+        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self._sock.settimeout(self._timeout)
+        self._sock.connect(self._socket_path)
+
+    def _send(self, data):
+        """Send data to statsd."""
+        if not self._sock:
+            self.connect()
+        self._do_send(data)
+
+    def _do_send(self, data):
+        self._sock.sendall(data.encode('ascii') + b'\n')
+
+    def close(self):
+        self._sock.close()
+        self._sock = None
+
+    def reconnect(self, data):
+        self.close()
+        self.connect()
+
+    def pipeline(self):
+        return TCPPipeline(self)
+
+
 class PipelineBase(StatsClientBase):
 
     __metaclass__ = abc.ABCMeta
