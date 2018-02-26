@@ -3,6 +3,7 @@ import functools
 import random
 import re
 import socket
+from datetime import timedelta
 
 import mock
 from nose.tools import eq_
@@ -363,6 +364,12 @@ def _test_timing(cl, proto):
 
     cl.timing('foo', 100, rate=0.5)
     _sock_check(cl._sock, 3, proto, 'foo:100.000000|ms|@0.5')
+
+    cl.timing('foo', timedelta(seconds=1.5))
+    _sock_check(cl._sock, 4, proto, 'foo:1500.000000|ms')
+
+    cl.timing('foo', timedelta(days=1.5), rate=0.2)
+    _sock_check(cl._sock, 5, proto, 'foo:129600000.000000|ms|@0.2')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
