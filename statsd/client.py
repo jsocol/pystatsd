@@ -1,5 +1,6 @@
 from __future__ import with_statement
 from collections import deque
+from datetime import timedelta
 import functools
 import random
 import socket
@@ -90,7 +91,14 @@ class StatsClientBase(object):
         return Timer(self, stat, rate)
 
     def timing(self, stat, delta, rate=1):
-        """Send new timing information. `delta` is in milliseconds."""
+        """
+        Send new timing information.
+
+        `delta` can be either a number of milliseconds or a timedelta.
+        """
+        if isinstance(delta, timedelta):
+            # Convert timedelta to number of milliseconds.
+            delta = delta.total_seconds() * 1000.
         self._send_stat(stat, '%0.6f|ms' % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
