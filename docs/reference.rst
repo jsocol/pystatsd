@@ -45,7 +45,7 @@ and prefix information.
 
 ::
 
-    StatsClient().incr(stat, count=1, rate=1)
+    StatsClient().incr(stat, count=1, rate=1, tags=None)
 
 Increment a :ref:`counter <counter-type>`.
 
@@ -57,6 +57,15 @@ Increment a :ref:`counter <counter-type>`.
 * ``rate``: a sample rate, a float between 0 and 1. Will only send data
   this percentage of the time. The statsd server will take the sample
   rate into account for counters.
+
+* ``tags``: optional dictionary with additional valued tags used by
+  Prometheus metrics exporter and DogStatsD (details at
+  :ref:`dogstatsd_extensions`). For example, you could compare
+  the performance of two workers by tagging a metric with the worker name:
+
+
+    StatsClient().incr(stat, count=1, rate=1, tags={'worker': 'one'})
+    StatsClient().incr(stat, count=1, rate=1, tags={'worker': 'two'})
 
 
 .. _decr:
@@ -79,6 +88,15 @@ Decrement a :ref:`counter <counter-type>`.
 * ``rate``: a sample rate, a float between 0 and 1. Will only send data
   this percentage of the time. The statsd server will take the sample
   rate into account for counters.
+
+* ``tags``: optional dictionary with additional valued tags used by
+  Prometheus metrics exporter and DogStatsD (details at
+  :ref:`dogstatsd_extensions`). For example, you could compare
+  the performance of two workers by tagging a metric with the worker name:
+
+
+    StatsClient().decr(stat, count=1, rate=1, tags={'worker': 'one'})
+    StatsClient().decr(stat, count=1, rate=1, tags={'worker': 'two'})
 
 
 .. _gauge:
@@ -103,6 +121,15 @@ Set a :ref:`gauge <gauge-type>` value.
 * ``delta``: whether or not to consider this a delta value or an
   absolute value. See the :ref:`gauge <gauge-type>` type for more
   detail.
+
+* ``tags``: optional dictionary with additional valued tags used by
+  Prometheus metrics exporter and DogStatsD (details at
+  :ref:`dogstatsd_extensions`). For example, you could compare
+  the performance of two workers by tagging a metric with the worker name:
+
+
+    StatsClient().gauge(stat, value, rate=1, delta=False, tags={'worker': 'one'})
+    StatsClient().gauge(stat, value, rate=1, delta=False, tags={'worker': 'two'})
 
 .. note::
 
@@ -130,6 +157,15 @@ Increment a :ref:`set <set-type>` value.
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for sets. Use with care.
 
+* ``tags``: optional dictionary with additional valued tags used by
+  Prometheus metrics exporter and DogStatsD (details at
+  :ref:`dogstatsd_extensions`). For example, you could compare
+  the performance of two workers by tagging a metric with the worker name:
+
+
+    StatsClient().set(stat, value, rate=1, tags={'worker': 'one'})
+    StatsClient().set(stat, value, rate=1, tags={'worker': 'two'})
+
 .. note::
 
    Sets were added to the statsd server in commit 1c10cfc0ac_. If you
@@ -156,6 +192,15 @@ Record :ref:`timer <timer-type>` information.
 * ``rate``: a sample rate, a float between 0 and 1. Will only send data
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for timers.
+
+* ``tags``: optional dictionary with additional valued tags used by
+  Prometheus metrics exporter and DogStatsD (details at
+  :ref:`dogstatsd_extensions`). For example, you could compare
+  the performance of two workers by tagging a metric with the worker name:
+
+
+    StatsClient().timing(stat, delta, rate=1, tags={'worker': 'one'})
+    StatsClient().timing(stat, delta, rate=1, tags={'worker': 'two'})
 
 
 .. _timer:
@@ -186,6 +231,15 @@ call.  See also the :ref:`chapter on timing <timing-chapter>`.
 * ``rate``: a sample rate, a float between 0 and 1. Will only send data
   this percentage of the time. The statsd server does *not* take the
   sample rate into account for timers.
+
+* ``tags``: optional dictionary with additional valued tags used by
+  Prometheus metrics exporter and DogStatsD (details at
+  :ref:`dogstatsd_extensions`). For example, you could compare
+  the performance of two workers by tagging a metric with the worker name:
+
+
+    StatsClient().timer(stat, rate=1, tags={'worker': 'one'})
+    StatsClient().timer(stat, rate=1, tags={'worker': 'two'})
 
 .. _timer-start:
 
@@ -363,5 +417,6 @@ Internally this does nothing else than calling ``close()`` and
 
 
 .. _statsd: https://github.com/etsy/statsd
+.. _dogstatsd_extensions: https://github.com/prometheus/statsd_exporter#dogstatsd-extensions
 .. _0ed78be: https://github.com/etsy/statsd/commit/0ed78be7
 .. _1c10cfc0ac: https://github.com/etsy/statsd/commit/1c10cfc0ac

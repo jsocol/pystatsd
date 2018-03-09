@@ -9,7 +9,10 @@ from nose.tools import eq_
 
 from statsd import StatsClient
 from statsd import TCPStatsClient
-
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 ADDR = (socket.gethostbyname('localhost'), 8125)
 
@@ -139,6 +142,15 @@ def _test_incr(cl, proto):
     cl.incr('foo', 10, rate=0.5)
     _sock_check(cl._sock, 4, proto, val='foo:10|c|@0.5')
 
+    # in real scenario use generic dict as `tags={'host': 'a', 'env': 'prod'}`,
+    # here OrderedDict is used to prevent changes in produced string
+    tags = OrderedDict([('env', 'prod'), ('host', 'a')])
+    cl.incr('foo', 10, rate=0.5, tags=tags)
+    _sock_check(cl._sock, 5, proto, val='foo:10|c|@0.5|#env:prod,host:a')
+
+    cl.incr('foo', 1.2, tags=tags)
+    _sock_check(cl._sock, 6, proto, val='foo:1.2|c|#env:prod,host:a')
+
 
 @mock.patch.object(random, 'random', lambda: -1)
 def test_incr_udp():
@@ -167,6 +179,15 @@ def _test_decr(cl, proto):
     cl.decr('foo', 1, rate=0.5)
     _sock_check(cl._sock, 4, proto, 'foo:-1|c|@0.5')
 
+    # in real scenario use generic dict as `tags={'host': 'a', 'env': 'prod'}`,
+    # here OrderedDict is used to prevent changes in produced string
+    tags = OrderedDict([('env', 'prod'), ('host', 'a')])
+    cl.decr('foo', 1, rate=0.5, tags=tags)
+    _sock_check(cl._sock, 5, proto, 'foo:-1|c|@0.5|#env:prod,host:a')
+
+    cl.decr('foo', 1.2, tags=tags)
+    _sock_check(cl._sock, 6, proto, 'foo:-1.2|c|#env:prod,host:a')
+
 
 @mock.patch.object(random, 'random', lambda: -1)
 def test_decr_udp():
@@ -191,6 +212,16 @@ def _test_gauge(cl, proto):
 
     cl.gauge('foo', 70, rate=0.5)
     _sock_check(cl._sock, 3, proto, 'foo:70|g|@0.5')
+
+    # in real scenario use generic dict as `tags={'host': 'a', 'env': 'prod'}`,
+    # here OrderedDict is used to prevent changes in produced string
+    tags = OrderedDict([('env', 'prod'), ('host', 'a')])
+
+    cl.gauge('foo', 70, rate=0.5, tags=tags)
+    _sock_check(cl._sock, 4, proto, 'foo:70|g|@0.5|#env:prod,host:a')
+
+    cl.gauge('foo', 1.2, tags=tags)
+    _sock_check(cl._sock, 5, proto, 'foo:1.2|g|#env:prod,host:a')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -363,6 +394,16 @@ def _test_timing(cl, proto):
 
     cl.timing('foo', 100, rate=0.5)
     _sock_check(cl._sock, 3, proto, 'foo:100.000000|ms|@0.5')
+
+    # in real scenario use generic dict as `tags={'host': 'a', 'env': 'prod'}`,
+    # here OrderedDict is used to prevent changes in produced string
+    tags = OrderedDict([('env', 'prod'), ('host', 'a')])
+
+    cl.timing('foo', 100, rate=0.5, tags=tags)
+    _sock_check(cl._sock, 4, proto, 'foo:100.000000|ms|@0.5|#env:prod,host:a')
+
+    cl.timing('foo', 350, tags=tags)
+    _sock_check(cl._sock, 5, proto, 'foo:350.000000|ms|#env:prod,host:a')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
@@ -762,11 +803,19 @@ def test_pipeline_null_tcp():
 
 
 def _test_pipeline_manager(cl, proto):
+    # in real scenario use generic dict as `tags={'host': 'a', 'env': 'prod'}`,
+    # here OrderedDict is used to prevent changes in produced string
+    tags = OrderedDict([('env', 'prod'), ('host', 'a')])
+
     with cl.pipeline() as pipe:
         pipe.incr('foo')
         pipe.decr('bar')
+        pipe.incr('xxx', tags=tags)
         pipe.gauge('baz', 15)
-    _sock_check(cl._sock, 1, proto, 'foo:1|c\nbar:-1|c\nbaz:15|g')
+    _sock_check(
+        cl._sock, 1, proto,
+        'foo:1|c\nbar:-1|c\nxxx:1|c|#env:prod,host:a\nbaz:15|g'
+    )
 
 
 def test_pipeline_manager_udp():

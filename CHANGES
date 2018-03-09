@@ -4,6 +4,7 @@ Statsd Changelog
 Unreleased
 ----------
 
+- Add optional tags to metrics (#105)
 - Fix timer decorator with partial functions (#85)
 
 Version 3.2.2
