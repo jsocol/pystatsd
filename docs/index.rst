@@ -7,7 +7,10 @@ Welcome to Python StatsD's documentation!
 =========================================
 
 statsd_ is a friendly front-end to Graphite_. This is a Python client
-for the statsd daemon.
+for the statsd daemon, with added support for tags (as defined in the
+Datadog protocol extension).
+
+Forked from https://github.com/jsocol/pystatsd.
 
 .. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
    :target: https://travis-ci.org/jsocol/pystatsd
@@ -40,7 +43,8 @@ You can also add a prefix to all your stats:
 .. code-block:: pycon
 
     >>> import statsd
-    >>> c = statsd.StatsClient('localhost', 8125, prefix='foo')
+    >>> c = statsd.StatsClient('localhost', 8125, prefix='foo',
+    ... tags={'environment:production'})
     >>> c.incr('bar')  # Will be 'foo.bar' in statsd/graphite.
 
 

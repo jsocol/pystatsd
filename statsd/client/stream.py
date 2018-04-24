@@ -6,6 +6,11 @@ from .base import StatsClientBase, PipelineBase
 
 
 class StreamPipeline(PipelineBase):
+
+    def __init__(self, client):
+        super(StreamPipeline, self).__init__(client)
+        self._tags = client._tags
+
     def _send(self):
         self._client._after('\n'.join(self._stats))
         self._stats.clear()
@@ -41,13 +46,14 @@ class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 timeout=None, ipv6=False):
+                 tags=None, timeout=None, ipv6=False):
         """Create a new client."""
         self._host = host
         self._port = port
         self._ipv6 = ipv6
         self._timeout = timeout
         self._prefix = prefix
+        self._tags = tags
         self._sock = None
 
     def connect(self):
