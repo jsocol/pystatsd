@@ -3,28 +3,10 @@ A Python statsd client
 ======================
 
 statsd_ is a friendly front-end to Graphite_. This is a Python client
-for the statsd daemon.
+for the statsd daemon, with added support for tags (as defined in the
+Datadog protocol extension).
 
-.. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
-   :target: https://travis-ci.org/jsocol/pystatsd
-   :alt: Travis-CI build status
-
-.. image:: https://img.shields.io/pypi/v/statsd.svg
-   :target: https://pypi.python.org/pypi/statsd/
-   :alt: Latest release
-
-.. image:: https://img.shields.io/pypi/pyversions/statsd.svg
-   :target: https://pypi.python.org/pypi/statsd/
-   :alt: Supported Python versions
-
-.. image:: https://img.shields.io/pypi/wheel/statsd.svg
-   :target: https://pypi.python.org/pypi/statsd/
-   :alt: Wheel Status
-
-:Code:          https://github.com/jsocol/pystatsd
-:License:       MIT; see LICENSE file
-:Issues:        https://github.com/jsocol/pystatsd/issues
-:Documentation: https://statsd.readthedocs.io/
+Forked from https://github.com/jsocol/pystatsd.
 
 Quickly, to use:
 
