@@ -4,7 +4,7 @@ import functools
 import random
 import socket
 
-# Use timer that's not susceptable to time of day adjustments.
+# Use timer that's not susceptible to time of day adjustments.
 try:
     # perf_counter is only present on Py3.3+
     from time import perf_counter as time_now
