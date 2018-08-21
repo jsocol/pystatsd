@@ -41,11 +41,10 @@ class Timer(object):
         def _wrapped(*args, **kwargs):
             start_time = time_now()
             try:
-                return_value = f(*args, **kwargs)
+                return f(*args, **kwargs)
             finally:
                 elapsed_time_ms = 1000.0 * (time_now() - start_time)
                 self.client.timing(self.stat, elapsed_time_ms, self.rate)
-            return return_value
         return _wrapped
 
     def __enter__(self):
