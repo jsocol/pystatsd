@@ -18,15 +18,24 @@ The simplest way to use a timer is to record the time yourself and send
 it manually, using the :ref:`timing` method::
 
     import time
+    from datetime import datetime
     from statsd import StatsClient
 
     statsd = StatsClient()
 
+    # Pass milliseconds directly
+
     start = time.time()
     time.sleep(3)
-
     # You must convert to milliseconds:
     dt = int((time.time() - start) * 1000)
+    statsd.timing('slept', dt)
+
+    # Or pass a timedelta
+
+    start = datetime.utcnow()
+    time.sleep(3)
+    dt = datetime.utcnow() - start
     statsd.timing('slept', dt)
 
 
