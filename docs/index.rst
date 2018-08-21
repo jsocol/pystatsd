@@ -26,14 +26,18 @@ for the statsd daemon.
 :Issues:        https://github.com/jsocol/pystatsd/issues
 :Documentation: https://statsd.readthedocs.io/
 
-Quickly, to use::
+Quickly, to use:
+
+.. code-block:: pycon
 
     >>> import statsd
     >>> c = statsd.StatsClient('localhost', 8125)
     >>> c.incr('foo')  # Increment the 'foo' counter.
     >>> c.timing('stats.timed', 320)  # Record a 320ms 'stats.timed'.
 
-You can also add a prefix to all your stats::
+You can also add a prefix to all your stats:
+
+.. code-block:: pycon
 
     >>> import statsd
     >>> c = statsd.StatsClient('localhost', 8125, prefix='foo')
@@ -45,15 +49,21 @@ Installing
 
 The easiest way to install statsd is with pip!
 
-You can install from PyPI::
+You can install from PyPI:
+
+.. code-block:: bash
 
     $ pip install statsd
 
-Or GitHub::
+Or GitHub:
+
+.. code-block:: bash
 
     $ pip install -e git+https://github.com/jsocol/pystatsd#egg=statsd
 
-Or from source::
+Or from source:
+
+.. code-block:: bash
 
     $ git clone https://github.com/jsocol/pystatsd
     $ cd statsd
