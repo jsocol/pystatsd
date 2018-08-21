@@ -11,15 +11,18 @@ from nose.tools import eq_
 
 from statsd import StatsClient
 from statsd import TCPStatsClient
+from statsd import UnixSocketStatsClient
 
 
 ADDR = (socket.gethostbyname('localhost'), 8125)
+UNIX_SOCKET = 'tmp.socket'
 
 
 # proto specific methods to get the socket method to send data
 send_method = {
     'udp': lambda x: x.sendto,
     'tcp': lambda x: x.sendall,
+    'unix': lambda x: x.sendall,
 }
 
 
@@ -27,6 +30,7 @@ send_method = {
 make_val = {
     'udp': lambda x, addr: mock.call(str.encode(x), addr),
     'tcp': lambda x, addr: mock.call(str.encode(x + '\n')),
+    'unix': lambda x, addr: mock.call(str.encode(x + '\n')),
 }
 
 
@@ -47,6 +51,15 @@ def _tcp_client(prefix=None, addr=None, port=None, timeout=None, ipv6=False):
         port = ADDR[1]
     sc = TCPStatsClient(host=addr, port=port, prefix=prefix, timeout=timeout,
                         ipv6=ipv6)
+    sc._sock = mock.Mock()
+    return sc
+
+
+def _unix_socket_client(prefix=None, socket_path=None):
+    if not socket_path:
+        socket_path = UNIX_SOCKET
+
+    sc = UnixSocketStatsClient(socket_path=socket_path, prefix=prefix)
     sc._sock = mock.Mock()
     return sc
 
@@ -156,6 +169,13 @@ def test_incr_tcp():
     _test_incr(cl, 'tcp')
 
 
+@mock.patch.object(random, 'random', lambda: -1)
+def test_incr_unix_socket():
+    """TCPStatsClient.incr works."""
+    cl = _unix_socket_client()
+    _test_incr(cl, 'unix')
+
+
 def _test_decr(cl, proto):
     cl.decr('foo')
     _sock_check(cl._sock, 1, proto, 'foo:-1|c')
@@ -184,6 +204,13 @@ def test_decr_tcp():
     _test_decr(cl, 'tcp')
 
 
+@mock.patch.object(random, 'random', lambda: -1)
+def test_decr_unix_socket():
+    """TCPStatsClient.decr works."""
+    cl = _unix_socket_client()
+    _test_decr(cl, 'unix')
+
+
 def _test_gauge(cl, proto):
     cl.gauge('foo', 30)
     _sock_check(cl._sock, 1, proto, 'foo:30|g')
@@ -207,6 +234,13 @@ def test_gauge_tcp():
     """TCPStatsClient.gauge works."""
     cl = _tcp_client()
     _test_gauge(cl, 'tcp')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_gauge_unix_socket():
+    """TCPStatsClient.decr works."""
+    cl = _unix_socket_client()
+    _test_gauge(cl, 'unix')
 
 
 def _test_ipv6(cl, proto, addr):
@@ -393,6 +427,13 @@ def test_timing_supports_timedelta():
     _sock_check(cl._sock, 2, proto, 'foo:129600000.000000|ms')
 
 
+@mock.patch.object(random, 'random', lambda: -1)
+def test_timing_unix_socket():
+    """UnixSocketStatsClient.timing works."""
+    cl = _unix_socket_client()
+    _test_timing(cl, 'unix')
+
+
 def _test_prepare(cl, proto):
     tests = (
         ('foo:1|c', ('foo', '1|c', 1)),
@@ -439,6 +480,13 @@ def test_prefix_tcp():
     """TCPStatsClient.incr works."""
     cl = _tcp_client(prefix='foo')
     _test_prefix(cl, 'tcp')
+
+
+@mock.patch.object(random, 'random', lambda: -1)
+def test_prefix_unix_socket():
+    """UnixSocketStatsClient.incr works."""
+    cl = _unix_socket_client(prefix='foo')
+    _test_prefix(cl, 'unix')
 
 
 def _test_timer_manager(cl, proto):
@@ -980,5 +1028,14 @@ def test_tcp_timeout(mock_socket):
     """Timeout on TCPStatsClient should be set on socket."""
     test_timeout = 321
     cl = TCPStatsClient(timeout=test_timeout)
+    cl.incr('foo')
+    cl._sock.settimeout.assert_called_once_with(test_timeout)
+
+
+@mock.patch.object(socket, 'socket')
+def test_unix_socket_timeout(mock_socket):
+    """Timeout on UnixSocketStatsClient should be set on socket."""
+    test_timeout = 321
+    cl = UnixSocketStatsClient(UNIX_SOCKET, timeout=test_timeout)
     cl.incr('foo')
     cl._sock.settimeout.assert_called_once_with(test_timeout)
