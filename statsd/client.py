@@ -3,7 +3,6 @@ from collections import deque
 import functools
 import random
 import socket
-import abc
 
 # Use timer that's not susceptable to time of day adjustments.
 try:
@@ -81,15 +80,11 @@ class Timer(object):
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
 
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
     def _send(self):
-        pass
+        raise NotImplementedError()
 
-    @abc.abstractmethod
     def pipeline(self):
-        pass
+        raise NotImplementedError()
 
     def timer(self, stat, rate=1):
         return Timer(self, stat, rate)
@@ -213,16 +208,13 @@ class TCPStatsClient(StatsClientBase):
 
 class PipelineBase(StatsClientBase):
 
-    __metaclass__ = abc.ABCMeta
-
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix
         self._stats = deque()
 
-    @abc.abstractmethod
     def _send(self):
-        pass
+        raise NotImplementedError()
 
     def _after(self, data):
         if data is not None:
