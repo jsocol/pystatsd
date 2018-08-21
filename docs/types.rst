@@ -160,8 +160,8 @@ For example, you could count the number of users accessing your system using:
 
     statsd.set('users', userid)
 
-If that method is called multiple times with the same userid in the same sample
-period, that userid will only be counted once.
+If :py:meth:`StatsClient.set()` is called multiple times with the same userid
+in the same sample period, that userid will only be counted once.
 
 
 .. _statsd: https://github.com/etsy/statsd

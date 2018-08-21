@@ -14,11 +14,6 @@ server supports.
     information.
 
 
-.. _StatsClient:
-
-``StatsClient``
-===============
-
 .. py:class:: StatsClient(host='localhost', port=8125, prefix=None, maxudpsize=512)
 
     Create a new ``StatsClient`` instance with the appropriate connection and
@@ -33,11 +28,6 @@ server supports.
         generally considered safe for the public internet, but private networks
         may support larger packet sizes.
 
-.. _incr:
-
-``incr``
---------
-
 .. py:method:: StatsClient.incr(stat, count=1, rate=1)
 
     Increment a :ref:`counter <counter-type>`.
@@ -48,12 +38,6 @@ server supports.
     :param float rate: a sample rate, a float between 0 and 1. Will only send
         data this percentage of the time. The statsd server will take the
         sample rate into account for counters.
-
-
-.. _decr:
-
-``decr``
---------
 
 .. py:method:: StatsClient.decr(stat, count=1, rate=1)
 
@@ -66,12 +50,6 @@ server supports.
     :param float rate: a sample rate, a float between 0 and 1. Will only send
         data this percentage of the time. The statsd server will take the
         sample rate into account for counters
-
-
-.. _gauge:
-
-``gauge``
----------
 
 .. py:method:: StatsClient.gauge(stat, value, rate=1, delta=False)
 
@@ -94,12 +72,6 @@ server supports.
 
     Gauge deltas were added to the statsd server in version 0.6.0.
 
-
-.. _set:
-
-``set``
----------
-
 .. py:method:: StatsClient.set(stat, value, rate=1)
 
     Increment a :ref:`set <set-type>` value.
@@ -114,12 +86,6 @@ server supports.
 
    Sets were added to the statsd server in version 0.6.0.
 
-
-.. _timing:
-
-``timing``
-----------
-
 .. py:method:: StatsClient.timing(stat, delta, rate=1)
 
     Record :ref:`timer <timer-type>` information.
@@ -132,12 +98,6 @@ server supports.
     :param float rate: a sample rate, a float between 0 and 1. Will only send
         data this percentage of the time. The statsd server does *not* take the
         sample rate into account for timers.
-
-
-.. _timer:
-
-``timer``
-=========
 
 .. py:method:: StatsClient.timer(stat, rate=1)
 
@@ -172,11 +132,21 @@ server supports.
     def bar():
         pass
 
+.. py:method:: StatsClient.pipeline()
 
-.. _timer-class:
+    Returns a :py:class:`Pipeline` object for collecting several stats.  Can
+    also be used as a context manager.
 
-``Timer``
-=========
+.. code-block:: python
+
+    pipe = StatsClient().pipeline()
+    pipe.incr('foo')
+    pipe.send()
+
+    # or
+
+    with StatsClient().pipeline as pipe:
+        pipe.incr('bar')
 
 .. py:class:: Timer()
 
@@ -202,23 +172,11 @@ context manager or decorator. For example:
 :py:class:`Timer` objects may be reused by calling :py:meth:`start()
 <Timer.start()>` again.
 
-
-.. _timer-start:
-
-``start``
----------
-
 .. py:method:: Timer.start()
 
     Causes a timer object to start counting. Called automatically when the
     object is used as a decorator or context manager. Returns the timer object
     for simplicity.
-
-
-.. _timer-stop:
-
-``stop``
---------
 
 .. py:method:: Timer.stop(send=True)
 
@@ -237,12 +195,6 @@ context manager or decorator. For example:
     timer = StatsClient().timer('foo').start()
     timer.stop()
 
-
-.. _timer-send:
-
-``send``
---------
-
 .. py:method:: Timer.send()
 
     Causes the timer to send any unsent data. If the data has already been
@@ -257,34 +209,6 @@ context manager or decorator. For example:
 .. note::
 
     See the note abbout :ref:`timer objects and pipelines <timer-direct-note>`.
-
-
-.. _pipeline:
-
-``pipeline``
-============
-
-.. py:method:: StatsClient.pipeline()
-
-    Returns a :py:class:`Pipeline` object for collecting several stats.  Can
-    also be used as a context manager.
-
-.. code-block:: python
-
-    pipe = StatsClient().pipeline()
-    pipe.incr('foo')
-    pipe.send()
-
-    # or
-
-    with StatsClient().pipeline as pipe:
-        pipe.incr('bar')
-
-
-.. _Pipeline:
-
-``Pipeline``
-============
 
 .. py:class:: Pipeline()
 
@@ -306,21 +230,10 @@ context manager or decorator. For example:
     with StatsClient().pipeline as pipe:
         pipe.incr('bar')
 
-.. _pipeline-send:
-
-``send``
---------
-
 .. py:method:: Pipeline.send()
 
     Causes the :py:class:`Pipeline` object to send all batched stats in as few
     packets as possible.
-
-
-.. _TCPStatsClient:
-
-``TCPStatsClient``
-==================
 
 .. py:class:: TCPStatsClient(host='localhost', port=8125, prefix=None, timeout=None, ipv6=False)
 
@@ -335,7 +248,6 @@ context manager or decorator. For example:
     :param float timeout: socket timeout for any actions on the connection
         socket.
 
-
 ``TCPStatsClient`` implements all methods of :py:class:`StatsClient`, including
 :py:meth:`pipeline() <StatsClient.pipeline>`, with the difference that it is
 not thread safe and it can raise exceptions on connection errors. Unlike
@@ -343,12 +255,6 @@ not thread safe and it can raise exceptions on connection errors. Unlike
 
 In addition to the stats methods, ``TCPStatsClient`` supports the following
 TCP-specific methods.
-
-
-.. _tcp_close:
-
-``close``
----------
 
 .. py:method:: TCPStatsClient.close()
 
@@ -363,12 +269,6 @@ TCP-specific methods.
     statsd = TCPStatsClient()
     statsd.incr('some.event')
     statsd.close()
-
-
-.. _tcp_connect:
-
-``connect``
------------
 
 .. py:method:: TCPStatsClient.connect()
 
@@ -387,12 +287,6 @@ TCP-specific methods.
     statsd.close()
     statsd.connect()  # creates new connection
 
-
-.. _tcp_reconnect:
-
-``reconnect``
--------------
-
 .. py:method:: TCPStatsClient.reconnect()
 
     Closes a currently existing connection and replaces it with a new one.  If
@@ -408,12 +302,6 @@ TCP-specific methods.
     statsd = TCPStatsClient()
     statsd.incr('some.event')
     statsd.reconnect()  # closes open connection and creates new one
-
-
-.. _UnixSocketStatsClient:
-
-``UnixSocketStatsClient``
-=========================
 
 .. py:class:: UnixSocketStatsClient(socket_path, prefix=None, timeout=None)
 
