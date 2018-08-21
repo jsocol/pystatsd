@@ -39,6 +39,8 @@ it manually, using the :ref:`timing` method::
     statsd.timing('slept', dt)
 
 
+.. _timer-context-manager:
+
 Using a context manager
 =======================
 
@@ -57,6 +59,8 @@ block::
             i ** 2
     # The timing is sent immediately when the managed block exits.
 
+
+.. _timer-decorator:
 
 Using a decorator
 =================
@@ -81,6 +85,8 @@ will be sent to the statsd server.
 
 
 
+.. _timer-object:
+
 Using a Timer object directly
 =============================
 
@@ -102,7 +108,7 @@ better than nested.)
     foo_timer.stop()
 
 When :py:meth:`statsd.client.Timer.stop` is called, a :ref:`timing stat
-<timer-type>`_ will automatically be sent to StatsD. You can over ride
+<timer-type>` will automatically be sent to StatsD. You can over ride
 this behavior with the ``send=False`` keyword argument to ``stop()``::
 
     foo_timer.stop(send=False)
@@ -115,10 +121,13 @@ ready.
 
 .. note::
    This use of timers is compatible with :ref:`Pipelines
-   <pipeline-chapter>`_ but be careful with the ``send()`` method. It
-   *must* be called for the stat to be included when the Pipeline
-   finally sends data, but ``send()`` will *not* immediately cause data
-   to be sent in the context of a Pipeline. For example::
+   <pipeline-chapter>` but the ``send()`` method may not behave exactly
+   as expected. Timing data *must* be sent, either by calling ``stop()``
+   without ``send=False`` or calling ``send()`` explicitly, in order for
+   it to be included in the pipeline. However, it will *not* be sent
+   immediately.
+
+.. code-block:: python
 
     with statsd.pipeline() as pipe:
         foo_timer = pipe.timer('foo').start()
@@ -133,3 +142,9 @@ ready.
         foo_timer.stop(send=False)  # Will not be sent.
         foo_timer.send()  # Will be sent when the managed block exits.
         # Do something else...
+
+    with statsd.pipeline() as pipe:
+        foo_timer = pipe.timer('foo').start()
+        pipe.incr('bar')
+        # Do something...
+        foo_timer.stop(send=False)  # Data will _not_ be sent
