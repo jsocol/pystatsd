@@ -1,16 +1,13 @@
 language: python
 sudo: false
 python:
- - "2.6"
  - "2.7"
- - "3.2"
- - "3.3"
  - "3.4"
  - "3.5"
  - "3.6"
  - "pypy"
 install:
- - pip install -q "flake8<3.0.0" # Flake8 3.x dropped support of Python 2.6 and 3.3
+ - pip install -q "flake8"
 script:
- - nosetests
+ - nosetests --with-coverage --cover-package=statsd
  - flake8 statsd/
