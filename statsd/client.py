@@ -20,11 +20,12 @@ __all__ = ['StatsClient', 'TCPStatsClient']
 class Timer(object):
     """A context manager/decorator for statsd.timing()."""
 
-    def __init__(self, client, stat, rate=1):
+    def __init__(self, client, stat, rate=1, scale=1):
         self.client = client
         self.stat = stat
         self.rate = rate
         self.ms = None
+        self.scale = 1
         self._sent = False
         self._start_time = None
 
@@ -68,7 +69,8 @@ class Timer(object):
         if self._sent:
             raise RuntimeError('Already sent data.')
         self._sent = True
-        self.client.timing(self.stat, self.ms, self.rate)
+        scaled_timer = self.ms * self.scale
+        self.client.timing(self.stat, scaled_timer, self.rate)
 
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
@@ -83,8 +85,8 @@ class StatsClientBase(object):
     def pipeline(self):
         pass
 
-    def timer(self, stat, rate=1):
-        return Timer(self, stat, rate)
+    def timer(self, stat, rate=1, scale=1):
+        return Timer(self, stat, rate, scale)
 
     def timing(self, stat, delta, rate=1):
         """Send new timing information. `delta` is in milliseconds."""
