@@ -278,6 +278,7 @@ class Pipeline(PipelineBase):
 
     def _send(self):
         data = self._stats.popleft()
+        stat = None
         while self._stats:
             # Use popleft to preserve the order of the stats.
             stat = self._stats.popleft()
@@ -286,7 +287,8 @@ class Pipeline(PipelineBase):
                 data = stat
             else:
                 data += '\n' + stat
-        self._client._after(stat, data)
+        if stat is not None:
+            self._client._after(stat, data)
 
 
 class TCPPipeline(PipelineBase):
