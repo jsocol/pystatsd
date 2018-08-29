@@ -25,7 +25,7 @@ class Timer(object):
         self.stat = stat
         self.rate = rate
         self.ms = None
-        self.scale = 1
+        self.scale = scale
         self._sent = False
         self._start_time = None
 
