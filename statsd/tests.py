@@ -68,7 +68,7 @@ def _timer_check(sock, count, proto, start, end):
     send = send_method[proto](sock)
     eq_(send.call_count, count)
     value = send.call_args[0][0].decode('ascii')
-    exp = re.compile('^%s:\d+|%s$' % (start, end))
+    exp = re.compile(r'^%s:\d+|%s$' % (start, end))
     assert exp.match(value)
 
 
