@@ -60,7 +60,7 @@ Or GitHub::
 Or from source::
 
     $ git clone https://github.com/jsocol/pystatsd
-    $ cd statsd
+    $ cd pystatsd
     $ python setup.py install
 
 
