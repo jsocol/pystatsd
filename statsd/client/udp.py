@@ -48,3 +48,14 @@ class StatsClient(StatsClientBase):
 
     def pipeline(self):
         return Pipeline(self)
+
+
+class UnixSocketStatsClient(StatsClient):
+    """Unix domain socket version of the UDP StatsClient."""
+
+    def __init__(self, socket_path, prefix=None, maxudpsize=512):
+        """Create a new client."""
+        self._addr = socket_path
+        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        self._prefix = prefix
+        self._maxudpsize = maxudpsize
