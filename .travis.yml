@@ -11,4 +11,4 @@ install:
  - pip install -q "flake8"
 script:
  - nosetests --with-coverage --cover-package=statsd
- - flake8 .
+ - flake8 statsd/
