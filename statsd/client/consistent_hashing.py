@@ -2,7 +2,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 import socket
 
-from .base import StatsClientBase, PipelineBase
+from .base import StatsClientBase
+from .udp import Pipeline
 
 
 class ConsistentHashingStatsClient(StatsClientBase):
@@ -39,4 +40,8 @@ class ConsistentHashingStatsClient(StatsClientBase):
             pass
 
     def pipeline(self):
-        return PipelineBase(self)
+        return Pipeline(self)
+
+    def _after(self, stat, data):
+        if data:
+            self._send(stat, data)
