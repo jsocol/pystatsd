@@ -164,10 +164,13 @@ class StatsClient(StatsClientBase):
 class ConsistentHashingStatsClient(StatsClientBase):
     """A client for statsd."""
 
-    def __init__(self, hosts=['localhost'], port=8125, prefix=None,
+    # we have to update the kwarg to be host since the newer versions require it to be `host` instead of `hosts`
+    def __init__(self, host=('localhost'), port=8125, prefix=None,
                  maxudpsize=512, ipv6=False):
         self._addrs = []
         self._sock = None
+        # host is actually hosts
+        hosts = host
         for host in hosts:
             self._addrs.append(self._get_addr(ipv6, host, port))
         self._prefix = prefix
