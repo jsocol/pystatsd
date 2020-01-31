@@ -4,7 +4,27 @@ import socket
 import random
 
 from .base import StatsClientBase
-from .udp import Pipeline
+
+
+class Pipeline(PipelineBase):
+
+    def __init__(self, client):
+        super(Pipeline, self).__init__(client)
+        self._maxudpsize = client._maxudpsize
+
+    def _send(self):
+        data = self._stats.popleft()
+        stat = None
+        while self._stats:
+            # Use popleft to preserve the order of the stats.
+            stat = self._stats.popleft()
+            if len(stat) + len(data) + 1 >= self._maxudpsize:
+                self._client._after(stat, data)
+                data = stat
+            else:
+                data += '\n' + stat
+        if stat is not None:
+            self._client._after(stat, data)
 
 
 class ConsistentHashingStatsClient(StatsClientBase):
