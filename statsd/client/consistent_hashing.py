@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import socket
+import random
 
 from .base import StatsClientBase
 from .udp import Pipeline
@@ -45,3 +46,10 @@ class ConsistentHashingStatsClient(StatsClientBase):
     def _after(self, stat, data):
         if data:
             self._send(stat, data)
+
+    def _prepare(self, stat, value, rate=1):
+        if rate < 1:
+            if random.random() > rate:
+                return
+
+        return stat, value
