@@ -30,6 +30,11 @@ class ConsistentHashingStatsClient(StatsClientBase):
             self._sock = socket.socket(family, socket.SOCK_DGRAM)
         return addr
 
+    def _send_stat(self, stat, value, rate):
+        values = self._prepare(stat, value, rate)
+        if values:
+            self._after(values[0], values[1])
+
     def _send(self, stat, data):
         """Send data to statsd."""
         try:
