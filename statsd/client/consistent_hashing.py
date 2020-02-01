@@ -1,9 +1,11 @@
 from __future__ import absolute_import, division, unicode_literals
 
+
 import socket
 import random
 
 from .base import StatsClientBase
+from .udp import PipelineBase
 
 
 class Pipeline(PipelineBase):
