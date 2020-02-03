@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from django.conf import settings
 
 from statsd import defaults
-from statsd.client import ConsistentHashingStatsClient
+from statsd.client import StatsClient
 
 
 statsd = None
@@ -13,5 +13,5 @@ if statsd is None:
     prefix = getattr(settings, 'STATSD_PREFIX', defaults.PREFIX)
     maxudpsize = getattr(settings, 'STATSD_MAXUDPSIZE', defaults.MAXUDPSIZE)
     ipv6 = getattr(settings, 'STATSD_IPV6', defaults.IPV6)
-    statsd = ConsistentHashingStatsClient(host=host, port=port, prefix=prefix,
+    statsd = StatsClient(host=host, port=port, prefix=prefix,
                          maxudpsize=maxudpsize, ipv6=ipv6)
