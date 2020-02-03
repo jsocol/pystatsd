@@ -4,8 +4,25 @@ from __future__ import absolute_import, division, unicode_literals
 import socket
 import random
 
-from .base import StatsClientBase
 from .udp import PipelineBase, StatsClient
+from .timer import Timer
+
+
+class ScaleTimer(Timer):
+    """A context manager/decorator for statsd.timing()."""
+
+    def __init__(self, client, stat, rate=1, scale=1):
+        super(ScaleTimer, self).__init__(client, stat, rate=1)
+        self.scale = scale
+
+    def send(self):
+        if self.ms is None:
+            raise RuntimeError('No data recorded.')
+        if self._sent:
+            raise RuntimeError('Already sent data.')
+        self._sent = True
+        scaled_timer = self.ms * self.scale
+        self.client.timing(self.stat, scaled_timer, self.rate)
 
 
 class Pipeline(PipelineBase):
@@ -72,6 +89,9 @@ class ConsistentHashingStatsClient(StatsClient):
 
     def pipeline(self):
         return Pipeline(self)
+
+    def timer(self, stat, rate=1, scale=1):
+        return Timer(self, stat, rate, scale)
 
     def _after(self, stat, data):
         if data:
