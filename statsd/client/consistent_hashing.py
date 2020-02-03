@@ -5,7 +5,7 @@ import socket
 import random
 
 from .base import StatsClientBase
-from .udp import PipelineBase
+from .udp import PipelineBase, StatsClient
 
 
 class Pipeline(PipelineBase):
@@ -29,17 +29,20 @@ class Pipeline(PipelineBase):
             self._client._after(stat, data)
 
 
-class ConsistentHashingStatsClient(StatsClientBase):
+class ConsistentHashingStatsClient(StatsClient):
     """A client for statsd."""
 
     # we have to update the kwarg to be host since the newer versions require it to be `host` instead of `hosts`
-    def __init__(self, host=('localhost'), port=8125, prefix=None,
+    def __init__(self, host=('localhost',), port=8125, prefix=None,
                  maxudpsize=512, ipv6=False):
+        # host is actually hosts
+        self.hosts = host
+        # we should convert a single host to hosts if called with a string
+        if isinstance(self.hosts, basestring):
+            self.hosts = (self.hosts,)
         self._addrs = []
         self._sock = None
-        # host is actually hosts
-        hosts = host
-        for host in hosts:
+        for host in self.hosts:
             self._addrs.append(self._get_addr(ipv6, host, port))
         self._prefix = prefix
         self._maxudpsize = maxudpsize
