@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 
 import socket
-import random
 
 from .udp import PipelineBase, StatsClient
 from .timer import Timer
