@@ -72,10 +72,10 @@ class ConsistentHashingStatsClient(StatsClient):
             self._sock = socket.socket(family, socket.SOCK_DGRAM)
         return addr
 
-    def _send_stat(self, stat, value, rate):
-        values = self._prepare(stat, value, rate)
-        if values:
-            self._after(values[0], values[1])
+    def _send_stat(self, stat, data, rate):
+        value = self._prepare(stat, data, rate)
+        if value:
+            self._after(stat, value)
 
     def _send(self, stat, data):
         """Send data to statsd."""
@@ -96,10 +96,3 @@ class ConsistentHashingStatsClient(StatsClient):
     def _after(self, stat, data):
         if data:
             self._send(stat, data)
-
-    def _prepare(self, stat, value, rate=1):
-        if rate < 1:
-            if random.random() > rate:
-                return
-
-        return stat, value
