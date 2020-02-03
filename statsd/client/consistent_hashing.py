@@ -91,7 +91,7 @@ class ConsistentHashingStatsClient(StatsClient):
         return Pipeline(self)
 
     def timer(self, stat, rate=1, scale=1):
-        return Timer(self, stat, rate, scale)
+        return ScaleTimer(self, stat, rate, scale)
 
     def _after(self, stat, data):
         if data:
