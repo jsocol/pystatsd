@@ -4,12 +4,14 @@
 Pipelines
 =========
 
-The ``Pipeline`` class is a subclass of ``StatsClient`` that batches
-together several stats before sending. It implements the entire client
-interface, plus a ``send()`` method.
+The :py:class:`Pipeline` class is a subclass of :py:class:`StatsClient` that
+batches together several stats before sending. It implements the entire client
+interface, plus a :py:meth:`send() <Pipeline.send()>` method.
 
-``Pipeline`` objects should be created with
-``StatsClient().pipeline()``::
+:py:class:`Pipeline` objects should be created with
+:py:meth:`StatsClient.pipeline()`:
+
+.. code-block:: python
 
     client = StatsClient()
 
@@ -19,29 +21,30 @@ interface, plus a ``send()`` method.
     pipe.timing('baz', 520)
     pipe.send()
 
-No stats will be sent until ``send()`` is called, at which point they
-will be packed into as few UDP packets as possible.
+No stats will be sent until :py:meth:`send() <Pipeline.send()>` is called, at
+which point they will be packed into as few UDP packets as possible.
 
 
 As a Context Manager
 ====================
 
-``Pipeline`` objects can also be used as context managers::
+:py:class:`Pipeline` objects can also be used as context managers:
+
+.. code-block:: python
 
     with StatsClient().pipeline() as pipe:
         pipe.incr('foo')
         pipe.decr('bar')
 
-``pipe.send()`` will be called automatically when the managed block
+:py:meth:`Pipeline.send()` will be called automatically when the managed block
 exits.
 
 
 Thread Safety
 =============
 
-While ``StatsClient`` instances are considered thread-safe (or at least
+While :py:class:`StatsClient` instances are considered thread-safe (or at least
 as thread-safe as the standard library's ``socket.send`` is),
-``Pipeline`` instances **are not thread-safe**. Storing stats for later
-creates at least two important race conditions in a multi-threaded
-environment. You should create one ``Pipeline`` per-thread, if
-necessary.
+:py:class:`Pipeline` instances **are not thread-safe**. Storing stats for later
+creates at least two important race conditions in a multi-threaded environment.
+You should create one :py:class:`Pipeline` per-thread, if necessary.

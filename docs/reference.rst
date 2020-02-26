@@ -4,312 +4,265 @@
 API Reference
 =============
 
-The ``StatsClient`` provides accessors for all the types of data the
-statsd_ server supports.
+The ``StatsClient`` provides accessors for all the types of data the statsd_
+server supports.
 
 .. note::
 
-    Each public stats API method supports a ``rate`` parameter, but
-    statsd doesn't always use it the same way. See the
-    :ref:`types-chapter` for more information.
+    Each public stats API method supports a ``rate`` parameter, but statsd
+    doesn't always use it the same way. See the :ref:`types-chapter` for more
+    information.
 
 
-.. _StatsClient:
+.. py:class:: StatsClient(host='localhost', port=8125, prefix=None, maxudpsize=512)
 
-``StatsClient``
-===============
+    Create a new ``StatsClient`` instance with the appropriate connection and
+    prefix information.
 
-::
+    :param str host: the hostname or IP address of the statsd_ server
+    :param int port: the port of the statsd server
+    :param prefix: a prefix to distinguish and group stats from an application
+        or environment
+    :type prefix: str or None
+    :param int maxudpsize: the largest safe UDP packet to send. 512 is
+        generally considered safe for the public internet, but private networks
+        may support larger packet sizes.
 
-    StatsClient(host='localhost', port=8125, prefix=None, maxudpsize=512)
+.. py:method:: StatsClient.incr(stat, count=1, rate=1)
 
-Create a new ``StatsClient`` instance with the appropriate connection
-and prefix information.
+    Increment a :ref:`counter <counter-type>`.
 
-* ``host``: the hostname or IPv4 address of the statsd_ server.
+    :param str stat: the name of the counter to increment
+    :param int count: the amount to increment by. Typically an integer.  May be
+        negative, but see also :py:meth:`decr() <StatsClient.decr()>`.
+    :param float rate: a sample rate, a float between 0 and 1. Will only send
+        data this percentage of the time. The statsd server will take the
+        sample rate into account for counters.
 
-* ``port``: the port of the statsd server.
+.. py:method:: StatsClient.decr(stat, count=1, rate=1)
 
-* ``prefix``: a prefix to distinguish and group stats from an
-  application or environment.
+    Decrement a :ref:`counter <counter-type>`.
 
-* ``maxudpsize``: the largest safe UDP packet to save. 512 is generally
-  considered safe for the public internet, but private networks may
-  support larger packet sizes.
+    :param str stat: the name of the counter to increment
+    :param int count: the amount to increment by. Typically an integer.  May be
+        negative, but that will have the impact of incrementing the counter but
+        see also :py:meth:`incr() <StatsClient.incr()>`.
+    :param float rate: a sample rate, a float between 0 and 1. Will only send
+        data this percentage of the time. The statsd server will take the
+        sample rate into account for counters
 
+.. py:method:: StatsClient.gauge(stat, value, rate=1, delta=False)
 
-.. _incr:
+    Set a :ref:`gauge <gauge-type>` value.
 
-``incr``
---------
-
-::
-
-    StatsClient().incr(stat, count=1, rate=1)
-
-Increment a :ref:`counter <counter-type>`.
-
-* ``stat``: the name of the counter to increment.
-
-* ``count``: the amount to increment by. Typically an integer. May be
-  negative, but see also :ref:`decr`.
-
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server will take the sample
-  rate into account for counters.
-
-
-.. _decr:
-
-``decr``
---------
-
-::
-
-    StatsClient().decr(stat, count=1, rate=1)
-
-Decrement a :ref:`counter <counter-type>`.
-
-* ``stat``: the name of the counter to decrement.
-
-* ``count``: the amount to decrement by. Typically an integer. May be
-  negative but that will have the impact of incrementing the counter.
-  See also :ref:`incr`.
-
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server will take the sample
-  rate into account for counters.
-
-
-.. _gauge:
-
-``gauge``
----------
-
-::
-
-    StatsClient().gauge(stat, value, rate=1, delta=False)
-
-Set a :ref:`gauge <gauge-type>` value.
-
-* ``stat``: the name of the gauge to set.
-
-* ``value``: the current value of the gauge.
-
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server does *not* take the
-  sample rate into account for gauges. Use with care.
-
-* ``delta``: whether or not to consider this a delta value or an
-  absolute value. See the :ref:`gauge <gauge-type>` type for more
-  detail.
+    :param str stat: the name of the gauge to set
+    :param value: the current value of the gauge
+    :type value: int or float
+    :param float rate: a sample rate, a float between 0 and 1. Will only send
+        data this percentage of the time. The statsd server does *not* take the
+        sample rate into account for gauges. Use with care
+    :param bool delta: whether or not to consider this a delta value or an
+        absolute value. See the :ref:`gauge <gauge-type>` type for more detail
 
 .. note::
 
-   Gauges were added to the statsd server in commit 0ed78be_. If you try
-   to use this method with an older version of the server, the data will
-   not be recorded.
-
-
-.. _set:
-
-``set``
----------
-
-::
-
-    StatsClient().set(stat, value, rate=1)
-
-Increment a :ref:`set <set-type>` value.
-
-* ``stat``: the name of the set to update.
-
-* ``value``: the unique value to count.
-
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server does *not* take the
-  sample rate into account for sets. Use with care.
+    Gauges were added to the statsd server in version 0.1.1.
 
 .. note::
 
-   Sets were added to the statsd server in commit 1c10cfc0ac_. If you
-   try to use this method with an older version of the server, the
-   data will not be recorded.
+    Gauge deltas were added to the statsd server in version 0.6.0.
 
+.. py:method:: StatsClient.set(stat, value, rate=1)
 
-.. _timing:
+    Increment a :ref:`set <set-type>` value.
 
-``timing``
-----------
+    :param str stat: the name of the set to update
+    :param value: the unique value to count
+    :param float rate: a sample rate, a float between 0 and 1. Will only send
+        data this percentage of the time. The statsd server does *not* take the
+        sample rate into account for sets. Use with care.
 
-::
+.. note::
 
-    StatsClient().timing(stat, delta, rate=1)
+   Sets were added to the statsd server in version 0.6.0.
 
-Record :ref:`timer <timer-type>` information.
+.. py:method:: StatsClient.timing(stat, delta, rate=1)
 
-* ``stat``: the name of the timer to use.
+    Record :ref:`timer <timer-type>` information.
 
-* ``delta``: the number of milliseconds whatever action took. Should
-  always be milliseconds.
+    :param str stat: the name of the timer to use
+    :param delta: the number of milliseconds whatever action took.
+        :py:class:`datetime.timedelta` objects will be converted to
+        milliseconds
+    :type delta: int or float or datetime.timedelta
+    :param float rate: a sample rate, a float between 0 and 1. Will only send
+        data this percentage of the time. The statsd server does *not* take the
+        sample rate into account for timers.
 
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server does *not* take the
-  sample rate into account for timers.
+.. py:method:: StatsClient.timer(stat, rate=1)
 
+    Return a :py:class:`Timer` object that can be used as a context manager or
+    decorator to automatically record timing for a block or function call. See
+    also the :ref:`chapter on timing <timing-chapter>`.
 
-.. _timer:
+    :param str stat: the name of the timer to use
+    :param float rate: a sample rate, a float between 0 and 1. Will only send
+        data this percentage of the time. The statsd server does *not* take the
+        sample rate into account for timers.
 
-``timer``
-=========
-
-::
+.. code-block:: python
 
     with StatsClient().timer(stat, rate=1):
         pass
 
-::
+    # or
 
     @StatsClient().timer(stat, rate=1)
     def foo():
         pass
 
-::
+    # or (see below for more Timer methods)
 
     timer = StatsClient().timer('foo', rate=1)
 
-Automatically record timing information for a managed block or function
-call.  See also the :ref:`chapter on timing <timing-chapter>`.
+    with timer:
+        pass
 
-* ``stat``: the name of the timer to use.
+    @timer
+    def bar():
+        pass
 
-* ``rate``: a sample rate, a float between 0 and 1. Will only send data
-  this percentage of the time. The statsd server does *not* take the
-  sample rate into account for timers.
+.. py:method:: StatsClient.pipeline()
 
-.. _timer-start:
+    Returns a :py:class:`Pipeline` object for collecting several stats.  Can
+    also be used as a context manager.
 
-``start``
----------
-
-::
-
-    StatsClient().timer('foo').start()
-
-Causes a timer object to start counting. Called automatically when the
-object is used as a decorator or context manager. Returns the timer
-object for simplicity.
-
-
-.. _timer-stop:
-
-``stop``
---------
-
-::
-
-    timer = StatsClient().timer('foo').start()
-    timer.stop()
-
-Causes the timer object to stop timing and send the results to statsd_.
-Can be called with ``send=False`` to prevent immediate sending
-immediately, and use ``send()``. Called automatically when the object is
-used as a decorator or context manager. Returns the timer object.
-
-If ``stop()`` is called before ``start()``, a ``RuntimeError`` is
-raised.
-
-
-.. _timer-send:
-
-``send``
---------
-
-::
-
-    timer = StatsClient().timer('foo').start()
-    timer.stop(send=False)
-    timer.send()
-
-Causes the timer to send any unsent data. If the data has already been
-sent, or has not yet been recorded, a ``RuntimeError`` is raised.
-
-.. note::
-   See the note about :ref:`timer objects and pipelines <timer-direct-note>`.
-
-
-.. _pipeline:
-
-``pipeline``
-============
-
-::
-
-    StatsClient().pipeline()
-
-Returns a :ref:`Pipeline <pipeline-chapter>` object for collecting
-several stats. Can also be used as a context manager::
-
-    with StatsClient().pipeline() as pipe:
-        pipe.incr('foo')
-
-
-.. _pipeline-send:
-
-``send``
---------
-
-::
+.. code-block:: python
 
     pipe = StatsClient().pipeline()
     pipe.incr('foo')
     pipe.send()
 
-Causes a :ref:`Pipeline <pipeline-chapter>` object to send all batched
-stats.
+    # or
+
+    with StatsClient().pipeline as pipe:
+        pipe.incr('bar')
+
+.. py:class:: Timer()
+
+    The :ref:`Timer objects <timer-object>` returned by
+    :py:meth:`StatsClient.timer()`. These should never be instantiated
+    directly.
+
+:py:class:`Timer` objects should not be shared between threads (except when
+used as decorators, which is thread-safe) but could be used within another
+context manager or decorator. For example:
+
+.. code-block:: python
+
+    @contextmanager
+    def my_context():
+        timer = statsd.timer('my_context_timer')
+        timer.start()
+        try:
+            yield
+        finally:
+            timer.stop()
+
+:py:class:`Timer` objects may be reused by calling :py:meth:`start()
+<Timer.start()>` again.
+
+.. py:method:: Timer.start()
+
+    Causes a timer object to start counting. Called automatically when the
+    object is used as a decorator or context manager. Returns the timer object
+    for simplicity.
+
+.. py:method:: Timer.stop(send=True)
+
+    Causes the timer object to stop timing and send the results to statsd_.
+    Can be called with ``send=False`` to prevent immediate sending immediately,
+    and use :py:meth:`send() <Timer.send()>`. Called automatically when the
+    object is used as a decorator or context manager. Returns the timer object.
+
+    If ``stop()`` is called before :py:meth:`start() <Timer.start()>`, a
+    ``RuntimeError`` is raised.
+
+    :param bool send: Whether to automatically send the results
+
+.. code-block:: python
+
+    timer = StatsClient().timer('foo').start()
+    timer.stop()
+
+.. py:method:: Timer.send()
+
+    Causes the timer to send any unsent data. If the data has already been
+    sent, or has not yet been recorded, a ``RuntimeError`` is raised.
+
+.. code-block:: python
+
+    timer = StatsClient().timer('foo').start()
+    timer.stop(send=False)
+    timer.send()
 
 .. note::
 
-   This method is not implemented on the base StatsClient class.
+    See the note abbout :ref:`timer objects and pipelines <timer-direct-note>`.
 
+.. py:class:: Pipeline()
 
-.. _TCPStatsClient:
+    A :ref:`Pipeline <pipeline-chapter>` object that can be used to collect and
+    send several stats at once. Useful for reducing network traffic and
+    speeding up instrumentation under certain loads. Can be used as a context
+    manager.
 
-``TCPStatsClient``
-==================
+    Pipeline extends :py:class:`StatsClient` and has all associated methods.
 
-::
+.. code-block:: python
 
-    TCPStatsClient(host='localhost', port=8125, prefix=None, timeout=None)
+    pipe = StatsClient().pipeline()
+    pipe.incr('foo')
+    pipe.send()
 
-Create a new ``TCPStatsClient`` instance with the appropriate connection
-and prefix information.
+    # or
 
-* ``host``: the hostname or IPv4 address of the statsd_ server.
+    with StatsClient().pipeline as pipe:
+        pipe.incr('bar')
 
-* ``port``: the port of the statsd server.
+.. py:method:: Pipeline.send()
 
-* ``prefix``: a prefix to distinguish and group stats from an
-  application or environment.
+    Causes the :py:class:`Pipeline` object to send all batched stats in as few
+    packets as possible.
 
-* ``timeout``: socket timeout for any actions on the connection socket.
+.. py:class:: TCPStatsClient(host='localhost', port=8125, prefix=None, timeout=None, ipv6=False)
 
+    Create a new ``TCPStatsClient`` instance with the appropriate connection
+    and prefix information.
 
-``TCPStatsClient`` implements all methods of ``StatsClient``, including
-``pipeline()``, with the difference that it is not thread safe and it
-can raise exceptions on connection errors. Unlike ``StatsClient`` it
-uses a TCP connection to communicate with StatsD.
+    :param str host: the hostname or IP address of the statsd_ server
+    :param int port: the port of the statsd server
+    :param prefix: a prefix to distinguish and group stats from an application
+        or environment.
+    :type prefix: str or None
+    :param float timeout: socket timeout for any actions on the connection
+        socket.
 
-In addition to the stats methods, ``TCPStatsClient`` supports the
-following TCP-specific methods.
+``TCPStatsClient`` implements all methods of :py:class:`StatsClient`, including
+:py:meth:`pipeline() <StatsClient.pipeline>`, with the difference that it is
+not thread safe and it can raise exceptions on connection errors. Unlike
+:py:class:`StatsClient` it uses a TCP connection to communicate with StatsD.
 
+In addition to the stats methods, ``TCPStatsClient`` supports the following
+TCP-specific methods.
 
-.. _tcp_close:
+.. py:method:: TCPStatsClient.close()
 
-``close``
----------
+    Closes a connection that's currently open and deletes it's socket. If this
+    is called on a :py:class:`TCPStatsClient` which currently has no open
+    connection it is a non-action.
 
-::
+.. code-block:: python
 
     from statsd import TCPStatsClient
 
@@ -317,17 +270,15 @@ following TCP-specific methods.
     statsd.incr('some.event')
     statsd.close()
 
-Closes a connection that's currently open and deletes it's socket. If
-this is called on a ``TCPStatsClient`` which currently has no open
-connection it is a non-action.
+.. py:method:: TCPStatsClient.connect()
 
+    Creates a connection to StatsD. If there are errors like connection timed
+    out or connection refused, the according exceptions will be raised. It is
+    usually not necessary to call this method because sending data to StatsD
+    will call ``connect`` implicitely if the current instance of
+    :py:class:`TCPStatsClient` does not already hold an open connection.
 
-.. _tcp_connect:
-
-``connect``
------------
-
-::
+.. code-block:: python
 
     from statsd import TCPStatsClient
 
@@ -336,19 +287,15 @@ connection it is a non-action.
     statsd.close()
     statsd.connect()  # creates new connection
 
-Creates a connection to StatsD. If there are errors like connection
-timed out or connection refused, the according exceptions will be
-raised. It is usually not necessary to call this method because sending
-data to StatsD will call ``connect`` implicitely if the current instance
-of ``TCPStatsClient`` does not already hold an open connection.
+.. py:method:: TCPStatsClient.reconnect()
 
+    Closes a currently existing connection and replaces it with a new one.  If
+    no connection exists already it will simply create a new one.  Internally
+    this does nothing else than calling :py:meth:`close()
+    <TCPStatsClient.close()>` and :py:meth:`connect()
+    <TCPStatsClient.connect()>`.
 
-.. _tcp_reconnect:
-
-``reconnect``
--------------
-
-::
+.. code-block:: python
 
     from statsd import TCPStatsClient
 
@@ -356,12 +303,17 @@ of ``TCPStatsClient`` does not already hold an open connection.
     statsd.incr('some.event')
     statsd.reconnect()  # closes open connection and creates new one
 
-Closes a currently existing connection and replaces it with a new one.
-If no connection exists already it will simply create a new one.
-Internally this does nothing else than calling ``close()`` and
-``connect()``.
+.. py:class:: UnixSocketStatsClient(socket_path, prefix=None, timeout=None)
+
+    A version of :py:class:`StatsClient` that communicates over Unix sockets.
+    It implements all methods of :py:class:`StatsClient`.
+
+    :param str socket_path: the path to the (writeable) Unix socket
+    :param prefix: a prefix to distinguish and group stats from an application
+        or environment
+    :type prefix: str or None
+    :param float timeout: socket timeout for any actions on the connection
+        socket.
 
 
 .. _statsd: https://github.com/etsy/statsd
-.. _0ed78be: https://github.com/etsy/statsd/commit/0ed78be7
-.. _1c10cfc0ac: https://github.com/etsy/statsd/commit/1c10cfc0ac

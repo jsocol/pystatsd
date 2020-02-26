@@ -1,6 +1,18 @@
 Statsd Changelog
 ================
 
+Version 3.3
+-----------
+
+- Drop support for Python 2.5, 2.6, 3.2, 3.3 (#108, #116).
+- Add UnixSocketStatsClient (#76, #112).
+- Add support for timedeltas in timing() (#104, #111).
+- Fix timer decorator with partial functions (#85).
+- Remove ABCMeta metaclass (incompatible with Py3) (#109).
+- Refactor client module (#115).
+- Various doc updates (#99, #102, #110, #113, #114).
+
+
 Version 3.2.2
 -------------
 
