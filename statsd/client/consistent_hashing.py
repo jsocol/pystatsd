@@ -31,8 +31,7 @@ class Pipeline(PipelineBase):
         self._maxudpsize = client._maxudpsize
 
     def _send(self):
-        data = self._stats.popleft()
-        stat = None
+        stat = data = self._stats.popleft()
         while self._stats:
             # Use popleft to preserve the order of the stats.
             stat = self._stats.popleft()
