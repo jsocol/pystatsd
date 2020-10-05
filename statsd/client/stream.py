@@ -68,9 +68,10 @@ class TCPStatsClient(StreamClientBase):
 class UnixSocketStatsClient(StreamClientBase):
     """Unix domain socket version of StatsClient."""
 
-    def __init__(self, socket_path, prefix=None, timeout=None):
+    def __init__(self, socket_path, prefix=None, tags=None, timeout=None):
         """Create a new client."""
         self._socket_path = socket_path
+        self._tags = tags
         self._timeout = timeout
         self._prefix = prefix
         self._sock = None
