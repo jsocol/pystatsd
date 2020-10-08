@@ -28,6 +28,10 @@ server supports.
         generally considered safe for the public internet, but private networks
         may support larger packet sizes.
 
+.. py:method:: StatsClient.close()
+
+    Close the underlying UDP socket.
+
 .. py:method:: StatsClient.incr(stat, count=1, rate=1)
 
     Increment a :ref:`counter <counter-type>`.

@@ -10,6 +10,10 @@ from .timer import Timer
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
 
+    def close(self):
+        """Used to close and clean up any underlying resources."""
+        raise NotImplementedError()
+
     def _send(self):
         raise NotImplementedError()
 

@@ -46,5 +46,10 @@ class StatsClient(StatsClientBase):
             # No time for love, Dr. Jones!
             pass
 
+    def close(self):
+        if self._sock and hasattr(self._sock, 'close'):
+            self._sock.close()
+        self._sock = None
+
     def pipeline(self):
         return Pipeline(self)
