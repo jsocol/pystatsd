@@ -2,28 +2,23 @@
 A Python statsd client
 ======================
 
-statsd_ is a friendly front-end to Graphite_. This is a Python client
-for the statsd daemon.
+A python client for [Etsy](http://etsy.com)'s [StatsD](https://github.com/etsy/statsd) server and [InfluxDB's](http://influxdb.com) [Telegraf](https://github.com/influxdb/telegraf) StatsD server.
 
-.. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
-   :target: https://travis-ci.org/jsocol/pystatsd
-   :alt: Travis-CI build status
-
-.. image:: https://img.shields.io/pypi/v/statsd.svg
-   :target: https://pypi.python.org/pypi/statsd/
+.. image:: https://img.shields.io/pypi/v/statshog.svg
+   :target: https://pypi.python.org/pypi/statshog/
    :alt: Latest release
 
-.. image:: https://img.shields.io/pypi/pyversions/statsd.svg
-   :target: https://pypi.python.org/pypi/statsd/
+.. image:: https://img.shields.io/pypi/pyversions/statshog.svg
+   :target: https://pypi.python.org/pypi/statshog/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/pypi/wheel/statsd.svg
-   :target: https://pypi.python.org/pypi/statsd/
+.. image:: https://img.shields.io/pypi/wheel/statshog.svg
+   :target: https://pypi.python.org/pypi/statshog/
    :alt: Wheel Status
 
-:Code:          https://github.com/jsocol/pystatsd
+:Code:          https://github.com/macobo/statshog
 :License:       MIT; see LICENSE file
-:Issues:        https://github.com/jsocol/pystatsd/issues
+:Issues:        https://github.com/macobo/statshog/issues
 :Documentation: https://statsd.readthedocs.io/
 
 Quickly, to use:
@@ -55,11 +50,11 @@ You can install from PyPI::
 
 Or GitHub::
 
-    $ pip install -e git+https://github.com/jsocol/pystatsd#egg=statsd
+    $ pip install -e git+https://github.com/macobo/statshog#egg=statshog
 
 Or from source::
 
-    $ git clone https://github.com/jsocol/pystatsd
+    $ git clone https://github.com/macobo/statshog
     $ cd pystatsd
     $ python setup.py install
 

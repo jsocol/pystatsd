@@ -2,13 +2,13 @@ from setuptools import find_packages, setup
 
 
 setup(
-    name='statsd',
-    version='3.3.0',
+    name='statshog',
+    version='1.0.0',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
-    author='James Socol',
-    author_email='james@mozilla.com',
-    url='https://github.com/jsocol/pystatsd',
+    author='Karl-Aksel Puulmann',
+    author_email='karl@technicalwealth.ee',
+    url='https://github.com/macobo/statshog',
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
