@@ -59,6 +59,11 @@ Or from source::
     $ python setup.py install
 
 
+To use together with [django-statsd](https://github.com/django-statsd/django-statsd), add the following to your `settings.py::
+
+    STATSD_CLIENT = "statshog"
+
+
 Docs
 ====
 

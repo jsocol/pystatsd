@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 import os
 
-from statsd import defaults
-from statsd.client import StatsClient
+from statshog import defaults
+from statshog.client import StatsClient
 
 
 statsd = None
