@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import socket
+from typing import Tuple, Union
 
 from .base import StatsClientBase, PipelineBase
 
@@ -27,13 +28,13 @@ class StreamClientBase(StatsClientBase):
     def pipeline(self):
         return StreamPipeline(self)
 
-    def _send(self, data):
+    def _send(self, data: str):
         """Send data to statsd."""
         if not self._sock:
             self.connect()
         self._do_send(data)
 
-    def _do_send(self, data):
+    def _do_send(self, data: str):
         self._sock.sendall(data.encode("ascii") + b"\n")
 
 
@@ -42,12 +43,12 @@ class TCPStatsClient(StreamClientBase):
 
     def __init__(
         self,
-        host="localhost",
-        port=8125,
-        prefix=None,
-        timeout=None,
-        ipv6=False,
-        telegraf=False,
+        host: str = "localhost",
+        port: int = 8125,
+        prefix: Union[str, None] = None,
+        timeout: Union[float, None] = None,
+        ipv6: bool = False,
+        telegraf: bool = False,
     ):
         """Create a new client."""
         self._host = host
@@ -71,7 +72,13 @@ class TCPStatsClient(StreamClientBase):
 class UnixSocketStatsClient(StreamClientBase):
     """Unix domain socket version of StatsClient."""
 
-    def __init__(self, socket_path, prefix=None, timeout=None, telegraf=False):
+    def __init__(
+        self,
+        socket_path: Union[Tuple, str, bytes],
+        prefix: Union[str, None] = None,
+        timeout: Union[float, None] = None,
+        telegraf: bool = False,
+    ):
         """Create a new client."""
         self._socket_path = socket_path
         self._timeout = timeout

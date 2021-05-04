@@ -6,12 +6,12 @@ import socket
 from datetime import timedelta
 from unittest import SkipTest
 
-import mock
-from nose.tools import eq_
+import mock  # type: ignore
+from nose.tools import eq_  # type: ignore
 
-from statsd import StatsClient
-from statsd import TCPStatsClient
-from statsd import UnixSocketStatsClient
+from statshog import StatsClient
+from statshog import TCPStatsClient
+from statshog import UnixSocketStatsClient
 
 
 ADDR = (socket.gethostbyname("localhost"), 8125)
@@ -78,7 +78,8 @@ def _sock_check(sock, count, proto, val=None, addr=None):
         addr = ADDR
     if val is not None:
         eq_(
-            send.call_args, make_val[proto](val, addr),
+            send.call_args,
+            make_val[proto](val, addr),
         )
 
 

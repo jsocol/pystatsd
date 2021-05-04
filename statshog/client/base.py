@@ -3,27 +3,36 @@ from __future__ import absolute_import, division, unicode_literals
 import random
 from collections import deque
 from datetime import timedelta
+from typing import Deque, Dict, Union
 
-from .timer import Timer
+Tags = Union[Dict[str, Union[str, int]], None]
 
 
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
 
+    _prefix: Union[str, None]
+    _telegraf: bool
+
     def close(self):
         """Used to close and clean up any underlying resources."""
-        raise NotImplementedError()
-
-    def _send(self):
         raise NotImplementedError()
 
     def pipeline(self):
         raise NotImplementedError()
 
-    def timer(self, stat, rate=1, tags=None):
+    def timer(self, stat: str, rate: float = 1.0, tags: Tags = None):
+        from .timer import Timer
+
         return Timer(self, stat, rate, tags)
 
-    def timing(self, stat, delta, rate=1, tags=None):
+    def timing(
+        self,
+        stat: str,
+        delta: Union[timedelta, int, float],
+        rate: float = 1.0,
+        tags: Tags = None,
+    ):
         """
         Send new timing information.
 
@@ -34,15 +43,22 @@ class StatsClientBase(object):
             delta = delta.total_seconds() * 1000.0
         self._send_stat(stat, "%0.6f|ms" % delta, rate, tags)
 
-    def incr(self, stat, count=1, rate=1, tags=None):
+    def incr(self, stat: str, count: int = 1, rate: float = 1.0, tags: Tags = None):
         """Increment a stat by `count`."""
         self._send_stat(stat, "%s|c" % count, rate, tags)
 
-    def decr(self, stat, count=1, rate=1, tags=None):
+    def decr(self, stat: str, count: int = 1, rate: float = 1.0, tags: Tags = None):
         """Decrement a stat by `count`."""
-        self.incr(stat, -count, rate)
+        self.incr(stat, -count, rate, tags)
 
-    def gauge(self, stat, value, rate=1, delta=False, tags=None):
+    def gauge(
+        self,
+        stat: str,
+        value: int,
+        rate: float = 1.0,
+        delta: bool = False,
+        tags: Tags = None,
+    ):
         """Set a gauge value."""
         if value < 0 and not delta:
             if rate < 1:
@@ -55,14 +71,14 @@ class StatsClientBase(object):
             prefix = "+" if delta and value >= 0 else ""
             self._send_stat(stat, "%s%s|g" % (prefix, value), rate, tags)
 
-    def set(self, stat, value, rate=1, tags=None):
+    def set(self, stat: str, value: int, rate: float = 1.0, tags: Tags = None):
         """Set a set value."""
         self._send_stat(stat, "%s|s" % value, rate, tags)
 
-    def _send_stat(self, stat, value, rate, tags=None):
+    def _send_stat(self, stat, value, rate, tags: Tags = None):
         self._after(self._prepare(stat, value, rate, tags))
 
-    def _prepare(self, stat, value, rate, tags=None):
+    def _prepare(self, stat: str, value, rate, tags: Tags = None):
         if rate < 1:
             if random.random() > rate:
                 return
@@ -85,7 +101,9 @@ class StatsClientBase(object):
 
 
 class PipelineBase(StatsClientBase):
-    def __init__(self, client):
+    _stats: Deque[str]
+
+    def __init__(self, client: StatsClientBase):
         self._client = client
         self._prefix = client._prefix
         self._stats = deque()
@@ -93,7 +111,7 @@ class PipelineBase(StatsClientBase):
     def _send(self):
         raise NotImplementedError()
 
-    def _after(self, data):
+    def _after(self, data: str):
         if data is not None:
             self._stats.append(data)
 
@@ -112,5 +130,5 @@ class PipelineBase(StatsClientBase):
         return self.__class__(self)
 
 
-def make_tags(tags):
+def make_tags(tags: Dict[str, Union[str, int]]):
     return ",".join(f"{k}={v}" for k, v in tags.items())

@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from django.conf import settings
+from django.conf import settings  # type: ignore
 
 from statshog import defaults
 from statshog.client import StatsClient

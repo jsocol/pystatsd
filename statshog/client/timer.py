@@ -1,6 +1,8 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import functools
+from typing import Callable
+from statshog.client.base import StatsClientBase, Tags
 
 # Use timer that's not susceptible to time of day adjustments.
 try:
@@ -21,7 +23,9 @@ def safe_wraps(wrapper, *args, **kwargs):
 class Timer(object):
     """A context manager/decorator for statsd.timing()."""
 
-    def __init__(self, client, stat, rate=1, tags=None):
+    def __init__(
+        self, client: StatsClientBase, stat: str, rate: float = 1.0, tags: Tags = None
+    ):
         self.client = client
         self.stat = stat
         self.rate = rate
@@ -30,7 +34,7 @@ class Timer(object):
         self._sent = False
         self._start_time = None
 
-    def __call__(self, f):
+    def __call__(self, f: Callable):
         """Thread-safe timing function decorator."""
 
         @safe_wraps(f)
