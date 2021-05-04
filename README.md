@@ -20,44 +20,52 @@ Issues:   <https://github.com/macobo/statshog/issues>
 
 Documentation:   <https://statshog.readthedocs.io/>
 
-Quickly, to use:
 
-```python
->>> import statshog
->>> c = statshog.StatsClient('localhost', 8125)
->>> c.incr('foo')  # Increment the 'foo' counter.
->>> c.timing('stats.timed', 320)  # Record a 320ms 'stats.timed'.
-```
 
-You can also add a prefix to all your stats:
-
-```python
->>> import statshog
->>> c = statshog.StatsClient('localhost', 8125, prefix='foo')
->>> c.incr('bar')  # Will be 'foo.bar' in statsd/graphite.
-```
-
-# Installing
+# Install
 
 The easiest way to install statsd is with pip!
 
 You can install from PyPI:
 
-    $ pip install statsd
+```bash
+pip install statshog
+```
 
 Or GitHub:
 
-```
+```bash
 $ pip install -e git+https://github.com/macobo/statshog#egg=statshog
 ```
 
 Or from source:
 
 ```bash
-$ git clone https://github.com/macobo/statshog
-$ cd pystatsd
-$ python setup.py install
+git clone https://github.com/macobo/statshog
+cd pystatsd
+python setup.py install
 ```
+
+# Usage
+
+## Quick usage
+
+```python
+import statshog
+statsd = statshog.StatsClient(host='localhost', port=8125)
+statsd.incr('foo')  # Increment the 'foo' counter.
+statsd.timing('stats.timed', 320)  # Record a 320ms 'stats.timed'
+```
+
+## Using with telegraf/influxdb
+
+```python
+import statshog
+statsd = statshog.StatsClient(telegraf=True)
+statsd.timing('stats.timed', 320, tags={"mytag": 456})
+```
+
+## django-statsd
 
 To use together with
 [django-statsd](<https://github.com/django-statsd/django-statsd>), add
@@ -66,8 +74,3 @@ the following to your `settings.py`:
 ```
 STATSD_CLIENT = "statshog"
 ```
-
-# Docs
-
-There are lots of docs in the docs/\` directory and on
-[ReadTheDocs](https://statsd.readthedocs.io/en/latest/index.html).
