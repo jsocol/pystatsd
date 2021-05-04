@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from .timer import Timer
 
+
 class StatsClientBase(object):
     """A Base class for various statsd clients."""
 
@@ -30,12 +31,12 @@ class StatsClientBase(object):
         """
         if isinstance(delta, timedelta):
             # Convert timedelta to number of milliseconds.
-            delta = delta.total_seconds() * 1000.
-        self._send_stat(stat, '%0.6f|ms' % delta, rate, tags)
+            delta = delta.total_seconds() * 1000.0
+        self._send_stat(stat, "%0.6f|ms" % delta, rate, tags)
 
     def incr(self, stat, count=1, rate=1, tags=None):
         """Increment a stat by `count`."""
-        self._send_stat(stat, '%s|c' % count, rate, tags)
+        self._send_stat(stat, "%s|c" % count, rate, tags)
 
     def decr(self, stat, count=1, rate=1, tags=None):
         """Decrement a stat by `count`."""
@@ -48,15 +49,15 @@ class StatsClientBase(object):
                 if random.random() > rate:
                     return
             with self.pipeline() as pipe:
-                pipe._send_stat(stat, '0|g', 1, tags)
-                pipe._send_stat(stat, '%s|g' % value, 1, tags)
+                pipe._send_stat(stat, "0|g", 1, tags)
+                pipe._send_stat(stat, "%s|g" % value, 1, tags)
         else:
-            prefix = '+' if delta and value >= 0 else ''
-            self._send_stat(stat, '%s%s|g' % (prefix, value), rate, tags)
+            prefix = "+" if delta and value >= 0 else ""
+            self._send_stat(stat, "%s%s|g" % (prefix, value), rate, tags)
 
     def set(self, stat, value, rate=1, tags=None):
         """Set a set value."""
-        self._send_stat(stat, '%s|s' % value, rate, tags)
+        self._send_stat(stat, "%s|s" % value, rate, tags)
 
     def _send_stat(self, stat, value, rate, tags=None):
         self._after(self._prepare(stat, value, rate, tags))
@@ -65,10 +66,10 @@ class StatsClientBase(object):
         if rate < 1:
             if random.random() > rate:
                 return
-            value = '%s|@%s' % (value, rate)
+            value = "%s|@%s" % (value, rate)
 
         if self._prefix:
-            stat = '%s.%s' % (self._prefix, stat)
+            stat = "%s.%s" % (self._prefix, stat)
 
         if tags:
             if self._telegraf:
@@ -76,7 +77,7 @@ class StatsClientBase(object):
             else:
                 raise ValueError("Tags are not supported without telegraf support")
 
-        return '%s:%s' % (stat, value)
+        return "%s:%s" % (stat, value)
 
     def _after(self, data):
         if data:
@@ -84,7 +85,6 @@ class StatsClientBase(object):
 
 
 class PipelineBase(StatsClientBase):
-
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix
@@ -113,4 +113,4 @@ class PipelineBase(StatsClientBase):
 
 
 def make_tags(tags):
-    return ','.join(f'{k}={v}' for k, v in tags.items())
+    return ",".join(f"{k}={v}" for k, v in tags.items())

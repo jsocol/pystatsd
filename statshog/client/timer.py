@@ -32,6 +32,7 @@ class Timer(object):
 
     def __call__(self, f):
         """Thread-safe timing function decorator."""
+
         @safe_wraps(f)
         def _wrapped(*args, **kwargs):
             start_time = time_now()
@@ -40,6 +41,7 @@ class Timer(object):
             finally:
                 elapsed_time_ms = 1000.0 * (time_now() - start_time)
                 self.client.timing(self.stat, elapsed_time_ms, self.rate, self.tags)
+
         return _wrapped
 
     def __enter__(self):
@@ -56,7 +58,7 @@ class Timer(object):
 
     def stop(self, send=True):
         if self._start_time is None:
-            raise RuntimeError('Timer has not started.')
+            raise RuntimeError("Timer has not started.")
         dt = time_now() - self._start_time
         self.ms = 1000.0 * dt  # Convert to milliseconds.
         if send:
@@ -65,8 +67,8 @@ class Timer(object):
 
     def send(self):
         if self.ms is None:
-            raise RuntimeError('No data recorded.')
+            raise RuntimeError("No data recorded.")
         if self._sent:
-            raise RuntimeError('Already sent data.')
+            raise RuntimeError("Already sent data.")
         self._sent = True
         self.client.timing(self.stat, self.ms, self.rate, self.tags)
