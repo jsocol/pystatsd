@@ -41,7 +41,7 @@ class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
 
     def __init__(self, host='localhost', port=8125, prefix=None,
-                 timeout=None, ipv6=False):
+                 timeout=None, ipv6=False, telegraf=False):
         """Create a new client."""
         self._host = host
         self._port = port
@@ -49,6 +49,7 @@ class TCPStatsClient(StreamClientBase):
         self._timeout = timeout
         self._prefix = prefix
         self._sock = None
+        self._telegraf = telegraf
 
     def connect(self):
         fam = socket.AF_INET6 if self._ipv6 else socket.AF_INET
@@ -62,12 +63,13 @@ class TCPStatsClient(StreamClientBase):
 class UnixSocketStatsClient(StreamClientBase):
     """Unix domain socket version of StatsClient."""
 
-    def __init__(self, socket_path, prefix=None, timeout=None):
+    def __init__(self, socket_path, prefix=None, timeout=None, telegraf=False):
         """Create a new client."""
         self._socket_path = socket_path
         self._timeout = timeout
         self._prefix = prefix
         self._sock = None
+        self._telegraf = telegraf
 
     def connect(self):
         self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
