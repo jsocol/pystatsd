@@ -1,0 +1,93 @@
+name: Release
+
+on:
+    pull_request:
+        types: [closed]
+
+jobs:
+  release:
+    name: Bump version based on PR label
+    runs-on: ubuntu-20.04
+    if: |
+        github.event.pull_request.merged
+        && (
+            contains(github.event.pull_request.labels.*.name, 'bump patch')
+            || contains(github.event.pull_request.labels.*.name, 'bump minor')
+            || contains(github.event.pull_request.labels.*.name, 'bump major')
+        )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Detect version bump type
+        id: bump-type
+        run: |
+            BUMP_TYPE=null
+            if [[ $BUMP_PATCH_PRESENT == 'true' ]]; then
+                BUMP_TYPE=patch
+            fi
+            if [[ $BUMP_MINOR_PRESENT == 'true' ]]; then
+                BUMP_TYPE=minor
+            fi
+            if [[ $BUMP_MAJOR_PRESENT == 'true' ]]; then
+                BUMP_TYPE=major
+            fi
+            echo "::set-output name=bump-type::$BUMP_TYPE"
+        env:
+            BUMP_PATCH_PRESENT: ${{ contains(github.event.pull_request.labels.*.name, 'bump patch') }}
+            BUMP_MINOR_PRESENT: ${{ contains(github.event.pull_request.labels.*.name, 'bump minor') }}
+            BUMP_MAJOR_PRESENT: ${{ contains(github.event.pull_request.labels.*.name, 'bump major') }}
+
+      - name: Determine new version
+        id: new-version
+        if: steps.bump-type.outputs.bump-type != 'null'
+        run: |
+            OLD_VERSION=$(cat statshog/__init__.py | sed -n 's/^__version__ = "\(.*\)"$/\1/p')
+            NEW_VERSION=$(npx semver $OLD_VERSION -i ${{ steps.bump-type.outputs.bump-type }})
+            echo "::set-output name=new-version::$NEW_VERSION"
+      - name: Update version in statshog/__init__.py
+        if: steps.bump-type.outputs.bump-type != 'null'
+        run: |
+          sed -i 's/^__version__ = "\(.*\)"$/__version__ = "${{ steps.new-version.outputs.new-version }}"/g' statshog/__init__.py
+          cat statshog/__init__.py
+
+      - name: Commit bump
+        if: steps.bump-type.outputs.bump-type != 'null'
+        uses: EndBug/add-and-commit@v7
+        with:
+            branch: ${{ github.event.pull_request.base.ref }}
+            message: 'Bump version to ${{ steps.new-version.outputs.new-version }}'
+
+      - name: Install pypa/build
+        run: >-
+          python -m
+          pip install
+          build
+          --user
+
+      - name: Build a binary wheel and a source tarball
+        run: >-
+          python -m
+          build
+          --sdist
+          --wheel
+          --outdir dist/
+          .
+      - name: Publish distribution 📦 to Test PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      # - name: Publish distribution 📦 to PyPI
+      #   if: steps.bump-type.outputs.bump-type != 'null'
+      #   uses: pypa/gh-action-pypi-publish@master
+      #   with:
+      #     password: ${{ secrets.PYPI_API_TOKEN }}
