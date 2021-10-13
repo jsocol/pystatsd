@@ -82,6 +82,7 @@ Contents
    pipeline.rst
    tcp.rst
    unix_socket.rst
+   async.rst
    reference.rst
    contributing.rst
 
