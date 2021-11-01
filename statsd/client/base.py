@@ -20,10 +20,10 @@ class StatsClientBase(object):
     def pipeline(self):
         raise NotImplementedError()
 
-    def timer(self, stat, rate=1):
+    def timer(self, stat, rate: int=1):
         return Timer(self, stat, rate)
 
-    def timing(self, stat, delta, rate=1):
+    def timing(self, stat, delta, rate: int=1):
         """
         Send new timing information.
 
@@ -34,15 +34,15 @@ class StatsClientBase(object):
             delta = delta.total_seconds() * 1000.
         self._send_stat(stat, '%0.6f|ms' % delta, rate)
 
-    def incr(self, stat, count=1, rate=1):
+    def incr(self, stat, count: int=1, rate: int=1):
         """Increment a stat by `count`."""
         self._send_stat(stat, '%s|c' % count, rate)
 
-    def decr(self, stat, count=1, rate=1):
+    def decr(self, stat, count: int=1, rate: int=1):
         """Decrement a stat by `count`."""
         self.incr(stat, -count, rate)
 
-    def gauge(self, stat, value, rate=1, delta=False):
+    def gauge(self, stat, value, rate: int=1, delta: bool=False):
         """Set a gauge value."""
         if value < 0 and not delta:
             if rate < 1:
@@ -55,7 +55,7 @@ class StatsClientBase(object):
             prefix = '+' if delta and value >= 0 else ''
             self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
 
-    def set(self, stat, value, rate=1):
+    def set(self, stat, value, rate: int=1):
         """Set a set value."""
         self._send_stat(stat, '%s|s' % value, rate)
 

@@ -34,7 +34,7 @@ make_val = {
 }
 
 
-def _udp_client(prefix=None, addr=None, port=None, ipv6=False):
+def _udp_client(prefix=None, addr=None, port=None, ipv6: bool=False):
     if not addr:
         addr = ADDR[0]
     if not port:
@@ -44,7 +44,7 @@ def _udp_client(prefix=None, addr=None, port=None, ipv6=False):
     return sc
 
 
-def _tcp_client(prefix=None, addr=None, port=None, timeout=None, ipv6=False):
+def _tcp_client(prefix=None, addr=None, port=None, timeout=None, ipv6: bool=False):
     if not addr:
         addr = ADDR[0]
     if not port:
@@ -598,7 +598,7 @@ def _test_timer_decorator_rate(cl, proto):
         return [b, a]
 
     @cl.timer('bar', rate=0.2)
-    def bar(a, b=2, c=3):
+    def bar(a, b: int=2, c: int=3):
         return [c, b, a]
 
     eq_([2, 4], foo(4, 2))
