@@ -7,11 +7,11 @@ from .base import StatsClientBase, PipelineBase
 
 class Pipeline(PipelineBase):
 
-    def __init__(self, client):
+    def __init__(self, client) -> None:
         super(Pipeline, self).__init__(client)
         self._maxudpsize = client._maxudpsize
 
-    def _send(self):
+    def _send(self) -> None:
         data = self._stats.popleft()
         while self._stats:
             # Use popleft to preserve the order of the stats.
@@ -28,7 +28,7 @@ class StatsClient(StatsClientBase):
     """A client for statsd."""
 
     def __init__(self, host: str='localhost', port: int=8125, prefix=None,
-                 maxudpsize: int=512, ipv6: bool=False):
+                 maxudpsize: int=512, ipv6: bool=False) -> None:
         """Create a new client."""
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
@@ -38,7 +38,7 @@ class StatsClient(StatsClientBase):
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
-    def _send(self, data):
+    def _send(self, data) -> None:
         """Send data to statsd."""
         try:
             self._sock.sendto(data.encode('ascii'), self._addr)
@@ -46,7 +46,7 @@ class StatsClient(StatsClientBase):
             # No time for love, Dr. Jones!
             pass
 
-    def close(self):
+    def close(self) -> None:
         if self._sock and hasattr(self._sock, 'close'):
             self._sock.close()
         self._sock = None

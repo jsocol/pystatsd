@@ -64,7 +64,7 @@ def _unix_socket_client(prefix=None, socket_path=None):
     return sc
 
 
-def _timer_check(sock, count, proto, start, end):
+def _timer_check(sock, count, proto, start, end) -> None:
     send = send_method[proto](sock)
     eq_(send.call_count, count)
     value = send.call_args[0][0].decode('ascii')
@@ -72,7 +72,7 @@ def _timer_check(sock, count, proto, start, end):
     assert exp.match(value)
 
 
-def _sock_check(sock, count, proto, val=None, addr=None):
+def _sock_check(sock, count, proto, val=None, addr=None) -> None:
     send = send_method[proto](sock)
     eq_(send.call_count, count)
     if not addr:
@@ -122,14 +122,14 @@ class assert_raises(object):
 
     """
 
-    def __init__(self, *exc_cls):
+    def __init__(self, *exc_cls) -> None:
         self.exc_cls = exc_cls
 
     def __enter__(self):
         # For access to the exception later.
         return self
 
-    def __exit__(self, typ, value, tb):
+    def __exit__(self, typ, value, tb) -> bool:
         assert typ, 'No exception raised.'
         assert typ in self.exc_cls, '%s not in %s' % (
             typ.__name__, [e.__name__ for e in self.exc_cls])
@@ -141,7 +141,7 @@ class assert_raises(object):
         return True
 
 
-def _test_incr(cl, proto):
+def _test_incr(cl, proto) -> None:
     cl.incr('foo')
     _sock_check(cl._sock, 1, proto, val='foo:1|c')
 
@@ -156,27 +156,27 @@ def _test_incr(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_incr_udp():
+def test_incr_udp() -> None:
     """StatsClient.incr works."""
     cl = _udp_client()
     _test_incr(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_incr_tcp():
+def test_incr_tcp() -> None:
     """TCPStatsClient.incr works."""
     cl = _tcp_client()
     _test_incr(cl, 'tcp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_incr_unix_socket():
+def test_incr_unix_socket() -> None:
     """TCPStatsClient.incr works."""
     cl = _unix_socket_client()
     _test_incr(cl, 'unix')
 
 
-def _test_decr(cl, proto):
+def _test_decr(cl, proto) -> None:
     cl.decr('foo')
     _sock_check(cl._sock, 1, proto, 'foo:-1|c')
 
@@ -191,27 +191,27 @@ def _test_decr(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_decr_udp():
+def test_decr_udp() -> None:
     """StatsClient.decr works."""
     cl = _udp_client()
     _test_decr(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_decr_tcp():
+def test_decr_tcp() -> None:
     """TCPStatsClient.decr works."""
     cl = _tcp_client()
     _test_decr(cl, 'tcp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_decr_unix_socket():
+def test_decr_unix_socket() -> None:
     """TCPStatsClient.decr works."""
     cl = _unix_socket_client()
     _test_decr(cl, 'unix')
 
 
-def _test_gauge(cl, proto):
+def _test_gauge(cl, proto) -> None:
     cl.gauge('foo', 30)
     _sock_check(cl._sock, 1, proto, 'foo:30|g')
 
@@ -223,46 +223,46 @@ def _test_gauge(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_udp():
+def test_gauge_udp() -> None:
     """StatsClient.gauge works."""
     cl = _udp_client()
     _test_gauge(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_tcp():
+def test_gauge_tcp() -> None:
     """TCPStatsClient.gauge works."""
     cl = _tcp_client()
     _test_gauge(cl, 'tcp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_unix_socket():
+def test_gauge_unix_socket() -> None:
     """TCPStatsClient.decr works."""
     cl = _unix_socket_client()
     _test_gauge(cl, 'unix')
 
 
-def _test_ipv6(cl, proto, addr):
+def _test_ipv6(cl, proto, addr) -> None:
     cl.gauge('foo', 30)
     _sock_check(cl._sock, 1, proto, 'foo:30|g', addr=addr)
 
 
-def test_ipv6_udp():
+def test_ipv6_udp() -> None:
     """StatsClient can use to IPv6 address."""
     addr = ('::1', 8125, 0, 0)
     cl = _udp_client(addr=addr[0], ipv6=True)
     _test_ipv6(cl, 'udp', addr)
 
 
-def test_ipv6_tcp():
+def test_ipv6_tcp() -> None:
     """TCPStatsClient can use to IPv6 address."""
     addr = ('::1', 8125, 0, 0)
     cl = _tcp_client(addr=addr[0], ipv6=True)
     _test_ipv6(cl, 'tcp', addr)
 
 
-def _test_resolution(cl, proto, addr):
+def _test_resolution(cl, proto, addr) -> None:
     cl.incr('foo')
     _sock_check(cl._sock, 1, proto, 'foo:1|c', addr=addr)
 
@@ -273,22 +273,22 @@ def test_ipv6_resolution_udp():
     _test_resolution(cl, 'udp', ('::1', 8125, 0, 0))
 
 
-def test_ipv6_resolution_tcp():
+def test_ipv6_resolution_tcp() -> None:
     cl = _tcp_client(addr='localhost', ipv6=True)
     _test_resolution(cl, 'tcp', ('::1', 8125, 0, 0))
 
 
-def test_ipv4_resolution_udp():
+def test_ipv4_resolution_udp() -> None:
     cl = _udp_client(addr='localhost')
     _test_resolution(cl, 'udp', ('127.0.0.1', 8125))
 
 
-def test_ipv4_resolution_tcp():
+def test_ipv4_resolution_tcp() -> None:
     cl = _tcp_client(addr='localhost')
     _test_resolution(cl, 'tcp', ('127.0.0.1', 8125))
 
 
-def _test_gauge_delta(cl, proto):
+def _test_gauge_delta(cl, proto) -> None:
     tests = (
         (12, '+12'),
         (-13, '-13'),
@@ -296,7 +296,7 @@ def _test_gauge_delta(cl, proto):
         (-1.3, '-1.3'),
     )
 
-    def _check(num, result):
+    def _check(num, result) -> None:
         cl._sock.reset_mock()
         cl.gauge('foo', num, delta=True)
         _sock_check(cl._sock, 1, proto, 'foo:%s|g' % result)
@@ -306,39 +306,39 @@ def _test_gauge_delta(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_delta_udp():
+def test_gauge_delta_udp() -> None:
     """StatsClient.gauge works with delta values."""
     cl = _udp_client()
     _test_gauge_delta(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_delta_tcp():
+def test_gauge_delta_tcp() -> None:
     """TCPStatsClient.gauge works with delta values."""
     cl = _tcp_client()
     _test_gauge_delta(cl, 'tcp')
 
 
-def _test_gauge_absolute_negative(cl, proto):
+def _test_gauge_absolute_negative(cl, proto) -> None:
     cl.gauge('foo', -5, delta=False)
     _sock_check(cl._sock, 1, 'foo:0|g\nfoo:-5|g')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_absolute_negative_udp():
+def test_gauge_absolute_negative_udp() -> None:
     """StatsClient.gauge works with absolute negative value."""
     cl = _udp_client()
     _test_gauge_delta(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_gauge_absolute_negative_tcp():
+def test_gauge_absolute_negative_tcp() -> None:
     """TCPStatsClient.gauge works with absolute negative value."""
     cl = _tcp_client()
     _test_gauge_delta(cl, 'tcp')
 
 
-def _test_gauge_absolute_negative_rate(cl, proto, mock_random):
+def _test_gauge_absolute_negative_rate(cl, proto, mock_random) -> None:
     mock_random.return_value = -1
     cl.gauge('foo', -1, rate=0.5, delta=False)
     _sock_check(cl._sock, 1, proto, 'foo:0|g\nfoo:-1|g')
@@ -350,20 +350,20 @@ def _test_gauge_absolute_negative_rate(cl, proto, mock_random):
 
 
 @mock.patch.object(random, 'random')
-def test_gauge_absolute_negative_rate_udp(mock_random):
+def test_gauge_absolute_negative_rate_udp(mock_random) -> None:
     """StatsClient.gauge works with absolute negative value and rate."""
     cl = _udp_client()
     _test_gauge_absolute_negative_rate(cl, 'udp', mock_random)
 
 
 @mock.patch.object(random, 'random')
-def test_gauge_absolute_negative_rate_tcp(mock_random):
+def test_gauge_absolute_negative_rate_tcp(mock_random) -> None:
     """TCPStatsClient.gauge works with absolute negative value and rate."""
     cl = _tcp_client()
     _test_gauge_absolute_negative_rate(cl, 'tcp', mock_random)
 
 
-def _test_set(cl, proto):
+def _test_set(cl, proto) -> None:
     cl.set('foo', 10)
     _sock_check(cl._sock, 1, proto, 'foo:10|s')
 
@@ -378,20 +378,20 @@ def _test_set(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_set_udp():
+def test_set_udp() -> None:
     """StatsClient.set works."""
     cl = _udp_client()
     _test_set(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_set_tcp():
+def test_set_tcp() -> None:
     """TCPStatsClient.set works."""
     cl = _tcp_client()
     _test_set(cl, 'tcp')
 
 
-def _test_timing(cl, proto):
+def _test_timing(cl, proto) -> None:
     cl.timing('foo', 100)
     _sock_check(cl._sock, 1, proto, 'foo:100.000000|ms')
 
@@ -403,20 +403,20 @@ def _test_timing(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timing_udp():
+def test_timing_udp() -> None:
     """StatsClient.timing works."""
     cl = _udp_client()
     _test_timing(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timing_tcp():
+def test_timing_tcp() -> None:
     """TCPStatsClient.timing works."""
     cl = _tcp_client()
     _test_timing(cl, 'tcp')
 
 
-def test_timing_supports_timedelta():
+def test_timing_supports_timedelta() -> None:
     cl = _udp_client()
     proto = 'udp'
 
@@ -428,20 +428,20 @@ def test_timing_supports_timedelta():
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timing_unix_socket():
+def test_timing_unix_socket() -> None:
     """UnixSocketStatsClient.timing works."""
     cl = _unix_socket_client()
     _test_timing(cl, 'unix')
 
 
-def _test_prepare(cl, proto):
+def _test_prepare(cl, proto) -> None:
     tests = (
         ('foo:1|c', ('foo', '1|c', 1)),
         ('bar:50|ms|@0.5', ('bar', '50|ms', 0.5)),
         ('baz:23|g', ('baz', '23|g', 1)),
     )
 
-    def _check(o, s, v, r):
+    def _check(o, s, v, r) -> None:
         with mock.patch.object(random, 'random', lambda: -1):
             eq_(o, cl._prepare(s, v, r))
 
@@ -450,65 +450,65 @@ def _test_prepare(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_prepare_udp():
+def test_prepare_udp() -> None:
     """Test StatsClient._prepare method."""
     cl = _udp_client()
     _test_prepare(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_prepare_tcp():
+def test_prepare_tcp() -> None:
     """Test TCPStatsClient._prepare method."""
     cl = _tcp_client()
     _test_prepare(cl, 'tcp')
 
 
-def _test_prefix(cl, proto):
+def _test_prefix(cl, proto) -> None:
     cl.incr('bar')
     _sock_check(cl._sock, 1, proto, 'foo.bar:1|c')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_prefix_udp():
+def test_prefix_udp() -> None:
     """StatsClient.incr works."""
     cl = _udp_client(prefix='foo')
     _test_prefix(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_prefix_tcp():
+def test_prefix_tcp() -> None:
     """TCPStatsClient.incr works."""
     cl = _tcp_client(prefix='foo')
     _test_prefix(cl, 'tcp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_prefix_unix_socket():
+def test_prefix_unix_socket() -> None:
     """UnixSocketStatsClient.incr works."""
     cl = _unix_socket_client(prefix='foo')
     _test_prefix(cl, 'unix')
 
 
-def _test_timer_manager(cl, proto):
+def _test_timer_manager(cl, proto) -> None:
     with cl.timer('foo'):
         pass
 
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_timer_manager_udp():
+def test_timer_manager_udp() -> None:
     """StatsClient.timer can be used as manager."""
     cl = _udp_client()
     _test_timer_manager(cl, 'udp')
 
 
-def test_timer_manager_tcp():
+def test_timer_manager_tcp() -> None:
     """TCPStatsClient.timer can be used as manager."""
     cl = _tcp_client()
     _test_timer_manager(cl, 'tcp')
 
 
-def _test_timer_decorator(cl, proto):
+def _test_timer_decorator(cl, proto) -> None:
     @cl.timer('foo')
     def foo(a, b):
         return [a, b]
@@ -529,37 +529,37 @@ def _test_timer_decorator(cl, proto):
     _timer_check(cl._sock, 3, proto, 'bar', 'ms')
 
 
-def test_timer_decorator_udp():
+def test_timer_decorator_udp() -> None:
     """StatsClient.timer is a thread-safe decorator (UDP)."""
     cl = _udp_client()
     _test_timer_decorator(cl, 'udp')
 
 
-def test_timer_decorator_tcp():
+def test_timer_decorator_tcp() -> None:
     """StatsClient.timer is a thread-safe decorator (TCP)."""
     cl = _tcp_client()
     _test_timer_decorator(cl, 'tcp')
 
 
-def _test_timer_capture(cl, proto):
+def _test_timer_capture(cl, proto) -> None:
     with cl.timer('woo') as result:
         eq_(result.ms, None)
     assert isinstance(result.ms, float)
 
 
-def test_timer_capture_udp():
+def test_timer_capture_udp() -> None:
     """You can capture the output of StatsClient.timer (UDP)."""
     cl = _udp_client()
     _test_timer_capture(cl, 'udp')
 
 
-def test_timer_capture_tcp():
+def test_timer_capture_tcp() -> None:
     """You can capture the output of StatsClient.timer (TCP)."""
     cl = _tcp_client()
     _test_timer_capture(cl, 'tcp')
 
 
-def _test_timer_context_rate(cl, proto):
+def _test_timer_context_rate(cl, proto) -> None:
     with cl.timer('foo', rate=0.5):
         pass
 
@@ -567,20 +567,20 @@ def _test_timer_context_rate(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_context_rate_udp():
+def test_timer_context_rate_udp() -> None:
     """StatsClient.timer can be used as manager with rate."""
     cl = _udp_client()
     _test_timer_context_rate(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_context_rate_tcp():
+def test_timer_context_rate_tcp() -> None:
     """TCPStatsClient.timer can be used as manager with rate."""
     cl = _tcp_client()
     _test_timer_context_rate(cl, 'tcp')
 
 
-def test_timer_decorator_partial_function():
+def test_timer_decorator_partial_function() -> None:
     """TCPStatsClient.timer can be used as decorator on a partial function."""
     cl = _tcp_client()
 
@@ -592,7 +592,7 @@ def test_timer_decorator_partial_function():
     _timer_check(cl._sock, 1, 'tcp', 'foo', 'ms|@0.1')
 
 
-def _test_timer_decorator_rate(cl, proto):
+def _test_timer_decorator_rate(cl, proto) -> None:
     @cl.timer('foo', rate=0.1)
     def foo(a, b):
         return [b, a]
@@ -609,14 +609,14 @@ def _test_timer_decorator_rate(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_decorator_rate_udp():
+def test_timer_decorator_rate_udp() -> None:
     """StatsClient.timer can be used as decorator with rate."""
     cl = _udp_client()
     _test_timer_decorator_rate(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_decorator_rate_tcp():
+def test_timer_decorator_rate_tcp() -> None:
     """TCPStatsClient.timer can be used as decorator with rate."""
     cl = _tcp_client()
     _test_timer_decorator_rate(cl, 'tcp')
@@ -630,17 +630,17 @@ def _test_timer_context_exceptions(cl, proto):
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_timer_context_exceptions_udp():
+def test_timer_context_exceptions_udp() -> None:
     cl = _udp_client()
     _test_timer_context_exceptions(cl, 'udp')
 
 
-def test_timer_context_exceptions_tcp():
+def test_timer_context_exceptions_tcp() -> None:
     cl = _tcp_client()
     _test_timer_context_exceptions(cl, 'tcp')
 
 
-def _test_timer_decorator_exceptions(cl, proto):
+def _test_timer_decorator_exceptions(cl, proto) -> None:
     @cl.timer('foo')
     def foo():
         raise ValueError()
@@ -651,36 +651,36 @@ def _test_timer_decorator_exceptions(cl, proto):
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_timer_decorator_exceptions_udp():
+def test_timer_decorator_exceptions_udp() -> None:
     cl = _udp_client()
     _test_timer_decorator_exceptions(cl, 'udp')
 
 
-def test_timer_decorator_exceptions_tcp():
+def test_timer_decorator_exceptions_tcp() -> None:
     cl = _tcp_client()
     _test_timer_decorator_exceptions(cl, 'tcp')
 
 
-def _test_timer_object(cl, proto):
+def _test_timer_object(cl, proto) -> None:
     t = cl.timer('foo').start()
     t.stop()
 
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_timer_object_udp():
+def test_timer_object_udp() -> None:
     """StatsClient.timer works."""
     cl = _udp_client()
     _test_timer_object(cl, 'udp')
 
 
-def test_timer_object_tcp():
+def test_timer_object_tcp() -> None:
     """TCPStatsClient.timer works."""
     cl = _tcp_client()
     _test_timer_object(cl, 'tcp')
 
 
-def _test_timer_object_no_send(cl, proto):
+def _test_timer_object_no_send(cl, proto) -> None:
     t = cl.timer('foo').start()
     t.stop(send=False)
     _sock_check(cl._sock, 0, proto)
@@ -689,19 +689,19 @@ def _test_timer_object_no_send(cl, proto):
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_timer_object_no_send_udp():
+def test_timer_object_no_send_udp() -> None:
     """Stop StatsClient.timer without sending."""
     cl = _udp_client()
     _test_timer_object_no_send(cl, 'udp')
 
 
-def test_timer_object_no_send_tcp():
+def test_timer_object_no_send_tcp() -> None:
     """Stop TCPStatsClient.timer without sending."""
     cl = _tcp_client()
     _test_timer_object_no_send(cl, 'tcp')
 
 
-def _test_timer_object_rate(cl, proto):
+def _test_timer_object_rate(cl, proto) -> None:
     t = cl.timer('foo', rate=0.5)
     t.start()
     t.stop()
@@ -710,20 +710,20 @@ def _test_timer_object_rate(cl, proto):
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_object_rate_udp():
+def test_timer_object_rate_udp() -> None:
     """StatsClient.timer works with rate."""
     cl = _udp_client()
     _test_timer_object_rate(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: -1)
-def test_timer_object_rate_tcp():
+def test_timer_object_rate_tcp() -> None:
     """TCPStatsClient.timer works with rate."""
     cl = _tcp_client()
     _test_timer_object_rate(cl, 'tcp')
 
 
-def _test_timer_object_no_send_twice(cl):
+def _test_timer_object_no_send_twice(cl) -> None:
     t = cl.timer('foo').start()
     t.stop()
 
@@ -731,19 +731,19 @@ def _test_timer_object_no_send_twice(cl):
         t.send()
 
 
-def test_timer_object_no_send_twice_udp():
+def test_timer_object_no_send_twice_udp() -> None:
     """StatsClient.timer raises RuntimeError if send is called twice."""
     cl = _udp_client()
     _test_timer_object_no_send_twice(cl)
 
 
-def test_timer_object_no_send_twice_tcp():
+def test_timer_object_no_send_twice_tcp() -> None:
     """TCPStatsClient.timer raises RuntimeError if send is called twice."""
     cl = _tcp_client()
     _test_timer_object_no_send_twice(cl)
 
 
-def _test_timer_send_without_stop(cl):
+def _test_timer_send_without_stop(cl) -> None:
     with cl.timer('foo') as t:
         assert t.ms is None
         with assert_raises(RuntimeError):
@@ -755,36 +755,36 @@ def _test_timer_send_without_stop(cl):
         t.send()
 
 
-def test_timer_send_without_stop_udp():
+def test_timer_send_without_stop_udp() -> None:
     """StatsClient.timer raises error if send is called before stop."""
     cl = _udp_client()
     _test_timer_send_without_stop(cl)
 
 
-def test_timer_send_without_stop_tcp():
+def test_timer_send_without_stop_tcp() -> None:
     """TCPStatsClient.timer raises error if send is called before stop."""
     cl = _tcp_client()
     _test_timer_send_without_stop(cl)
 
 
-def _test_timer_object_stop_without_start(cl):
+def _test_timer_object_stop_without_start(cl) -> None:
     with assert_raises(RuntimeError):
         cl.timer('foo').stop()
 
 
-def test_timer_object_stop_without_start_udp():
+def test_timer_object_stop_without_start_udp() -> None:
     """StatsClient.timer raises error if stop is called before start."""
     cl = _udp_client()
     _test_timer_object_stop_without_start(cl)
 
 
-def test_timer_object_stop_without_start_tcp():
+def test_timer_object_stop_without_start_tcp() -> None:
     """TCPStatsClient.timer raises error if stop is called before start."""
     cl = _tcp_client()
     _test_timer_object_stop_without_start(cl)
 
 
-def _test_pipeline(cl, proto):
+def _test_pipeline(cl, proto) -> None:
     pipe = cl.pipeline()
     pipe.incr('foo')
     pipe.decr('bar')
@@ -793,37 +793,37 @@ def _test_pipeline(cl, proto):
     _sock_check(cl._sock, 1, proto, 'foo:1|c\nbar:-1|c\nbaz:320.000000|ms')
 
 
-def test_pipeline_udp():
+def test_pipeline_udp() -> None:
     """StatsClient.pipeline works."""
     cl = _udp_client()
     _test_pipeline(cl, 'udp')
 
 
-def test_pipeline_tcp():
+def test_pipeline_tcp() -> None:
     """TCPStatsClient.pipeline works."""
     cl = _tcp_client()
     _test_pipeline(cl, 'tcp')
 
 
-def _test_pipeline_null(cl, proto):
+def _test_pipeline_null(cl, proto) -> None:
     pipe = cl.pipeline()
     pipe.send()
     _sock_check(cl._sock, 0, proto)
 
 
-def test_pipeline_null_udp():
+def test_pipeline_null_udp() -> None:
     """Ensure we don't error on an empty pipeline (UDP)."""
     cl = _udp_client()
     _test_pipeline_null(cl, 'udp')
 
 
-def test_pipeline_null_tcp():
+def test_pipeline_null_tcp() -> None:
     """Ensure we don't error on an empty pipeline (TCP)."""
     cl = _tcp_client()
     _test_pipeline_null(cl, 'tcp')
 
 
-def _test_pipeline_manager(cl, proto):
+def _test_pipeline_manager(cl, proto) -> None:
     with cl.pipeline() as pipe:
         pipe.incr('foo')
         pipe.decr('bar')
@@ -831,59 +831,59 @@ def _test_pipeline_manager(cl, proto):
     _sock_check(cl._sock, 1, proto, 'foo:1|c\nbar:-1|c\nbaz:15|g')
 
 
-def test_pipeline_manager_udp():
+def test_pipeline_manager_udp() -> None:
     """StatsClient.pipeline can be used as manager."""
     cl = _udp_client()
     _test_pipeline_manager(cl, 'udp')
 
 
-def test_pipeline_manager_tcp():
+def test_pipeline_manager_tcp() -> None:
     """TCPStatsClient.pipeline can be used as manager."""
     cl = _tcp_client()
     _test_pipeline_manager(cl, 'tcp')
 
 
-def _test_pipeline_timer_manager(cl, proto):
+def _test_pipeline_timer_manager(cl, proto) -> None:
     with cl.pipeline() as pipe:
         with pipe.timer('foo'):
             pass
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_pipeline_timer_manager_udp():
+def test_pipeline_timer_manager_udp() -> None:
     """Timer manager can be retrieve from UDP Pipeline manager."""
     cl = _udp_client()
     _test_pipeline_timer_manager(cl, 'udp')
 
 
-def test_pipeline_timer_manager_tcp():
+def test_pipeline_timer_manager_tcp() -> None:
     """Timer manager can be retrieve from TCP Pipeline manager."""
     cl = _tcp_client()
     _test_pipeline_timer_manager(cl, 'tcp')
 
 
-def _test_pipeline_timer_decorator(cl, proto):
+def _test_pipeline_timer_decorator(cl, proto) -> None:
     with cl.pipeline() as pipe:
         @pipe.timer('foo')
-        def foo():
+        def foo() -> None:
             pass
         foo()
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_pipeline_timer_decorator_udp():
+def test_pipeline_timer_decorator_udp() -> None:
     """UDP Pipeline manager can be used as decorator."""
     cl = _udp_client()
     _test_pipeline_timer_decorator(cl, 'udp')
 
 
-def test_pipeline_timer_decorator_tcp():
+def test_pipeline_timer_decorator_tcp() -> None:
     """TCP Pipeline manager can be used as decorator."""
     cl = _tcp_client()
     _test_pipeline_timer_decorator(cl, 'tcp')
 
 
-def _test_pipeline_timer_object(cl, proto):
+def _test_pipeline_timer_object(cl, proto) -> None:
     with cl.pipeline() as pipe:
         t = pipe.timer('foo').start()
         t.stop()
@@ -891,57 +891,57 @@ def _test_pipeline_timer_object(cl, proto):
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
 
-def test_pipeline_timer_object_udp():
+def test_pipeline_timer_object_udp() -> None:
     """Timer from UDP Pipeline manager works."""
     cl = _udp_client()
     _test_pipeline_timer_object(cl, 'udp')
 
 
-def test_pipeline_timer_object_tcp():
+def test_pipeline_timer_object_tcp() -> None:
     """Timer from TCP Pipeline manager works."""
     cl = _tcp_client()
     _test_pipeline_timer_object(cl, 'tcp')
 
 
-def _test_pipeline_empty(cl):
+def _test_pipeline_empty(cl) -> None:
     with cl.pipeline() as pipe:
         pipe.incr('foo')
         eq_(1, len(pipe._stats))
     eq_(0, len(pipe._stats))
 
 
-def test_pipeline_empty_udp():
+def test_pipeline_empty_udp() -> None:
     """Pipelines should be empty after a send() call (UDP)."""
     cl = _udp_client()
     _test_pipeline_empty(cl)
 
 
-def test_pipeline_empty_tcp():
+def test_pipeline_empty_tcp() -> None:
     """Pipelines should be empty after a send() call (TCP)."""
     cl = _tcp_client()
     _test_pipeline_empty(cl)
 
 
-def _test_pipeline_negative_absolute_gauge(cl, proto):
+def _test_pipeline_negative_absolute_gauge(cl, proto) -> None:
     with cl.pipeline() as pipe:
         pipe.gauge('foo', -10, delta=False)
         pipe.incr('bar')
     _sock_check(cl._sock, 1, proto, 'foo:0|g\nfoo:-10|g\nbar:1|c')
 
 
-def test_pipeline_negative_absolute_gauge_udp():
+def test_pipeline_negative_absolute_gauge_udp() -> None:
     """Negative absolute gauges use an internal pipeline (UDP)."""
     cl = _udp_client()
     _test_pipeline_negative_absolute_gauge(cl, 'udp')
 
 
-def test_pipeline_negative_absolute_gauge_tcp():
+def test_pipeline_negative_absolute_gauge_tcp() -> None:
     """Negative absolute gauges use an internal pipeline (TCP)."""
     cl = _tcp_client()
     _test_pipeline_negative_absolute_gauge(cl, 'tcp')
 
 
-def _test_big_numbers(cl, proto):
+def _test_big_numbers(cl, proto) -> None:
     num = 1234568901234
     tests = (
         # Explicitly create strings so we avoid the bug we're trying to test.
@@ -950,7 +950,7 @@ def _test_big_numbers(cl, proto):
         ('timing', 'foo:1234568901234.000000|ms'),
     )
 
-    def _check(method, result):
+    def _check(method, result) -> None:
         cl._sock.reset_mock()
         getattr(cl, method)('foo', num)
         _sock_check(cl._sock, 1, proto, result)
@@ -959,38 +959,38 @@ def _test_big_numbers(cl, proto):
         _check(method, result)
 
 
-def test_big_numbers_udp():
+def test_big_numbers_udp() -> None:
     """Test big numbers with UDP client."""
     cl = _udp_client()
     _test_big_numbers(cl, 'udp')
 
 
-def test_big_numbers_tcp():
+def test_big_numbers_tcp() -> None:
     """Test big numbers with TCP client."""
     cl = _tcp_client()
     _test_big_numbers(cl, 'tcp')
 
 
-def _test_rate_no_send(cl, proto):
+def _test_rate_no_send(cl, proto) -> None:
     cl.incr('foo', rate=0.5)
     _sock_check(cl._sock, 0, proto)
 
 
 @mock.patch.object(random, 'random', lambda: 2)
-def test_rate_no_send_udp():
+def test_rate_no_send_udp() -> None:
     """Rate below random value prevents sending with StatsClient.incr."""
     cl = _udp_client()
     _test_rate_no_send(cl, 'udp')
 
 
 @mock.patch.object(random, 'random', lambda: 2)
-def test_rate_no_send_tcp():
+def test_rate_no_send_tcp() -> None:
     """Rate below random value prevents sending with TCPStatsClient.incr."""
     cl = _tcp_client()
     _test_rate_no_send(cl, 'tcp')
 
 
-def test_socket_error():
+def test_socket_error() -> None:
     """Socket error on StatsClient should be ignored."""
     cl = _udp_client()
     cl._sock.sendto.side_effect = socket.timeout()
@@ -998,7 +998,7 @@ def test_socket_error():
     _sock_check(cl._sock, 1, 'udp', 'foo:1|c')
 
 
-def test_pipeline_packet_size():
+def test_pipeline_packet_size() -> None:
     """Pipelines shouldn't send packets larger than 512 bytes (UDP only)."""
     sc = _udp_client()
     pipe = sc.pipeline()
@@ -1012,7 +1012,7 @@ def test_pipeline_packet_size():
 
 
 @mock.patch.object(socket, 'socket')
-def test_tcp_raises_exception_to_user(mock_socket):
+def test_tcp_raises_exception_to_user(mock_socket) -> None:
     """Socket errors in TCPStatsClient should be raised to user."""
     addr = ('127.0.0.1', 1234)
     cl = _tcp_client(addr=addr[0], port=addr[1])
@@ -1024,7 +1024,7 @@ def test_tcp_raises_exception_to_user(mock_socket):
 
 
 @mock.patch.object(socket, 'socket')
-def test_tcp_timeout(mock_socket):
+def test_tcp_timeout(mock_socket) -> None:
     """Timeout on TCPStatsClient should be set on socket."""
     test_timeout = 321
     cl = TCPStatsClient(timeout=test_timeout)
@@ -1033,7 +1033,7 @@ def test_tcp_timeout(mock_socket):
 
 
 @mock.patch.object(socket, 'socket')
-def test_unix_socket_timeout(mock_socket):
+def test_unix_socket_timeout(mock_socket) -> None:
     """Timeout on UnixSocketStatsClient should be set on socket."""
     test_timeout = 321
     cl = UnixSocketStatsClient(UNIX_SOCKET, timeout=test_timeout)

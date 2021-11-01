@@ -21,7 +21,7 @@ def safe_wraps(wrapper, *args, **kwargs):
 class Timer(object):
     """A context manager/decorator for statsd.timing()."""
 
-    def __init__(self, client, stat, rate: int=1):
+    def __init__(self, client, stat, rate: int=1) -> None:
         self.client = client
         self.stat = stat
         self.rate = rate
@@ -44,7 +44,7 @@ class Timer(object):
     def __enter__(self):
         return self.start()
 
-    def __exit__(self, typ, value, tb):
+    def __exit__(self, typ, value, tb) -> None:
         self.stop()
 
     def start(self):

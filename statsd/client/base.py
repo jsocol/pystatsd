@@ -23,7 +23,7 @@ class StatsClientBase(object):
     def timer(self, stat, rate: int=1):
         return Timer(self, stat, rate)
 
-    def timing(self, stat, delta, rate: int=1):
+    def timing(self, stat, delta, rate: int=1) -> None:
         """
         Send new timing information.
 
@@ -34,15 +34,15 @@ class StatsClientBase(object):
             delta = delta.total_seconds() * 1000.
         self._send_stat(stat, '%0.6f|ms' % delta, rate)
 
-    def incr(self, stat, count: int=1, rate: int=1):
+    def incr(self, stat, count: int=1, rate: int=1) -> None:
         """Increment a stat by `count`."""
         self._send_stat(stat, '%s|c' % count, rate)
 
-    def decr(self, stat, count: int=1, rate: int=1):
+    def decr(self, stat, count: int=1, rate: int=1) -> None:
         """Decrement a stat by `count`."""
         self.incr(stat, -count, rate)
 
-    def gauge(self, stat, value, rate: int=1, delta: bool=False):
+    def gauge(self, stat, value, rate: int=1, delta: bool=False) -> None:
         """Set a gauge value."""
         if value < 0 and not delta:
             if rate < 1:
@@ -55,11 +55,11 @@ class StatsClientBase(object):
             prefix = '+' if delta and value >= 0 else ''
             self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
 
-    def set(self, stat, value, rate: int=1):
+    def set(self, stat, value, rate: int=1) -> None:
         """Set a set value."""
         self._send_stat(stat, '%s|s' % value, rate)
 
-    def _send_stat(self, stat, value, rate):
+    def _send_stat(self, stat, value, rate) -> None:
         self._after(self._prepare(stat, value, rate))
 
     def _prepare(self, stat, value, rate):
@@ -73,14 +73,14 @@ class StatsClientBase(object):
 
         return '%s:%s' % (stat, value)
 
-    def _after(self, data):
+    def _after(self, data) -> None:
         if data:
             self._send(data)
 
 
 class PipelineBase(StatsClientBase):
 
-    def __init__(self, client):
+    def __init__(self, client) -> None:
         self._client = client
         self._prefix = client._prefix
         self._stats = deque()
@@ -88,17 +88,17 @@ class PipelineBase(StatsClientBase):
     def _send(self):
         raise NotImplementedError()
 
-    def _after(self, data):
+    def _after(self, data) -> None:
         if data is not None:
             self._stats.append(data)
 
     def __enter__(self):
         return self
 
-    def __exit__(self, typ, value, tb):
+    def __exit__(self, typ, value, tb) -> None:
         self.send()
 
-    def send(self):
+    def send(self) -> None:
         if not self._stats:
             return
         self._send()
