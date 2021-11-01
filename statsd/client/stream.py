@@ -40,8 +40,8 @@ class StreamClientBase(StatsClientBase):
 class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
 
-    def __init__(self, host: str='localhost', port: int=8125, prefix=None,
-                 timeout=None, ipv6: bool=False) -> None:
+    def __init__(self, host: str = 'localhost', port: int = 8125, prefix=None,
+                 timeout=None, ipv6: bool = False) -> None:
         """Create a new client."""
         self._host = host
         self._port = port

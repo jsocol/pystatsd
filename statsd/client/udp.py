@@ -27,8 +27,8 @@ class Pipeline(PipelineBase):
 class StatsClient(StatsClientBase):
     """A client for statsd."""
 
-    def __init__(self, host: str='localhost', port: int=8125, prefix=None,
-                 maxudpsize: int=512, ipv6: bool=False) -> None:
+    def __init__(self, host: str = 'localhost', port: int = 8125, prefix=None,
+                 maxudpsize: int = 512, ipv6: bool = False) -> None:
         """Create a new client."""
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(

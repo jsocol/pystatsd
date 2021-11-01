@@ -21,7 +21,7 @@ def safe_wraps(wrapper, *args, **kwargs):
 class Timer(object):
     """A context manager/decorator for statsd.timing()."""
 
-    def __init__(self, client, stat, rate: int=1) -> None:
+    def __init__(self, client, stat, rate: int = 1) -> None:
         self.client = client
         self.stat = stat
         self.rate = rate
@@ -53,7 +53,7 @@ class Timer(object):
         self._start_time = time_now()
         return self
 
-    def stop(self, send: bool=True):
+    def stop(self, send: bool = True):
         if self._start_time is None:
             raise RuntimeError('Timer has not started.')
         dt = time_now() - self._start_time
