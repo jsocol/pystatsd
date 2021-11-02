@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import socket
+from typing import Optional, Union
 
 from .base import StatsClientBase, PipelineBase
 
@@ -12,7 +13,9 @@ class StreamPipeline(PipelineBase):
 
 
 class StreamClientBase(StatsClientBase):
-    def connect(self):
+    _sock: Optional[socket.socket]
+
+    def connect(self) -> None:
         raise NotImplementedError()
 
     def close(self) -> None:
@@ -24,24 +27,37 @@ class StreamClientBase(StatsClientBase):
         self.close()
         self.connect()
 
-    def pipeline(self):
+    def pipeline(self) -> StreamPipeline:
         return StreamPipeline(self)
 
-    def _send(self, data) -> None:
+    def _send(self, data: str) -> None:
         """Send data to statsd."""
         if not self._sock:
             self.connect()
         self._do_send(data)
 
-    def _do_send(self, data) -> None:
+    def _do_send(self, data: str) -> None:
+        assert self._sock is not None
         self._sock.sendall(data.encode('ascii') + b'\n')
 
 
 class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
+    _host: str
+    _port: int
+    _prefix: Optional[str]
+    _timeout: Optional[float]
+    _ipv6: bool
+    _sock: Optional[socket.socket]
 
-    def __init__(self, host: str = 'localhost', port: int = 8125, prefix=None,
-                 timeout=None, ipv6: bool = False) -> None:
+    def __init__(
+        self,
+        host: str = 'localhost',
+        port: int = 8125,
+        prefix: Optional[str] = None,
+        timeout: Optional[float] = None,
+        ipv6: bool = False,
+    ) -> None:
         """Create a new client."""
         self._host = host
         self._port = port
@@ -61,8 +77,17 @@ class TCPStatsClient(StreamClientBase):
 
 class UnixSocketStatsClient(StreamClientBase):
     """Unix domain socket version of StatsClient."""
+    _socket_path: Union[str, bytes, tuple]
+    _prefix: Optional[str]
+    _timeout: Optional[float]
+    _sock: Optional[socket.socket]
 
-    def __init__(self, socket_path, prefix=None, timeout=None) -> None:
+    def __init__(
+        self,
+        socket_path: Union[str, bytes, tuple],
+        prefix: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> None:
         """Create a new client."""
         self._socket_path = socket_path
         self._timeout = timeout

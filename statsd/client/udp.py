@@ -1,13 +1,14 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import socket
+from typing import Optional
 
 from .base import StatsClientBase, PipelineBase
 
 
 class Pipeline(PipelineBase):
 
-    def __init__(self, client) -> None:
+    def __init__(self, client: 'StatsClient') -> None:
         super(Pipeline, self).__init__(client)
         self._maxudpsize = client._maxudpsize
 
@@ -27,8 +28,18 @@ class Pipeline(PipelineBase):
 class StatsClient(StatsClientBase):
     """A client for statsd."""
 
-    def __init__(self, host: str = 'localhost', port: int = 8125, prefix=None,
-                 maxudpsize: int = 512, ipv6: bool = False) -> None:
+    _addr: tuple
+    _sock: Optional[socket.socket]
+    _maxudpsize: int
+
+    def __init__(
+        self,
+        host: str = 'localhost',
+        port: int = 8125,
+        prefix: Optional[str] = None,
+        maxudpsize: int = 512,
+        ipv6: bool = False,
+    ) -> None:
         """Create a new client."""
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
@@ -38,7 +49,7 @@ class StatsClient(StatsClientBase):
         self._prefix = prefix
         self._maxudpsize = maxudpsize
 
-    def _send(self, data) -> None:
+    def _send(self, data: str) -> None:
         """Send data to statsd."""
         try:
             self._sock.sendto(data.encode('ascii'), self._addr)
@@ -51,5 +62,5 @@ class StatsClient(StatsClientBase):
             self._sock.close()
         self._sock = None
 
-    def pipeline(self):
+    def pipeline(self) -> Pipeline:
         return Pipeline(self)

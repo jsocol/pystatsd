@@ -1030,6 +1030,7 @@ def test_tcp_timeout(mock_socket) -> None:
     test_timeout = 321
     cl = TCPStatsClient(timeout=test_timeout)
     cl.incr('foo')
+    assert cl._sock is not None
     cl._sock.settimeout.assert_called_once_with(test_timeout)
 
 
@@ -1039,4 +1040,5 @@ def test_unix_socket_timeout(mock_socket) -> None:
     test_timeout = 321
     cl = UnixSocketStatsClient(UNIX_SOCKET, timeout=test_timeout)
     cl.incr('foo')
+    assert cl._sock is not None
     cl._sock.settimeout.assert_called_once_with(test_timeout)
