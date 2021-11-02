@@ -37,7 +37,8 @@ class Timer(object):
     _sent: bool
     _start_time: Optional[float]
 
-    def __init__(self, client: 'StatsClientBase', stat: str, rate: float = 1) -> None:
+    def __init__(self, client: 'StatsClientBase',
+                 stat: str, rate: float = 1) -> None:
         self.client = client
         self.stat = stat
         self.rate = rate

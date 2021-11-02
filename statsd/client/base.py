@@ -47,7 +47,8 @@ class StatsClientBase(object):
         """Decrement a stat by `count`."""
         self.incr(stat, -count, rate)
 
-    def gauge(self, stat: str, value: float, rate: float = 1, delta: bool = False) -> None:
+    def gauge(self, stat: str, value: float, rate: float = 1,
+              delta: bool = False) -> None:
         """Set a gauge value."""
         if value < 0 and not delta:
             if rate < 1:
