@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 import random
 from collections import deque
 from datetime import timedelta
-from typing import Deque, Optional, TypeVar
+from typing import Deque, Optional, TypeVar, Union
 
 from .timer import Timer
 
@@ -28,7 +28,12 @@ class StatsClientBase(object):
     def timer(self, stat: str, rate: float = 1) -> Timer:
         return Timer(self, stat, rate)
 
-    def timing(self, stat: str, delta, rate: float = 1) -> None:
+    def timing(
+        self,
+        stat: str,
+        delta: Union[timedelta, float],
+        rate: float = 1,
+    ) -> None:
         """
         Send new timing information.
 
@@ -47,8 +52,13 @@ class StatsClientBase(object):
         """Decrement a stat by `count`."""
         self.incr(stat, -count, rate)
 
-    def gauge(self, stat: str, value: float, rate: float = 1,
-              delta: bool = False) -> None:
+    def gauge(
+        self,
+        stat: str,
+        value: float,
+        rate: float = 1,
+        delta: bool = False,
+    ) -> None:
         """Set a gauge value."""
         if value < 0 and not delta:
             if rate < 1:
