@@ -1,3 +1,4 @@
 include AUTHORS CHANGES LICENSE MANIFEST.in README.rst
 include setup.py
+include statsd/py.typed
 recursive-include docs *
