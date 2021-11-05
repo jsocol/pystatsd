@@ -1,3 +1,4 @@
 mock==1.0.1
 nose==1.2.1
-flake8==1.7.0
+flake8
+mypy==0.910
