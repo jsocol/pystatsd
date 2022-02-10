@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='statsd',
-    version='3.3.0',
+    version='3.3.1',
     description='A simple statsd client.',
     long_description=open('README.rst').read(),
     author='James Socol',
