@@ -5,9 +5,7 @@ import re
 import socket
 from datetime import timedelta
 from unittest import SkipTest
-
-import mock
-from nose.tools import eq_
+from unittest import mock
 
 from statsd import StatsClient
 from statsd import TCPStatsClient
@@ -66,7 +64,7 @@ def _unix_socket_client(prefix=None, socket_path=None):
 
 def _timer_check(sock, count, proto, start, end):
     send = send_method[proto](sock)
-    eq_(send.call_count, count)
+    assert send.call_count == count
     value = send.call_args[0][0].decode('ascii')
     exp = re.compile(r'^%s:\d+|%s$' % (start, end))
     assert exp.match(value)
@@ -74,14 +72,11 @@ def _timer_check(sock, count, proto, start, end):
 
 def _sock_check(sock, count, proto, val=None, addr=None):
     send = send_method[proto](sock)
-    eq_(send.call_count, count)
+    assert send.call_count == count
     if not addr:
         addr = ADDR
     if val is not None:
-        eq_(
-            send.call_args,
-            make_val[proto](val, addr),
-        )
+        assert send.call_args == make_val[proto](val, addr)
 
 
 class assert_raises(object):
@@ -443,7 +438,7 @@ def _test_prepare(cl, proto):
 
     def _check(o, s, v, r):
         with mock.patch.object(random, 'random', lambda: -1):
-            eq_(o, cl._prepare(s, v, r))
+            assert o == cl._prepare(s, v, r)
 
     for o, (s, v, r) in tests:
         _check(o, s, v, r)
@@ -519,13 +514,13 @@ def _test_timer_decorator(cl, proto):
 
     # make sure it works with more than one decorator, called multiple
     # times, and that parameters are handled correctly
-    eq_([4, 2], foo(4, 2))
+    assert [4, 2] == foo(4, 2)
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
 
-    eq_([2, 4], bar(4, 2))
+    assert [2, 4] == bar(4, 2)
     _timer_check(cl._sock, 2, proto, 'bar', 'ms')
 
-    eq_([6, 5], bar(5, 6))
+    assert [6, 5] == bar(5, 6)
     _timer_check(cl._sock, 3, proto, 'bar', 'ms')
 
 
@@ -543,7 +538,7 @@ def test_timer_decorator_tcp():
 
 def _test_timer_capture(cl, proto):
     with cl.timer('woo') as result:
-        eq_(result.ms, None)
+        assert result.ms is None
     assert isinstance(result.ms, float)
 
 
@@ -587,7 +582,7 @@ def test_timer_decorator_partial_function():
     foo = functools.partial(lambda x: x * x, 2)
     func = cl.timer('foo')(foo)
 
-    eq_(4, func())
+    assert 4 == func()
 
     _timer_check(cl._sock, 1, 'tcp', 'foo', 'ms|@0.1')
 
@@ -601,10 +596,10 @@ def _test_timer_decorator_rate(cl, proto):
     def bar(a, b=2, c=3):
         return [c, b, a]
 
-    eq_([2, 4], foo(4, 2))
+    assert [2, 4] == foo(4, 2)
     _timer_check(cl._sock, 1, proto, 'foo', 'ms|@0.1')
 
-    eq_([3, 2, 5], bar(5))
+    assert [3, 2, 5] == bar(5)
     _timer_check(cl._sock, 2, proto, 'bar', 'ms|@0.2')
 
 
@@ -906,8 +901,8 @@ def test_pipeline_timer_object_tcp():
 def _test_pipeline_empty(cl):
     with cl.pipeline() as pipe:
         pipe.incr('foo')
-        eq_(1, len(pipe._stats))
-    eq_(0, len(pipe._stats))
+        assert 1 == len(pipe._stats)
+    assert 0 == len(pipe._stats)
 
 
 def test_pipeline_empty_udp():
@@ -1006,7 +1001,7 @@ def test_pipeline_packet_size():
         # 32 * 16 = 512, so this will need 2 packets.
         pipe.incr('sixteen_char_str')
     pipe.send()
-    eq_(2, sc._sock.sendto.call_count)
+    assert 2 == sc._sock.sendto.call_count
     assert len(sc._sock.sendto.call_args_list[0][0][0]) <= 512
     assert len(sc._sock.sendto.call_args_list[1][0][0]) <= 512
 
@@ -1017,7 +1012,7 @@ def test_tcp_raises_exception_to_user(mock_socket):
     addr = ('127.0.0.1', 1234)
     cl = _tcp_client(addr=addr[0], port=addr[1])
     cl.incr('foo')
-    eq_(1, cl._sock.sendall.call_count)
+    assert 1 == cl._sock.sendall.call_count
     cl._sock.sendall.side_effect = socket.error
     with assert_raises(socket.error):
         cl.incr('foo')
