@@ -1,0 +1,22 @@
+version: 2.1
+
+jobs:
+  test:
+    parameters:
+      python-version:
+        type: string
+    docker:
+      - image: cimg/python:<< parameters.python-version>>
+    steps:
+      - checkout
+      - run: pip install --requirement requirements.txt
+      - run: pytest statsd/tests.py
+      - run: flake8 statsd
+
+workflows:
+  test-pythons:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              python-version: ["3.7", "3.8", "3.9", "3.10"]
