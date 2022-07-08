@@ -3,7 +3,6 @@ from django.conf import settings
 from statsd import defaults
 from statsd.client import StatsClient
 
-
 statsd = None
 
 if statsd is None:

@@ -1,6 +1,6 @@
 import socket
 
-from .base import StatsClientBase, PipelineBase
+from .base import PipelineBase, StatsClientBase
 
 
 class Pipeline(PipelineBase):

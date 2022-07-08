@@ -3,13 +3,9 @@ import random
 import re
 import socket
 from datetime import timedelta
-from unittest import SkipTest
-from unittest import mock
+from unittest import SkipTest, mock
 
-from statsd import StatsClient
-from statsd import TCPStatsClient
-from statsd import UnixSocketStatsClient
-
+from statsd import StatsClient, TCPStatsClient, UnixSocketStatsClient
 
 ADDR = (socket.gethostbyname("localhost"), 8125)
 UNIX_SOCKET = "tmp.socket"
