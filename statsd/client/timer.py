@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import functools
 
 # Use timer that's not susceptible to time of day adjustments.
@@ -18,7 +16,7 @@ def safe_wraps(wrapper, *args, **kwargs):
     return functools.wraps(wrapper, *args, **kwargs)
 
 
-class Timer(object):
+class Timer:
     """A context manager/decorator for statsd.timing()."""
 
     def __init__(self, client, stat, rate=1):

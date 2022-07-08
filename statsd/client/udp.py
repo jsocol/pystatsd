@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import socket
 
 from .base import StatsClientBase, PipelineBase
@@ -8,7 +6,7 @@ from .base import StatsClientBase, PipelineBase
 class Pipeline(PipelineBase):
 
     def __init__(self, client):
-        super(Pipeline, self).__init__(client)
+        super().__init__(client)
         self._maxudpsize = client._maxudpsize
 
     def _send(self):
@@ -42,7 +40,7 @@ class StatsClient(StatsClientBase):
         """Send data to statsd."""
         try:
             self._sock.sendto(data.encode('ascii'), self._addr)
-        except (socket.error, RuntimeError):
+        except (OSError, RuntimeError):
             # No time for love, Dr. Jones!
             pass
 

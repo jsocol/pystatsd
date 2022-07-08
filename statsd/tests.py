@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import functools
 import random
 import re
@@ -66,7 +65,7 @@ def _timer_check(sock, count, proto, start, end):
     send = send_method[proto](sock)
     assert send.call_count == count
     value = send.call_args[0][0].decode('ascii')
-    exp = re.compile(r'^%s:\d+|%s$' % (start, end))
+    exp = re.compile(fr'^{start}:\d+|{end}$')
     assert exp.match(value)
 
 
@@ -79,7 +78,7 @@ def _sock_check(sock, count, proto, val=None, addr=None):
         assert send.call_args == make_val[proto](val, addr)
 
 
-class assert_raises(object):
+class assert_raises:
     """A context manager that asserts a given exception was raised.
 
     >>> with assert_raises(TypeError):
@@ -126,7 +125,7 @@ class assert_raises(object):
 
     def __exit__(self, typ, value, tb):
         assert typ, 'No exception raised.'
-        assert typ in self.exc_cls, '%s not in %s' % (
+        assert typ in self.exc_cls, '{} not in {}'.format(
             typ.__name__, [e.__name__ for e in self.exc_cls])
         self.exc_type = typ
         self.exception = value
