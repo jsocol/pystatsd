@@ -9,7 +9,7 @@ jobs:
       - image: cimg/python:<< parameters.python-version>>
     steps:
       - checkout
-      - run: pip install --requirement requirements.txt
+      - run: pip install --requirement requirements-dev.txt
       - run: pytest statsd/tests.py
       - run: flake8 statsd
 
