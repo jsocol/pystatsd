@@ -10,7 +10,7 @@ setup(
     author_email='james@mozilla.com',
     url='https://github.com/jsocol/pystatsd',
     license='MIT',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     package_data={'': ['README.rst']},
     test_suite='nose.collector',

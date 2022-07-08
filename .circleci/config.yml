@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - run: pip install --requirement requirements-dev.txt
-      - run: pytest statsd/tests.py
+      - run: pytest
       - run: flake8 statsd
       - run: black --check --diff statsd
       - run: isort --check-only --diff statsd
