@@ -13,6 +13,7 @@ jobs:
       - run: pytest statsd/tests.py
       - run: flake8 statsd
       - run: black --check --diff statsd
+      - run: isort --check-only --diff statsd
 
 workflows:
   test-pythons:
