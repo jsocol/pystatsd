@@ -29,12 +29,12 @@ class StatsClientBase:
         """
         if isinstance(delta, timedelta):
             # Convert timedelta to number of milliseconds.
-            delta = delta.total_seconds() * 1000.
-        self._send_stat(stat, '%0.6f|ms' % delta, rate)
+            delta = delta.total_seconds() * 1000.0
+        self._send_stat(stat, "%0.6f|ms" % delta, rate)
 
     def incr(self, stat, count=1, rate=1):
         """Increment a stat by `count`."""
-        self._send_stat(stat, '%s|c' % count, rate)
+        self._send_stat(stat, "%s|c" % count, rate)
 
     def decr(self, stat, count=1, rate=1):
         """Decrement a stat by `count`."""
@@ -47,15 +47,15 @@ class StatsClientBase:
                 if random.random() > rate:
                     return
             with self.pipeline() as pipe:
-                pipe._send_stat(stat, '0|g', 1)
-                pipe._send_stat(stat, '%s|g' % value, 1)
+                pipe._send_stat(stat, "0|g", 1)
+                pipe._send_stat(stat, "%s|g" % value, 1)
         else:
-            prefix = '+' if delta and value >= 0 else ''
-            self._send_stat(stat, f'{prefix}{value}|g', rate)
+            prefix = "+" if delta and value >= 0 else ""
+            self._send_stat(stat, f"{prefix}{value}|g", rate)
 
     def set(self, stat, value, rate=1):
         """Set a set value."""
-        self._send_stat(stat, '%s|s' % value, rate)
+        self._send_stat(stat, "%s|s" % value, rate)
 
     def _send_stat(self, stat, value, rate):
         self._after(self._prepare(stat, value, rate))
@@ -64,12 +64,12 @@ class StatsClientBase:
         if rate < 1:
             if random.random() > rate:
                 return
-            value = f'{value}|@{rate}'
+            value = f"{value}|@{rate}"
 
         if self._prefix:
-            stat = f'{self._prefix}.{stat}'
+            stat = f"{self._prefix}.{stat}"
 
-        return f'{stat}:{value}'
+        return f"{stat}:{value}"
 
     def _after(self, data):
         if data:
@@ -77,7 +77,6 @@ class StatsClientBase:
 
 
 class PipelineBase(StatsClientBase):
-
     def __init__(self, client):
         self._client = client
         self._prefix = client._prefix
