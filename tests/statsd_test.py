@@ -254,21 +254,21 @@ def test_gauge_delta_tcp():
 
 def _test_gauge_absolute_negative(cl, proto):
     cl.gauge("foo", -5, delta=False)
-    _sock_check(cl._sock, 1, "foo:0|g\nfoo:-5|g")
+    _sock_check(cl._sock, 1, proto, "foo:0|g\nfoo:-5|g")
 
 
 @mock.patch.object(random, "random", lambda: -1)
 def test_gauge_absolute_negative_udp():
     """StatsClient.gauge works with absolute negative value."""
     cl = _udp_client()
-    _test_gauge_delta(cl, "udp")
+    _test_gauge_absolute_negative(cl, "udp")
 
 
 @mock.patch.object(random, "random", lambda: -1)
 def test_gauge_absolute_negative_tcp():
     """TCPStatsClient.gauge works with absolute negative value."""
     cl = _tcp_client()
-    _test_gauge_delta(cl, "tcp")
+    _test_gauge_absolute_negative(cl, "tcp")
 
 
 def _test_gauge_absolute_negative_rate(cl, proto, mock_random):
