@@ -5,6 +5,8 @@ import socket
 from datetime import timedelta
 from unittest import SkipTest, mock
 
+import pytest
+
 from statsd import StatsClient, TCPStatsClient, UnixSocketStatsClient
 
 ADDR = (socket.gethostbyname("localhost"), 8125)
@@ -71,64 +73,6 @@ def _sock_check(sock, count, proto, val=None, addr=None):
         addr = ADDR
     if val is not None:
         assert send.call_args == make_val[proto](val, addr)
-
-
-class assert_raises:
-    """A context manager that asserts a given exception was raised.
-
-    >>> with assert_raises(TypeError):
-    ...     raise TypeError
-
-    >>> with assert_raises(TypeError):
-    ...     raise ValueError
-    AssertionError: ValueError not in ['TypeError']
-
-    >>> with assert_raises(TypeError):
-    ...     pass
-    AssertionError: No exception raised.
-
-    Or you can specify any of a number of exceptions:
-
-    >>> with assert_raises(TypeError, ValueError):
-    ...     raise ValueError
-
-    >>> with assert_raises(TypeError, ValueError):
-    ...     raise KeyError
-    AssertionError: KeyError not in ['TypeError', 'ValueError']
-
-    You can also get the exception back later:
-
-    >>> with assert_raises(TypeError) as cm:
-    ...     raise TypeError('bad type!')
-    >>> cm.exception
-    TypeError('bad type!')
-    >>> cm.exc_type
-    TypeError
-    >>> cm.traceback
-    <traceback @ 0x3323ef0>
-
-    Lowercase name because that it's a class is an implementation detail.
-
-    """
-
-    def __init__(self, *exc_cls):
-        self.exc_cls = exc_cls
-
-    def __enter__(self):
-        # For access to the exception later.
-        return self
-
-    def __exit__(self, typ, value, tb):
-        assert typ, "No exception raised."
-        assert typ in self.exc_cls, "{} not in {}".format(
-            typ.__name__, [e.__name__ for e in self.exc_cls]
-        )
-        self.exc_type = typ
-        self.exception = value
-        self.traceback = tb
-
-        # Swallow expected exceptions.
-        return True
 
 
 def _test_incr(cl, proto):
@@ -613,7 +557,7 @@ def test_timer_decorator_rate_tcp():
 
 
 def _test_timer_context_exceptions(cl, proto):
-    with assert_raises(socket.timeout):
+    with pytest.raises(socket.timeout):
         with cl.timer("foo"):
             raise socket.timeout()
 
@@ -635,7 +579,7 @@ def _test_timer_decorator_exceptions(cl, proto):
     def foo():
         raise ValueError()
 
-    with assert_raises(ValueError):
+    with pytest.raises(ValueError):
         foo()
 
     _timer_check(cl._sock, 1, proto, "foo", "ms")
@@ -717,7 +661,7 @@ def _test_timer_object_no_send_twice(cl):
     t = cl.timer("foo").start()
     t.stop()
 
-    with assert_raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         t.send()
 
 
@@ -736,12 +680,12 @@ def test_timer_object_no_send_twice_tcp():
 def _test_timer_send_without_stop(cl):
     with cl.timer("foo") as t:
         assert t.ms is None
-        with assert_raises(RuntimeError):
+        with pytest.raises(RuntimeError):
             t.send()
 
     t = cl.timer("bar").start()
     assert t.ms is None
-    with assert_raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         t.send()
 
 
@@ -758,7 +702,7 @@ def test_timer_send_without_stop_tcp():
 
 
 def _test_timer_object_stop_without_start(cl):
-    with assert_raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         cl.timer("foo").stop()
 
 
@@ -1011,7 +955,7 @@ def test_tcp_raises_exception_to_user(mock_socket):
     cl.incr("foo")
     assert 1 == cl._sock.sendall.call_count
     cl._sock.sendall.side_effect = socket.error
-    with assert_raises(socket.error):
+    with pytest.raises(socket.error):
         cl.incr("foo")
 
 
