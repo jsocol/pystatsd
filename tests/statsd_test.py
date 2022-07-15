@@ -974,3 +974,25 @@ def test_unix_socket_timeout(mock_socket):
     cl = UnixSocketStatsClient(UNIX_SOCKET, timeout=test_timeout)
     cl.incr("foo")
     cl._sock.settimeout.assert_called_once_with(test_timeout)
+
+
+@mock.patch.object(socket, "socket")
+@pytest.mark.parametrize("cl", (_udp_client(), _tcp_client()))
+def test_closing_closes_socket(mock_socket, cl):
+    sock = cl._sock
+
+    cl.close()
+
+    assert cl._sock is None
+    assert sock.close.call_args_list == [mock.call()]
+
+
+@mock.patch.object(socket, "socket")
+def test_tcp_reconnect_closes_then_reconnects(mock_socket):
+    cl = _tcp_client()
+    orig_sock = cl._sock
+
+    cl.reconnect()
+
+    assert orig_sock.close.call_args_list == [mock.call()]
+    assert cl._sock is not orig_sock
