@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.conf import settings  # type: ignore[import]
 
 from statsd import defaults
 from statsd.client import StatsClient
