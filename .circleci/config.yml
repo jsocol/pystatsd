@@ -70,8 +70,8 @@ jobs:
       - *attach_virtualenv
       - *load_virtualenv
       - run: flake8 statsd
-      - run: black --check --diff statsd
-      - run: isort --check-only --diff statsd
+      - run: black --check --diff statsd tests
+      - run: isort --check-only --diff statsd tests
 
 workflows:
   test-pythons:
