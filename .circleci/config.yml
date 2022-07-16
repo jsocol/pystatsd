@@ -1,6 +1,55 @@
 version: 2.1
 
+attach_virtualenv: &attach_virtualenv
+  attach_workspace:
+      at: /tmp/workspace
+
+load_virtualenv: &load_virtualenv
+  # Load a virtualenv from the 'build' job
+  run:
+    name: Load virtualenv
+    command: |
+        cp --recursive /tmp/workspace/venvs .
+        venv_path="$PWD/venvs/$(python --version | tr --delete " ")"
+        echo "export PATH=$venv_path/bin:\$PATH" >> $BASH_ENV
+        echo "export VIRTUAL_ENV=$venv_path" >> $BASH_ENV
+
 jobs:
+  build:
+    parameters:
+      python-version:
+        type: string
+    docker:
+      - image: cimg/python:<< parameters.python-version>>
+    steps:
+      - checkout
+      - run:
+          name: Build cache-key
+          command: |
+            cp requirements-dev.txt pip-cache-key.txt
+            python --version --version >> pip-cache-key.txt
+      - restore_cache:
+          key: pip-cache-v0-{{ checksum "pip-cache-key.txt" }}
+      - run:
+          # build a virtualenv that can be copied across other jobs
+          name: Setup Virtual env
+          command: |
+            mkdir ./venvs/
+            # each Python version has its own venv
+            venv_path="$PWD/venvs/$(python --version | tr --delete " ")"
+            python -m venv "$venv_path"
+            echo "export PATH=$venv_path/bin:\$PATH" >> $BASH_ENV
+            echo "export VIRTUAL_ENV=$venv_path" >> $BASH_ENV
+      - run:
+          name: Install requirements
+          command: pip install --requirement requirements-dev.txt --cache-dir .cache/pip
+      - save_cache:
+          key: pip-cache-v0-{{ checksum "pip-cache-key.txt" }}
+          paths: .cache/pip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - venvs
   test:
     parameters:
       python-version:
@@ -9,8 +58,17 @@ jobs:
       - image: cimg/python:<< parameters.python-version>>
     steps:
       - checkout
-      - run: pip install --requirement requirements-dev.txt
+      - *attach_virtualenv
+      - *load_virtualenv
       - run: pytest
+
+  lint:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - *attach_virtualenv
+      - *load_virtualenv
       - run: flake8 statsd
       - run: black --check --diff statsd
       - run: isort --check-only --diff statsd
@@ -18,7 +76,16 @@ jobs:
 workflows:
   test-pythons:
     jobs:
+      - build:
+          matrix:
+            parameters:
+              python-version: ["3.7", "3.8", "3.9", "3.10"]
       - test:
           matrix:
             parameters:
               python-version: ["3.7", "3.8", "3.9", "3.10"]
+          requires:
+            - build
+      - lint:
+          requires:
+            - build
