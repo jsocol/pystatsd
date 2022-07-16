@@ -72,6 +72,7 @@ jobs:
       - run: flake8 statsd
       - run: black --check --diff statsd tests
       - run: isort --check-only --diff statsd tests
+      - run: mypy --show-error-codes statsd tests
 
 workflows:
   test-pythons:

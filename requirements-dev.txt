@@ -2,3 +2,4 @@ flake8>=4.0
 pytest>=6.2.5
 black ~= 22.0
 isort ~= 5.10
+mypy <= 1.0.0
