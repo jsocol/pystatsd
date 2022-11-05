@@ -88,6 +88,26 @@ execute will be sent to the statsd server.
     myfunc(1, 2)
     myfunc(3, 7)
 
+This works with async functions too (Python 3.5+). It measures the total elapsed time
+from when the function is called to when it completes.
+
+.. code-block:: python
+
+    from statsd import StatsClient
+
+    statsd = StatsClient()
+
+    @statsd.timer('myfunc')
+    async def myfunc(a, b):
+        """Do asynchronous IO for a and b"""
+
+    async def main():
+        # Timing is measured even while myfunc yields and other coroutines are running.
+        await myfunc(1, 2)
+
+    # Run main() using your choice of event loop here (asyncio, trio, etc...):
+    import trio
+    trio.run(main)
 
 
 .. _timer-object:
