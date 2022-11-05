@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import random
 from collections import deque
 from datetime import timedelta
