@@ -7,7 +7,7 @@ for the statsd daemon.
 
 .. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
    :target: https://travis-ci.org/jsocol/pystatsd
-   :alt: Travis-CI build status
+   :alt: Latest CI status
 
 .. image:: https://img.shields.io/pypi/v/statsd.svg
    :target: https://pypi.python.org/pypi/statsd/
