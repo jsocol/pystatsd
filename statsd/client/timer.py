@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import functools
 
 # Use timer that's not susceptible to time of day adjustments.
