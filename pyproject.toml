@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "statsd"
-version = "3.3.0"
-authors = [{name = "James Socol", email = "james@mozilla.com"}]
+version = "4.0.0"
+authors = [{name = "James Socol", email = "me@jamessocol.com"}]
 license = {text = "MIT"}
 description = "A simple statsd client."
 readme = "README.rst"

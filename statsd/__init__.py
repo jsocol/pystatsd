@@ -3,6 +3,6 @@ from .client import TCPStatsClient
 from .client import UnixSocketStatsClient
 
 
-VERSION = (3, 2, 1)
+VERSION = (4, 0, 0)
 __version__ = '.'.join(map(str, VERSION))
 __all__ = ['StatsClient', 'TCPStatsClient', 'UnixSocketStatsClient']

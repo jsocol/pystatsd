@@ -1,6 +1,6 @@
 # Statsd Changelog
 
-## Unreleased
+## v4.0
 
 ### Added
 
