@@ -4,10 +4,7 @@ import random
 import re
 import socket
 from datetime import timedelta
-from unittest import SkipTest
-
-import mock
-from nose.tools import eq_
+from unittest import SkipTest, mock
 
 from statsd import StatsClient
 from statsd import TCPStatsClient
@@ -32,6 +29,10 @@ make_val = {
     'tcp': lambda x, addr: mock.call(str.encode(x + '\n')),
     'unix': lambda x, addr: mock.call(str.encode(x + '\n')),
 }
+
+
+def eq_(a, b, msg=None):
+    assert a == b, msg
 
 
 def _udp_client(prefix=None, addr=None, port=None, ipv6=False):
