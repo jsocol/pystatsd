@@ -1,3 +1,4 @@
+import asyncio
 import functools
 import random
 import re
@@ -649,6 +650,30 @@ def _test_timer_decorator_exceptions(cl, proto):
         foo()
 
     _timer_check(cl._sock, 1, proto, 'foo', 'ms')
+
+
+def test_coroutine_timer_decorator():
+    event_loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(event_loop)
+
+    already = False
+    cl = _udp_client()
+
+    def _send(*_):
+        nonlocal already
+        assert already is True, '_send called before coroutine completed'
+
+    cl._send = _send
+
+    @cl.timer('bar')
+    async def inner():
+        nonlocal already
+        await asyncio.sleep(0)
+        already = True
+        return None
+
+    event_loop.run_until_complete(inner())
+    event_loop.close()
 
 
 def test_timer_decorator_exceptions_udp():
