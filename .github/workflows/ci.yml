@@ -1,7 +1,10 @@
-name: tox
-on: [push, pull_request]
+name: CI
+on:
+  push:
+    branches:
+      - main
 jobs:
-  tox:
+  test:
     strategy:
       fail-fast: false
       matrix:
