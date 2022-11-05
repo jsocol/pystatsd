@@ -1,5 +1,15 @@
-Statsd Changelog
-================
+# Statsd Changelog
+
+## Unreleased
+
+### Added
+
+- Updates support to Python 3.7 through 3.11.
+- Added `close()` method to UDP-based `StatsClient`. (#136)
+
+### Dropped
+
+- Drops support for Python 2.
 
 Version 3.3
 -----------
