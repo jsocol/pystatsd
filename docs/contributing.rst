@@ -25,12 +25,12 @@ necessary.
 Running Tests
 =============
 
-To run the tests, you just need ``nose`` and ``mock``. These can be
-installed with ``pip``::
+To run the tests, you just need ``nose2``. This can be installed with
+``pip``::
 
     $ mkvirtualenv statsd
     $ pip install -r requirements.txt
-    $ nosetests
+    $ nose2
 
 You can also run the tests with tox::
 

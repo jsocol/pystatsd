@@ -13,7 +13,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={'': ['README.rst']},
-    test_suite='nose.collector',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
