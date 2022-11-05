@@ -5,8 +5,8 @@ A Python statsd client
 statsd_ is a friendly front-end to Graphite_. This is a Python client
 for the statsd daemon.
 
-.. image:: https://travis-ci.org/jsocol/pystatsd.png?branch=master
-   :target: https://travis-ci.org/jsocol/pystatsd
+.. image:: https://github.com/jsocol/pystatsd/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/jsocol/pystatsd/actions/workflows/ci.yml
    :alt: Latest CI status
 
 .. image:: https://img.shields.io/pypi/v/statsd.svg
