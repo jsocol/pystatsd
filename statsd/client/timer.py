@@ -1,12 +1,6 @@
 import functools
-
-# Use timer that's not susceptible to time of day adjustments.
-try:
-    # perf_counter is only present on Py3.3+
-    from time import perf_counter as time_now
-except ImportError:
-    # fall back to using time
-    from time import time as time_now
+from inspect import iscoroutinefunction
+from time import perf_counter as time_now
 
 
 def safe_wraps(wrapper, *args, **kwargs):
@@ -29,6 +23,17 @@ class Timer(object):
 
     def __call__(self, f):
         """Thread-safe timing function decorator."""
+        if iscoroutinefunction(f):
+            @safe_wraps(f)
+            async def _async_wrapped(*args, **kwargs):
+                start_time = time_now()
+                try:
+                    return await f(*args, **kwargs)
+                finally:
+                    elapsed_time_ms = 1000.0 * (time_now() - start_time)
+                    self.client.timing(self.stat, elapsed_time_ms, self.rate)
+            return _async_wrapped
+
         @safe_wraps(f)
         def _wrapped(*args, **kwargs):
             start_time = time_now()

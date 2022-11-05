@@ -11,6 +11,11 @@
 
 - Drops support for Python 2.
 
+### Fixed
+
+- Using a timing decorator on an async function should now properly measure the
+  execution time, instead of counting immediately. See #119.
+
 Version 3.3
 -----------
 
