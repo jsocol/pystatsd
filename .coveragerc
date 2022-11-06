@@ -1,0 +1,13 @@
+[run]
+branch = True
+omit =
+    setup.py
+    statsd/tests.py
+    statsd/defaults/*.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    noqa
+    raise NotImplementedError
+fail_under = 94
