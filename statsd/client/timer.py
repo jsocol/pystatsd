@@ -10,7 +10,7 @@ def safe_wraps(wrapper, *args, **kwargs):
     return functools.wraps(wrapper, *args, **kwargs)
 
 
-class Timer(object):
+class Timer:
     """A context manager/decorator for statsd.timing()."""
 
     def __init__(self, client, stat, rate=1):

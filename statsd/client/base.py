@@ -5,7 +5,7 @@ from datetime import timedelta
 from .timer import Timer
 
 
-class StatsClientBase(object):
+class StatsClientBase:
     """A Base class for various statsd clients."""
 
     def close(self):
@@ -51,7 +51,7 @@ class StatsClientBase(object):
                 pipe._send_stat(stat, '%s|g' % value, 1)
         else:
             prefix = '+' if delta and value >= 0 else ''
-            self._send_stat(stat, '%s%s|g' % (prefix, value), rate)
+            self._send_stat(stat, '{}{}|g'.format(prefix, value), rate)
 
     def set(self, stat, value, rate=1):
         """Set a set value."""
@@ -64,12 +64,12 @@ class StatsClientBase(object):
         if rate < 1:
             if random.random() > rate:
                 return
-            value = '%s|@%s' % (value, rate)
+            value = '{}|@{}'.format(value, rate)
 
         if self._prefix:
-            stat = '%s.%s' % (self._prefix, stat)
+            stat = '{}.{}'.format(self._prefix, stat)
 
-        return '%s:%s' % (stat, value)
+        return '{}:{}'.format(stat, value)
 
     def _after(self, data):
         if data:
