@@ -212,7 +212,7 @@ context manager or decorator. For example:
 
 .. note::
 
-    See the note abbout :ref:`timer objects and pipelines <timer-direct-note>`.
+    See the note about :ref:`timer objects and pipelines <timer-direct-note>`.
 
 .. py:class:: Pipeline()
 
@@ -279,7 +279,7 @@ TCP-specific methods.
     Creates a connection to StatsD. If there are errors like connection timed
     out or connection refused, the according exceptions will be raised. It is
     usually not necessary to call this method because sending data to StatsD
-    will call ``connect`` implicitely if the current instance of
+    will call ``connect`` implicitly if the current instance of
     :py:class:`TCPStatsClient` does not already hold an open connection.
 
 .. code-block:: python
