@@ -5,12 +5,14 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    - cron: '33 7 * * 0' # run weekly on sundays
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]  # [macos-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy-3.9']
     runs-on: ${{ matrix.os }}
     steps:

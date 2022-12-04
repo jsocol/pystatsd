@@ -1,5 +1,13 @@
 # Statsd Changelog
 
+## UNRELEASED
+
+## v4.0.1
+
+### Fixed
+
+- Updated PyPI trove classifiers for current Python versions.
+
 ## v4.0
 
 ### Added
