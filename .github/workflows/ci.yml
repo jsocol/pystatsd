@@ -16,19 +16,21 @@ jobs:
         python: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy-3.9']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-      - run: pip install --upgrade pip
-      - run: pip install tox
-      - run: tox -e py
+    - uses: actions/checkout@v3
+
+    - uses: ./.github/actions/test
+      with:
+        python-version: ${{ matrix.python }}
+
   lint:
     runs-on: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - run: pip install flake8
-      - run: flake8 statsd
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - run: pip install flake8
+
+    - run: flake8 statsd

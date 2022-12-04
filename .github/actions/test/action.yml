@@ -1,0 +1,23 @@
+name: test
+description: 'runs a test matrix'
+inputs:
+  python-version:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v3
+
+  - uses: actions/setup-python@v4
+    with:
+      python-version: ${{ inputs.python-version }}
+
+  - run: pip install --upgrade pip
+    shell: sh
+
+  - run: pip install tox
+    shell: sh
+
+  - run: tox -e py
+    shell: sh
