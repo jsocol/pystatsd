@@ -29,6 +29,42 @@ urls = {Homepage = "https://github.com/jsocol/pystatsd"}
 [tool.distutils.bdist_wheel]
 universal = 1
 
+[tool.ruff]
+ignore = [
+    "PT008",
+    "SIM102",
+    "SIM105",
+    "SIM117",
+    "UP032"
+]
+select = [
+    "B",
+    "BLE",
+    "C4",
+    "DTZ",
+    "E",
+    "T10",
+    "EXE",
+    "F",
+    "G",
+    "ICN",
+    "INP",
+    "ISC",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLE",
+    "PTH",
+    "RUF",
+    "SIM",
+    "UP",
+    "W",
+]
+target-version = "py37"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
 [tool.setuptools]
 include-package-data = true
 

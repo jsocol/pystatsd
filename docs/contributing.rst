@@ -64,11 +64,11 @@ PEP8 and PyFlakes
 =================
 
 The development requirements (``requirements.txt``) include the
-``flake8`` tool. It is easy to run::
+``ruff`` tool. It is easy to run::
 
-    $ flake8 statsd/
+    $ ruff statsd/
 
-``flake8`` should not raise any issues or warnings.
+``ruff`` should not raise any issues or warnings.
 
 .. note::
 
