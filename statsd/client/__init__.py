@@ -1,2 +1,9 @@
-from .stream import TCPStatsClient, UnixSocketStatsClient  # noqa
-from .udp import StatsClient  # noqa
+from .stream import TCPStatsClient, UnixSocketStatsClient
+from .udp import StatsClient
+
+
+__all__ = [
+    'TCPStatsClient',
+    'UnixSocketStatsClient',
+    'StatsClient',
+]

@@ -1,4 +1,5 @@
 import socket
+from typing import Optional
 
 from .base import StatsClientBase, PipelineBase
 
@@ -10,19 +11,19 @@ class StreamPipeline(PipelineBase):
 
 
 class StreamClientBase(StatsClientBase):
-    def connect(self):
+    def connect(self) -> None:
         raise NotImplementedError()
 
-    def close(self):
+    def close(self) -> None:
         if self._sock and hasattr(self._sock, 'close'):
             self._sock.close()
         self._sock = None
 
-    def reconnect(self):
+    def reconnect(self) -> None:
         self.close()
         self.connect()
 
-    def pipeline(self):
+    def pipeline(self) -> StreamPipeline:
         return StreamPipeline(self)
 
     def _send(self, data):
@@ -38,8 +39,12 @@ class StreamClientBase(StatsClientBase):
 class TCPStatsClient(StreamClientBase):
     """TCP version of StatsClient."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None,
-                 timeout=None, ipv6=False):
+    def __init__(self,
+                 host: str = 'localhost',
+                 port: int = 8125,
+                 prefix: Optional[str] = None,
+                 timeout: Optional[float] = None,
+                 ipv6: bool = False) -> None:
         """Create a new client."""
         self._host = host
         self._port = port
@@ -48,7 +53,7 @@ class TCPStatsClient(StreamClientBase):
         self._prefix = prefix
         self._sock = None
 
-    def connect(self):
+    def connect(self) -> bool:
         fam = socket.AF_INET6 if self._ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
             self._host, self._port, fam, socket.SOCK_STREAM)[0]
@@ -60,14 +65,15 @@ class TCPStatsClient(StreamClientBase):
 class UnixSocketStatsClient(StreamClientBase):
     """Unix domain socket version of StatsClient."""
 
-    def __init__(self, socket_path, prefix=None, timeout=None):
+    def __init__(self, socket_path: str, prefix: Optional[str] = None,
+                 timeout: Optional[float] = None):
         """Create a new client."""
         self._socket_path = socket_path
         self._timeout = timeout
         self._prefix = prefix
         self._sock = None
 
-    def connect(self):
+    def connect(self) -> None:
         self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self._sock.settimeout(self._timeout)
         self._sock.connect(self._socket_path)
