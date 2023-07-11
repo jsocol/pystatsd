@@ -36,8 +36,8 @@ You can also run the tests with tox::
 
     $ tox
 
-Tox will run the tests in Pythons 2.5, 2.6, 2.7, 3.2, 3.3, 3.4, and
-PyPy, if they're available.
+Tox will run the tests in Pythons 3.7, 3.8, 3.9, 3.10, 3.11, and
+PyPy3, if they're available.
 
 
 Writing Tests
