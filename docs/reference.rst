@@ -149,7 +149,7 @@ server supports.
 
     # or
 
-    with StatsClient().pipeline as pipe:
+    with StatsClient().pipeline() as pipe:
         pipe.incr('bar')
 
 .. py:class:: Timer()
