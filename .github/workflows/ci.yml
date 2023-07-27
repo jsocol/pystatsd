@@ -5,6 +5,7 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
   schedule:
     - cron: '33 7 * * 0' # run weekly on sundays
 jobs:
