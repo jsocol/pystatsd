@@ -1,11 +1,12 @@
 import socket
+from typing import Optional
 
 from .base import StatsClientBase, PipelineBase
 
 
 class Pipeline(PipelineBase):
 
-    def __init__(self, client):
+    def __init__(self, client: StatsClientBase) -> None:
         super().__init__(client)
         self._maxudpsize = client._maxudpsize
 
@@ -25,8 +26,9 @@ class Pipeline(PipelineBase):
 class StatsClient(StatsClientBase):
     """A client for statsd."""
 
-    def __init__(self, host='localhost', port=8125, prefix=None,
-                 maxudpsize=512, ipv6=False):
+    def __init__(self, host: str = 'localhost', port: int = 8125,
+                 prefix: Optional[str] = None,
+                 maxudpsize: int = 512, ipv6: bool = False) -> None:
         """Create a new client."""
         fam = socket.AF_INET6 if ipv6 else socket.AF_INET
         family, _, _, _, addr = socket.getaddrinfo(
@@ -44,10 +46,10 @@ class StatsClient(StatsClientBase):
             # No time for love, Dr. Jones!
             pass
 
-    def close(self):
+    def close(self) -> None:
         if self._sock and hasattr(self._sock, 'close'):
             self._sock.close()
         self._sock = None
 
-    def pipeline(self):
+    def pipeline(self) -> Pipeline:
         return Pipeline(self)
