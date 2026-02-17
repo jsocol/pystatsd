@@ -660,7 +660,7 @@ def test_coroutine_timer_decorator():
     cl = _udp_client()
 
     def _send(*_):
-        nonlocal already
+        nonlocal already  # noqa: F824
         assert already is True, '_send called before coroutine completed'
 
     cl._send = _send
