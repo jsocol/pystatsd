@@ -61,7 +61,7 @@ Or from source::
 
     $ git clone https://github.com/jsocol/pystatsd
     $ cd pystatsd
-    $ python setup.py install
+    $ pip install .
 
 
 Docs
