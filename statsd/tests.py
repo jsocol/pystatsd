@@ -1037,15 +1037,16 @@ def test_pipeline_packet_size():
 
 
 @mock.patch.object(socket, 'socket')
-def test_tcp_raises_exception_to_user(mock_socket):
+def test_tcp_reconnect_on_exception(mock_socket):
     """Socket errors in TCPStatsClient should be raised to user."""
     addr = ('127.0.0.1', 1234)
     cl = _tcp_client(addr=addr[0], port=addr[1])
+    cl.reconnect = mock.Mock(wraps=cl.reconnect)
     cl.incr('foo')
     eq_(1, cl._sock.sendall.call_count)
     cl._sock.sendall.side_effect = socket.error
-    with assert_raises(socket.error):
-        cl.incr('foo')
+    cl.incr('foo')
+    assert 1 == cl.reconnect.call_count
 
 
 @mock.patch.object(socket, 'socket')

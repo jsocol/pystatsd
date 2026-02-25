@@ -29,7 +29,11 @@ class StreamClientBase(StatsClientBase):
         """Send data to statsd."""
         if not self._sock:
             self.connect()
-        self._do_send(data)
+        try:
+            self._do_send(data)
+        except (OSError, RuntimeError):
+            self.reconnect()
+            self._do_send(data)
 
     def _do_send(self, data):
         self._sock.sendall(data.encode('ascii') + b'\n')
