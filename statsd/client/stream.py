@@ -53,8 +53,12 @@ class TCPStatsClient(StreamClientBase):
         family, _, _, _, addr = socket.getaddrinfo(
             self._host, self._port, fam, socket.SOCK_STREAM)[0]
         self._sock = socket.socket(family, socket.SOCK_STREAM)
-        self._sock.settimeout(self._timeout)
-        self._sock.connect(addr)
+        try:
+            self._sock.settimeout(self._timeout)
+            self._sock.connect(addr)
+        except BaseException:
+            self.close()
+            raise
 
 
 class UnixSocketStatsClient(StreamClientBase):
@@ -69,5 +73,9 @@ class UnixSocketStatsClient(StreamClientBase):
 
     def connect(self):
         self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        self._sock.settimeout(self._timeout)
-        self._sock.connect(self._socket_path)
+        try:
+            self._sock.settimeout(self._timeout)
+            self._sock.connect(self._socket_path)
+        except BaseException:
+            self.close()
+            raise
