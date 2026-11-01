@@ -1057,6 +1057,7 @@ def test_tcp_timeout(mock_socket):
     cl._sock.settimeout.assert_called_once_with(test_timeout)
 
 
+@mock.patch.object(socket, 'AF_UNIX', 1, create=True)
 @mock.patch.object(socket, 'socket')
 def test_unix_socket_timeout(mock_socket):
     """Timeout on UnixSocketStatsClient should be set on socket."""
@@ -1064,3 +1065,28 @@ def test_unix_socket_timeout(mock_socket):
     cl = UnixSocketStatsClient(UNIX_SOCKET, timeout=test_timeout)
     cl.incr('foo')
     cl._sock.settimeout.assert_called_once_with(test_timeout)
+
+
+def test_failed_tcp_connect_closes_socket_and_can_retry():
+    _assert_failed_stream_connect_can_retry(TCPStatsClient(host='127.0.0.1'))
+
+
+def test_failed_unix_connect_closes_socket_and_can_retry():
+    with mock.patch.object(socket, 'AF_UNIX', 1, create=True):
+        _assert_failed_stream_connect_can_retry(
+            UnixSocketStatsClient(UNIX_SOCKET))
+
+
+def _assert_failed_stream_connect_can_retry(client):
+    failed_socket = mock.Mock()
+    failed_socket.connect.side_effect = OSError('connection refused')
+    retry_socket = mock.Mock()
+    with mock.patch.object(socket, 'socket',
+                           side_effect=[failed_socket, retry_socket]):
+        with assert_raises(OSError):
+            client.incr('first')
+        failed_socket.close.assert_called_once_with()
+        assert client._sock is None
+        client.incr('second')
+        retry_socket.connect.assert_called_once()
+        retry_socket.sendall.assert_called_once_with(b'second:1|c\n')
